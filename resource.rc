@@ -1,0 +1,165 @@
+/* resource.rc defines the dimensions and contents of all dialog box
+// controls and their child windows, as well as other miscellaneous
+// program resources.
+*/
+//----------------------------------------------------------------------
+/*Header files and preprocessor directives*/
+
+#define WIN32_LEAN_AND_MEAN
+
+#include "resource.h"
+#include <windows.h>
+
+//----------------------------------------------------------------------
+/*Dialog box resource definitions*/
+
+//Icons
+IDI_4CC_MED	ICON "4cc_med.ico"
+IDI_4CC		ICON "4cc_sm.ico"
+
+//Bitmaps
+IDB_4CCLOGO    BITMAP  DISCARDABLE     "4cc_logo.bmp"
+
+//Menu
+IDR_MAINMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Load 16 Edit file (encrypted)\tCtrl+6",	ID_FILE_OPEN_16_EN
+		MENUITEM "&Load 17 Edit file (encrypted)\tCtrl+7",	ID_FILE_OPEN_17_EN
+		MENUITEM "&Load 18 Edit file (encrypted)\tCtrl+8",	ID_FILE_OPEN_18_EN
+        MENUITEM "&Save Edit file (encrypted)\tCtrl+S",	ID_FILE_SAVE_EN
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",						ID_FILE_EXIT
+    END
+	POPUP "&Player"
+    BEGIN
+        MENUITEM "&Set all ability stats",		IDM_PLAY_STAT
+		MENUITEM "&Bump all ability stats",		IDM_PLAY_BUMP
+        MENUITEM "&Toggle FPC settings\tCtrl+I",IDM_PLAY_FTOG
+    END
+	POPUP "&Team"
+    BEGIN
+        MENUITEM "&Clear visual settings flags\tCtrl+F",IDM_TEAM_CLEAR
+		MENUITEM "Set &edited/created flag",	IDM_TEAM_CREAT
+        MENUITEM "Set &FPC invisibility",		IDM_TEAM_FPCON
+		MENUITEM "&Remove FPC invisibility",	IDM_TEAM_FPOFF
+		MENUITEM "&Save squad",	IDM_TEAM_SAVES
+		MENUITEM "&Load squad",	IDM_TEAM_LOADS
+    END
+	POPUP "&Database"
+    BEGIN
+		POPUP "&AATF"
+		BEGIN
+			MENUITEM "&Current Team", IDM_DATA_AATFC
+			MENUITEM "&Select Teams", IDM_DATA_AATFS //, GRAYED
+			MENUITEM "Compare &EDITs", IDM_DATA_COMPE
+		END
+        MENUITEM "&Output rosters to CSV",	IDM_DATA_OUTPUT
+		MENUITEM "&Fix database",			IDM_DATA_FIX
+    END
+END
+
+/*
+IDD_STATS DIALOGEX 0, 0, 98, 52
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "My Dialog Toolbar"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "&Press This Button",IDC_PRESS,7,7,84,14
+    PUSHBUTTON      "&Or This One",IDC_OK,7,31,84,14
+	PUSHBUTTON      "&Press This Button",IDC_PRESS,7,7,84,14
+END*/
+
+IDD_STATS DIALOG 0, 0, 160, 50
+STYLE WS_POPUP|WS_CAPTION|WS_BORDER|WS_SYSMENU 
+CAPTION "Set Player Ability Stats"
+FONT 9, "Segoe UI"
+BEGIN
+	DEFPUSHBUTTON   "&OK",IDC_OK,20,30,50,12,WS_TABSTOP //Default-selected pushbutton
+	PUSHBUTTON		"&Cancel",IDC_CANCEL,90,30,50,12,WS_TABSTOP //pushbutton
+
+	LTEXT			"Enter ability stat value:",IDC_STATIC,20,12,100,10
+	EDITTEXT		IDT_STAT,115,10,25,12,ES_NUMBER|WS_TABSTOP
+	CONTROL         "",IDC_STAT,"msctls_updown32",UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS,0,0,0,0
+END
+
+IDD_STAT_BUMP DIALOG 0, 0, 160, 50
+STYLE WS_POPUP|WS_CAPTION|WS_BORDER|WS_SYSMENU 
+CAPTION "Change Player Ability Stats"
+FONT 9, "Segoe UI"
+BEGIN
+	DEFPUSHBUTTON   "&OK",IDC_OK,20,30,50,12,WS_TABSTOP //Default-selected pushbutton
+	PUSHBUTTON		"&Cancel",IDC_CANCEL,90,30,50,12,WS_TABSTOP //pushbutton
+
+	LTEXT			"Enter ability stat change:",IDC_STATIC,20,12,100,10
+	EDITTEXT		IDT_STAT,115,10,25,12,ES_NUMBER|WS_TABSTOP
+	CONTROL         "",IDC_STAT,"msctls_updown32",UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS,0,0,0,0
+END
+
+
+IDD_BASIC DIALOGEX 170,5,130,245
+STYLE WS_VISIBLE|WS_CHILDWINDOW|DS_CONTROL
+FONT 9, "Segoe UI"
+BEGIN
+	//COMBOBOX		IDC_PLAY_STYL,55,213,66,63,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	
+END
+
+IDD_TAB_ONE DIALOGEX 9,17,300,310
+STYLE WS_VISIBLE|WS_CHILDWINDOW|DS_CONTROL
+FONT 9, "Segoe UI"
+BEGIN
+	//CONTROL         "",IDC_ABIL_FORM,"msctls_updown32",UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS,0,0,0,0
+
+END
+
+IDD_TAB_TWO DIALOGEX 9,17,310,310
+STYLE WS_VISIBLE|WS_CHILDWINDOW|DS_CONTROL
+FONT 9, "Segoe UI"
+BEGIN
+	//GROUPBOX        "Visual Settings",IDC_STATIC_T48,0,0,74,55
+
+END
+
+IDD_TAB_THREE DIALOGEX 9,17,310,310
+STYLE WS_VISIBLE|WS_CHILDWINDOW|DS_CONTROL
+FONT 9, "Segoe UI"
+BEGIN
+	//GROUPBOX        "Visual Settings",IDC_STATIC_T48,0,0,74,55
+
+END
+
+
+IDD_AATF DIALOGEX DISCARDABLE  0, 0, 300, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "AATF"
+FONT 9, "Segoe UI"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDB_AATFOK,50,282,200,14 //Default-selected pushbutton
+    EDITTEXT IDT_AATFOUT,7,7,285,272, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY //Read-only edit box
+END
+
+
+IDD_AATF_SEL DIALOG DISCARDABLE  0, 0, 260, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select teams for AATF:"
+FONT 9, "Segoe UI"
+BEGIN
+	DEFPUSHBUTTON   "&OK",IDC_OK,85,282,40,14 //Default-selected pushbutton
+    PUSHBUTTON      "&Cancel",IDC_CANCEL,135,282,40,14 //Another push button
+    LISTBOX IDC_AATF_SEL,7,7,245,272, WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_EXTENDEDSEL 
+END
+
+
+//IDD_AATF_MULT DIALOGEX DISCARDABLE  0, 0, 300, 300
+//STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+//EXSTYLE WS_EX_TOOLWINDOW
+//CAPTION "AATF"
+//FONT 9, "Segoe UI"
+//BEGIN
+//    DEFPUSHBUTTON   "&OK",IDB_AATFOK,50,282,200,14 //Default-selected pushbutton
+//    EDITTEXT IDT_AATFOUT,7,7,285,272, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY //Read-only edit box
+//END
