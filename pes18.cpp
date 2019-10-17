@@ -500,7 +500,16 @@ void fill_team_tactics18(int &current_byte, void* ghdescriptor, team_entry* gtea
 	{
 		if(team_id == gteams[t_ind].id) break;
 	}
-	current_byte+=0x209;
+	//current_byte+=0x209;
+	current_byte+=0x1E0;
+
+	//Starting lineup
+	for(int ii=0; ii<11; ii++)
+	{
+		gteams[t_ind].starting11[ii] = pDescriptorNew->data[current_byte];
+		current_byte++;
+	}
+	current_byte+=0x1E;
 
 	gteams[t_ind].captain_ind = (char)pDescriptorNew->data[current_byte];
 	current_byte+=0x67;

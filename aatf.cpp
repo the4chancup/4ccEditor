@@ -20,8 +20,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	int manletBonus = 5;
 
-	int ii,jj;
-
 	int numGK = 0;
     //Player ratings
     int numReg = 0;
@@ -35,10 +33,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
     bool usingRed = false;
     
     int errorTot = 0;
-	for(ii=0; ii<gteams[teamSel].num_on_team; ii++)
+	for(int ii=0; ii<gteams[teamSel].num_on_team; ii++)
 	{
 		//Find each player on team
-		for(jj=0; jj<gnum_players; jj++)
+		for(int jj=0; jj<gnum_players; jj++)
 		{
 			if(gplayers[jj].id == gteams[teamSel].players[ii])
 			{
@@ -55,6 +53,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 		int cardCount = 0;
         int cardMod = 0;
+		int cardLimit = 0;
         bool hasTrick = false;
 		int targetRate = 0, targetRate2 = 0;
 		int rating = player.drib;
@@ -158,7 +157,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 		//Count A positions
         int countA = 0;
-        for(jj=0;jj<13;jj++)
+        for(int jj=0;jj<13;jj++)
         {
             if(player.play_pos[jj] > 0)
                 countA++;
@@ -182,7 +181,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         }
 
 		//Count cards
-        for(jj=0;jj<28;jj++)
+        for(int jj=0;jj<28;jj++)
         {
             if(player.play_skill[jj])
             {
@@ -195,7 +194,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                     hasTrick = true;
             }
         }
-		for(jj=0;jj<7;jj++)
+		for(int jj=0;jj<7;jj++)
         {
             if(player.com_style[jj])
 				cardCount++;
@@ -257,12 +256,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Form is ") << player.form+1 << _T(", should be 4; ");
 			}
+
+			cardLimit = 2 + cardMod;
             if(player.reg_pos == 0) //GK gets 1 card, height capped to 185cm
             {
-                if(cardCount > 1 + cardMod)
+				cardLimit = 1 + cardMod;
+                if(cardCount > cardLimit)
 				{
                     errorTot++;
-					errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << 1 + cardMod << _T("; ");
+					errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 				}
 				if(player.height > 185)
 				{
@@ -270,10 +272,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					errorMsg << _T("GK height over 185cm; ");
 				}
             }
-            else if(cardCount > 2 + cardMod)
+            else if(cardCount > cardLimit)
 			{
                 errorTot++;
-				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << 2 + cardMod << _T("; ");
+				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 			}
             
 			if(player.reg_pos == 0) //GK gets target rate is 72
@@ -305,6 +307,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numSilver++;
 			targetRate = 91;
 			targetRate2 = 91;
+
             if(numSilver>2)
 			{
                 errorTot++;
@@ -329,10 +332,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 cardMod++;
 			if(player.play_skill[11]) //Free FTS for medals
 				cardMod++;
-            if(cardCount > 3 + cardMod)
+
+			cardLimit = 3 + cardMod;
+            if(cardCount > cardLimit)
 			{
                 errorTot++;
-				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << 3 + cardMod << _T("; ");
+				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 			}
             if(rating != targetRate)
 			{
@@ -345,6 +350,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numGold++;
 			targetRate = 99;
 			targetRate2 = 99;
+
             if(numGold>2)
 			{
                 errorTot++;
@@ -369,10 +375,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 cardMod++;
 			if(player.play_skill[11]) //Free FTS for medals
 				cardMod++;
-            if(cardCount > 4 + cardMod)
+
+			cardLimit = 4 + cardMod;
+            if(cardCount > cardLimit)
 			{
                 errorTot++;
-				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << 4 + cardMod << _T("; ");
+				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 			}
             if(rating != targetRate)
 			{

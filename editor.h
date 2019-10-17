@@ -601,6 +601,7 @@ struct team_entry
 
 	int num_on_team;
 
+	int starting11[11];
 	char captain_ind;
 
 	char color1_red;
@@ -621,6 +622,7 @@ struct team_entry
 		b_edit_name = false;
 		memset(name,0,sizeof(name));
 		memset(short_name,0,sizeof(short_name));
+		for(int ii=0; ii<11; ii++) starting11[ii]=0;
 		num_on_team = 0;
 		color1_red = 0;
 		color1_blue = 0;
