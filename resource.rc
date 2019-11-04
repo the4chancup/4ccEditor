@@ -55,7 +55,7 @@ BEGIN
 			MENUITEM "&Select Teams", IDM_DATA_AATFS //, GRAYED
 			MENUITEM "Compare &EDITs", IDM_DATA_COMPE
 		END
-        MENUITEM "&Output rosters to CSV",	IDM_DATA_OUTPUT
+        MENUITEM "&Output rosters to TSV",	IDM_DATA_OUTPUT
 		MENUITEM "&Fix database",			IDM_DATA_FIX
     END
 END

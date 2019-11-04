@@ -198,7 +198,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Summer 19 Edition (Version C)"),
+		_T("4ccEditor Summer 19 Edition (Version D)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120, 700,
 		NULL, NULL, ghinst, NULL);
@@ -5536,7 +5536,7 @@ void roster_data_output()
 	TCHAR* poss[] = {_T("GK"),_T("CB"),_T("LB"),_T("RB"),_T("DMF"),_T("CMF"),_T("LMF"),_T("RMF"),_T("AMF"),
 						_T("LWF"),_T("RWF"),_T("SS"),_T("CF")};
 
-	FILE *outStream = _tfopen(_T("EDIT.csv"), _T("w, ccs=UTF-8")); //ccs=UNICODE
+	FILE *outStream = _tfopen(_T("EDIT.tsv"), _T("w, ccs=UTF-8")); //ccs=UNICODE
 
 	if(!outStream)
 	{
@@ -5556,7 +5556,7 @@ void roster_data_output()
 				{
 					if( gteams[iteam].players[ii]==gplayers[jj].id )
 					{
-						_ftprintf(outStream, _T("%d,%s,%s\n"), gteams[iteam].numbers[ii], gplayers[jj].name,
+						_ftprintf(outStream, _T("%d\t%s\t%s\n"), gteams[iteam].numbers[ii], gplayers[jj].name,
 									poss[gplayers[jj].reg_pos]);
 //for Ved:					_ftprintf(outStream, _T("%s,%s,%s%d\n"), poss[gplayers[jj].reg_pos], gplayers[jj].name,
 //									short_name,ii+1);
