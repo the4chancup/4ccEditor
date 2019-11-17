@@ -19,6 +19,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	msgOut+=_T("\r\n");
 
 	int manletBonus = 5;
+	int goldRate = 99;
+	int silverRate = 88;
 
 	int numGK = 0;
     //Player ratings
@@ -181,7 +183,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         }
 
 		//Count cards
-        for(int jj=0;jj<28;jj++)
+		int numTrickOrCom = 0;
+		int numSkill;
+		if(pesVersion==19) numSkill=39;
+		else numSkill=28;
+        for(int jj=0;jj<numSkill;jj++)
         {
             if(player.play_skill[jj])
             {
@@ -191,13 +197,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                     cardMod++;
                 //One trick card may be free, check if has any
                 if(jj<6 || jj==16)
+				{
                     hasTrick = true;
+					numTrickOrCom++;
+				}
             }
         }
 		for(int jj=0;jj<7;jj++)
         {
             if(player.com_style[jj])
+			{
 				cardCount++;
+				numTrickOrCom++;
+			}
 		}
 
 		if(player.height <= 175)
@@ -209,8 +221,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numMid++;
         else if(player.height == 185)
             numTall++;
-        //else if(player.height == 189 && player.reg_pos == 0) //GK
-        //    numTall++;
+        else if(player.height == 189 && player.reg_pos == 0) //GK
+            numTall++;
         else if(player.height == 194)
             numGiant++;
         else
@@ -231,11 +243,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			errorMsg << _T("Weight out of range (") << max(30,player.height-129) << _T(",") << player.height-81 << _T("); ");
 		}
 
-		if(rating < 91)
+		if(rating < silverRate)
         {
             numReg++;
 			targetRate = 77;
-			targetRate2 = 72;
+			targetRate2 = 77;
 
 			if(player.height >= 180)
 			{
@@ -257,19 +269,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorMsg << _T("Form is ") << player.form+1 << _T(", should be 4; ");
 			}
 
-			cardLimit = 2 + cardMod;
-            if(player.reg_pos == 0) //GK gets 1 card, height capped to 185cm
+			cardLimit = 3 + cardMod;
+            if(player.reg_pos == 0) //GK gets 2 cards, height capped to 185cm
             {
-				cardLimit = 1 + cardMod;
+				cardLimit = 2 + cardMod;
                 if(cardCount > cardLimit)
 				{
                     errorTot++;
 					errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 				}
-				if(player.height > 185)
+				if(player.height > 189)
 				{
                     errorTot++;
-					errorMsg << _T("GK height over 185cm; ");
+					errorMsg << _T("GK height over 189cm; ");
 				}
             }
             else if(cardCount > cardLimit)
@@ -278,9 +290,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 			}
             
-			if(player.reg_pos == 0) //GK gets target rate is 72
+			if(player.reg_pos == 0) //GK gets target rate is 77
             {
-				targetRate = 72;
+				targetRate = 77;
 				if(player.height <= 175)
 				{
 					targetRate += manletBonus;
@@ -302,11 +314,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				}
             }
         }            
-        else if(rating < 99)
+        else if(rating < goldRate)
         {
             numSilver++;
-			targetRate = 91;
-			targetRate2 = 91;
+			targetRate = silverRate;
+			targetRate2 = silverRate;
 
             if(numSilver>2)
 			{
@@ -328,12 +340,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot be taller than 185cm; ");
 			}
-            if(hasTrick) //Free trick card for medals
+            if(numTrickOrCom > 0) //1 Free trick card for silvers
                 cardMod++;
-			if(player.play_skill[11]) //Free FTS for medals
-				cardMod++;
+			//if(player.play_skill[11]) //Free FTS for medals
+			//	cardMod++;
 
-			cardLimit = 3 + cardMod;
+			cardLimit = 4 + cardMod;
             if(cardCount > cardLimit)
 			{
                 errorTot++;
@@ -348,8 +360,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         else //rating == 99
         {
             numGold++;
-			targetRate = 99;
-			targetRate2 = 99;
+			targetRate = goldRate;
+			targetRate2 = goldRate;
 
             if(numGold>2)
 			{
@@ -371,12 +383,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot be taller than 185cm; ");
 			}
-            if(hasTrick)
-                cardMod++;
-			if(player.play_skill[11]) //Free FTS for medals
-				cardMod++;
+            if(numTrickOrCom > 0) //Up to two free tricks for golds
+                cardMod+=min(numTrickOrCom,2);
+			//if(player.play_skill[11]) //Free FTS for medals
+			//	cardMod++;
 
-			cardLimit = 4 + cardMod;
+			cardLimit = 5 + cardMod;
             if(cardCount > cardLimit)
 			{
                 errorTot++;
@@ -518,7 +530,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
     if(!usingRed) //Using Green height system
     {
 		msgOut+=_T("Using Green height system\r\n");
-        if(diff = 5 - numGiant)
+        if(diff = 6 - numGiant)
         {
             if(diff>0)
             {
@@ -542,7 +554,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             }
 			errorMsg << _T("Has ") << numTall << _T("/5 185/9cm players; ");
         }
-        if(diff = 7 - numMid)
+        if(diff = 6 - numMid)
         {
             if(diff>0)
             {

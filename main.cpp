@@ -198,9 +198,9 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Summer 19 Edition (Version D)"),
+		_T("4ccEditor Test Cup V19 Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
-		20, 20, 1120, 700,
+		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
 
 	if(ghw_main == NULL)
@@ -574,7 +574,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			
 			ghw_tabcon = CreateWindowEx(WS_EX_CONTROLPARENT, _T("SysTabControl32"), _T(""), 
 				TCS_OWNERDRAWFIXED | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-				530, 4, 555, 620, H, (HMENU)IDC_TAB_MAIN, GetModuleHandle(NULL), NULL);
+				530, 4, 555+144, 620, H, (HMENU)IDC_TAB_MAIN, GetModuleHandle(NULL), NULL);
 			setup_control(ghw_tabcon, ghFont, from_tab_proc);
 
 			TCITEM ti;
@@ -843,7 +843,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 
 			hw_new = CreateWindowEx(0, _T("Button"), _T("Player Skills"), 
 				BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
-				157+11, 5, 144+11, 580, ghw_tab1, (HMENU)IDC_STATIC_T19, GetModuleHandle(NULL), NULL);	
+				157+11, 5, 144*2+11, 580, ghw_tab1, (HMENU)IDC_STATIC_T19, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_cntl_proc);
 
 			x1=168+11, y1=24, ydiff=20, xc=126+11;
@@ -988,12 +988,68 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				x1, y1+ydiff*27, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_FIGH, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_cntl_proc);
 
-			hw_new = CreateWindowEx(0, _T("Button"), _T("Ability"), 
-				BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
-				318+22, 5, 185+11, 580, ghw_tab1, (HMENU)IDC_STATIC_T20, GetModuleHandle(NULL), NULL);	
+			//New for 19
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Double Touch"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_DOUB, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_cntl_proc);
 
-			x1=329+22, x2=448+33, xc=114+11, y1=24, y2=22, ydiff=22;//y1=24
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Crossover Turn"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_CROS, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Step on Skill"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*2, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_STEP, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Chip Shot"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*3, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_CHIP, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Dipping Shots"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*4, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_DIPP, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Rising Shots"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*5, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_RISI, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("No Look Pass"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*6, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_NOLO, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("High Punt Trajectory"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*7, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_HIGH, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Penalty Specialist"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*8, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_PENA, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("GK Penalty Specialist"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*9, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_GKPE, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Interception"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*10, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_INTE, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Ability"), 
+				BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
+				318+22+144, 5, 185+11, 580, ghw_tab1, (HMENU)IDC_STATIC_T20, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			x1=329+22+144, x2=448+33+144, xc=114+11, y1=24, y2=22, ydiff=22;//y1=24
 
 			hw_new = CreateWindowEx(0, _T("Static"), _T("Attacking Prowess:"), 
 				SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
@@ -2629,6 +2685,10 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 					giPesVersion = 18;
 					DoFileOpen(H, _T("Open PES18 EDIT file"));
 				break;
+				case ID_FILE_OPEN_19_EN:
+					giPesVersion = 19;
+					DoFileOpen(H, _T("Open PES19 EDIT file"));
+				break;
 				case ID_FILE_SAVE_EN:
 					if(ghdescriptor)
 					{
@@ -2636,8 +2696,10 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 							DoFileSave(H, _T("Save PES16 EDIT file"));
 						else if(giPesVersion==17)
 							DoFileSave(H, _T("Save PES17 EDIT file"));
-						else
+						else if(giPesVersion==18)
 							DoFileSave(H, _T("Save PES18 EDIT file"));
+						else
+							DoFileSave(H, _T("Save PES19 EDIT file"));
 					}
 				break;
 				case IDM_PLAY_STAT:
@@ -2778,7 +2840,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 					{
 						int ii;
 						for(ii=IDT_ABIL_ATKP;ii<IDC_ABIL_COVE;ii+=2)
-							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("91"));
+							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("88"));
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)_T("8"));
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)_T("3"));
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)_T("4"));
@@ -2793,7 +2855,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 						int ii;
 						for(ii=IDT_ABIL_ATKP;ii<IDC_ABIL_COVE;ii+=2)
 							if(ii==IDT_ABIL_DEFP || ii==IDT_ABIL_BWIN || ii==IDT_ABIL_EXPL) //Nerf Defensive Prowess, Ball winning and Explosive power to 72
-								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("72"));
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("77"));
 							else
 								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("77"));
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)_T("4"));
@@ -2959,7 +3021,7 @@ void data_handler(const TCHAR *pcs_file_name)
 
 	if(ghdescriptor) 
 	{
-		if(giPesVersion==18)
+		if(giPesVersion>=18)
 			destroyFileDescriptorNew((FileDescriptorNew*)ghdescriptor);
 		else
 			destroyFileDescriptorOld((FileDescriptorOld*)ghdescriptor);
@@ -3011,6 +3073,37 @@ void data_handler(const TCHAR *pcs_file_name)
 		//Change Body Control label to "Body Balance"
 		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Body Balance:"));
 		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35));
+
+		//Fill Play Style combobox:	
+		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) > 18)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("None"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+		}
+
+		//Disable extra skill checkboxes
+		for(ii=28;ii<39;ii++)
+		{
+			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
+			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE);
+		}
 		
 		//get number of player, team entries
 		gnum_players = ((FileDescriptorOld*)ghdescriptor)->data[0x34];
@@ -3070,6 +3163,37 @@ void data_handler(const TCHAR *pcs_file_name)
 		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Body Control:"));
 		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35));
 
+		//Fill Play Style combobox:	
+		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) > 18)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("None"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+		}
+
+		//Disable extra skill checkboxes
+		for(ii=28;ii<39;ii++)
+		{
+			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
+			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
+		}
+
 		//get number of player, team entries
 		gnum_players = ((FileDescriptorOld*)ghdescriptor)->data[0x5C];
 		gnum_players += (((FileDescriptorOld*)ghdescriptor)->data[0x5D])*256;
@@ -3105,7 +3229,7 @@ void data_handler(const TCHAR *pcs_file_name)
 			fill_team_tactics17(current_byte, ghdescriptor, gteams, gnum_teams);
 		}
 	}
-	else
+	else if(giPesVersion==18)
 	{
 		ghdescriptor = (void*)createFileDescriptorNew();
 		gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes18");
@@ -3133,6 +3257,37 @@ void data_handler(const TCHAR *pcs_file_name)
 		//Change Body Control label to "Strength on the Ball"
 		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Strength on Ball:"));
 		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35)); //RedrawWindow(static_label, NULL, NULL, RDW_ERASE);
+
+		//Fill Play Style combobox:	
+		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) > 18)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("None"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+		}
+
+		//Disable extra skill checkboxes
+		for(ii=28;ii<39;ii++)
+		{
+			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
+			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
+		}
 
 		//get number of player, team entries
 		gnum_players = ((FileDescriptorNew*)ghdescriptor)->data[96];
@@ -3167,6 +3322,104 @@ void data_handler(const TCHAR *pcs_file_name)
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			fill_team_tactics18(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+	}
+	else // PES 19
+	{
+		ghdescriptor = (void*)createFileDescriptorNew();
+		gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes19");
+		uint8_t *pfin = readFile(pcs_file_name, NULL);
+		//try
+		//{
+			decryptWithKeyNew((FileDescriptorNew*)ghdescriptor, pfin, reinterpret_cast<const char*>(gpMasterKey));
+		//}
+		//catch(...)
+		//{
+		//	MessageBox(ghw_main, _T("Bad file, cannot load."), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		//	return;
+		//}
+
+		//Ensure Custom Skin option is removed
+		if(SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_GETCOUNT, 0, 0) == 8)
+			SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_DELETESTRING, (WPARAM)7, 0);
+
+		//Enable Physical Contact skill edit control
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36));
+
+		//Change Body Control label to "Unwavering Balance"
+		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Unwavering Balance:"));
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35)); //RedrawWindow(static_label, NULL, NULL, RDW_ERASE);
+
+		//Fill Play Style combobox:	
+		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) < 22)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("None"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Roaming Flank"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Crossing Specialist"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Orchestrator"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fullback Finisher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+		}
+
+		//Enable extra skill checkboxes
+		for(ii=28;ii<39;ii++)
+		{
+			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), TRUE); 
+		}
+
+		//get number of player, team entries
+		gnum_players = ((FileDescriptorNew*)ghdescriptor)->data[96];
+		gnum_players += (((FileDescriptorNew*)ghdescriptor)->data[97])*256;
+
+		gnum_teams = ((FileDescriptorNew*)ghdescriptor)->data[100];
+		gnum_teams += (((FileDescriptorNew*)ghdescriptor)->data[101])*256;
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x7C;
+		gplayers = new player_entry[gnum_players];
+		for(ii=0;ii<gnum_players;ii++)
+		{
+			fill_player_entry19(gplayers[ii], current_byte, ghdescriptor);
+		}
+
+		//place team entries into array of structs
+		current_byte = 0x5BCC7C;
+		gteams = new team_entry[gnum_teams];
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_ids19(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		current_byte = 0x6773C4;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_rosters19(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+
+		current_byte = 0x69EC8C;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_tactics19(current_byte, ghdescriptor, gteams, gnum_teams);
 		}
 	}
 
@@ -3334,7 +3587,7 @@ void save_handler(const TCHAR *pcs_file_name)
 		output = encryptWithKeyOld((FileDescriptorOld*)ghdescriptor, &outputSize, reinterpret_cast<const char*>(gpMasterKey));
 		writeFile(pcs_file_name, output, outputSize);
 	}
-	else
+	else if(giPesVersion==18)
 	{
 		//Extract player info & appearance from array of structs
 		int ii, current_byte = 0x7C;
@@ -3358,6 +3611,38 @@ void save_handler(const TCHAR *pcs_file_name)
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			extract_team_tactics18(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		//Write out data to file
+		int outputSize;
+		uint8_t *output;
+		output = encryptWithKeyNew((FileDescriptorNew*)ghdescriptor, &outputSize, reinterpret_cast<const char*>(gpMasterKey));
+		writeFile(pcs_file_name, output, outputSize);
+	}
+	else // PES 19
+	{
+		//Extract player info & appearance from array of structs
+		int ii, current_byte = 0x7C;
+		for(ii=0;ii<gnum_players;ii++)
+		{
+			extract_player_entry19(gplayers[ii], current_byte, ghdescriptor);
+		}
+
+		//Extract team info from array of structs
+		current_byte = 0x5BCC7C;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_team_info19(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0x6773C4;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_teamplayer_info19(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0x69EC8C;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_team_tactics19(gteams[ii], current_byte, ghdescriptor);
 		}
 
 		//Write out data to file
@@ -3443,7 +3728,10 @@ void show_player_info(int p_ind)
 		Button_SetCheck(GetDlgItem(ghw_tab1, IDB_COM_TRIC+ii),gplayers[p_ind].com_style[ii]);
 	}
 
-	for(ii=0;ii<28;ii++)
+	int numSkill;
+	if(giPesVersion==19) numSkill=39;
+	else numSkill=28;
+	for(ii=0;ii<numSkill;ii++)
 	{
 		Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),gplayers[p_ind].play_skill[ii]);
 	}
@@ -3747,7 +4035,10 @@ player_entry get_form_player_info(int index)
 		else output.com_style[ii]=false;
 	}
 
-	for(ii=0;ii<28;ii++)
+	int numSkill;
+	if(giPesVersion==19) numSkill=39;
+	else numSkill=28;
+	for(ii=0;ii<numSkill;ii++)
 	{
 		if(Button_GetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii))==BST_CHECKED) 
 			output.play_skill[ii]=true;
@@ -5376,6 +5667,11 @@ void common_shortcuts(WPARAM W)
 	{
 		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_18_EN), 0);
 	}
+	//ctrl+9 for Open 19 dialog
+	else if( W == 0x39 && (GetKeyState(VK_CONTROL) & 0x8000) )
+	{
+		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_19_EN), 0);
+	}
 	//ctrl+S for Save dialog
 	else if( W == 0x53 && (GetKeyState(VK_CONTROL) & 0x8000) )
 	{
@@ -5764,8 +6060,23 @@ void import_squad(HWND hwnd)
 
 	if(GetOpenFileName(&ofn))
 	{
-		//Open file stream
-		std::ifstream input_file(inPath, std::ios::binary);
+		std::ifstream input_file;
+
+		//Check for squad export version compatibility
+		input_file.open(inPath, std::ifstream::ate | std::ios::binary);
+		//int byte_pos = 
+		if( (int)(input_file.tellg()) < 7268)
+		{
+			MessageBox(ghw_main, _T("Invalid 4CCS file!\r\nPlease save a 4CCS for this team using a PES19-compatible version of 4ccEditor."),
+				_T("Version Error!"), MB_ICONERROR | MB_OK); //wrong file version
+			input_file.close();
+			return;
+		}
+		input_file.close();
+
+		//Open file stream for reading
+		//std::ifstream input_file(inPath, std::ios::binary);
+		input_file.open(inPath, std::ios::binary);
 
 		//Find number of players on this team
 		for(num_on_team=0;num_on_team<32;num_on_team++)

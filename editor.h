@@ -77,7 +77,7 @@ struct player_export
 	bool b_base_copy; //Is Base Copy?
 	unsigned char strong_foot; //Stronger Foot 
 	bool com_style[7]; //COM Playing Styles
-	bool play_skill[28]; //Player Skills 
+	bool play_skill[39]; //Player Skills 
 	/*
 	0 Scissors Feint
 	1 Flip flap
@@ -107,6 +107,17 @@ struct player_export
 	25 Captaincy
 	26 Super sub
 	27 Fighting spirit
+	28 Double Touch
+	29 Crossover Turn
+	30 Step on Skill
+	31 Chip Shot
+	32 Dipping Shots
+	33 Rising Shots
+	34 No Look Pass
+	35 GK High Punt Trajectory
+	36 Penalty Specialist
+	37 GK Penalty Specialist
+	38 Interception
 	*/
 	wchar_t name[46]; //Player Name
 	char shirt_name[18]; //Shirt Name
@@ -208,7 +219,7 @@ struct player_entry
 	bool b_base_copy; //Is Base Copy?
 	unsigned char strong_foot; //Stronger Foot 
 	bool com_style[7]; //COM Playing Styles
-	bool play_skill[28]; //Player Skills 
+	bool play_skill[39]; //Player Skills 
 	wchar_t name[46]; //Player Name
 	char shirt_name[18]; //Shirt Name
 
@@ -264,6 +275,7 @@ struct player_entry
 		team_ind = -1;
 		memset(name,0,sizeof(name));
 		memset(shirt_name,0,sizeof(shirt_name));
+		memset(play_skill,0,sizeof(play_skill));
 	}
 
 	bool operator==(const player_entry& rhs)
@@ -273,7 +285,7 @@ struct player_entry
 
 		for(ii=0;ii<13;ii++) b_out = b_out && (this->play_pos[ii]==rhs.play_pos[ii]);
 		for(ii=0;ii<7;ii++) b_out = b_out && (this->com_style[ii]==rhs.com_style[ii]);
-		for(ii=0;ii<28;ii++) b_out = b_out && (this->play_skill[ii]==rhs.play_skill[ii]);
+		for(ii=0;ii<39;ii++) b_out = b_out && (this->play_skill[ii]==rhs.play_skill[ii]);
 		b_out = b_out && (wcscmp(this->name, rhs.name)==0);
 		b_out = b_out && (strcmp(this->shirt_name, rhs.shirt_name)==0);
 		b_out = b_out && (this->id==rhs.id);
@@ -595,8 +607,8 @@ struct team_entry
 	unsigned long id; //Team ID
 	wchar_t name[0x46];
 	char short_name[0x4];
-	unsigned long players[32];
-	unsigned char numbers[32];
+	unsigned long players[40];
+	unsigned char numbers[40];
 	bool b_edit_name;
 
 	int num_on_team;
@@ -688,6 +700,15 @@ void extract_player_entry18(player_entry, int &, void*);
 void extract_team_info18(team_entry, int &, void*);
 void extract_teamplayer_info18(team_entry, int &, void*);
 void extract_team_tactics18(team_entry, int &, void*);
+
+void fill_player_entry19(player_entry &, int &, void*);
+void fill_team_ids19(team_entry &, int &, void*);
+void fill_team_rosters19(int &, void*, team_entry*, int);
+void fill_team_tactics19(int &, void*, team_entry*, int);
+void extract_player_entry19(player_entry, int &, void*);
+void extract_team_info19(team_entry, int &, void*);
+void extract_teamplayer_info19(team_entry, int &, void*);
+void extract_team_tactics19(team_entry, int &, void*);
 
 void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
 

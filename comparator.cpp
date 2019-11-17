@@ -65,7 +65,7 @@ void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, 
 		//Cleanup should go here...
 		if(hc_descriptor) 
 		{
-			if(nPesVersion==18)
+			if(nPesVersion>=18)
 				destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
 			else
 				destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
@@ -91,7 +91,7 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
 
 	if(hc_descriptor) 
 	{
-		if(nPesVersion==18)
+		if(nPesVersion>=18)
 			destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
 		else
 			destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
@@ -194,7 +194,7 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
 			fill_team_tactics17(current_byte, hc_descriptor, c_teams, c_num_teams);
 		}
 	}
-	else
+	else if(nPesVersion==18)
 	{
 		hc_descriptor = (void*)createFileDescriptorNew();
 		pMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes18");
@@ -242,6 +242,67 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
 		for(ii=0;ii<c_num_teams;ii++)
 		{
 			fill_team_tactics18(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+	}
+	else // PES 19
+	{
+		hc_descriptor = (void*)createFileDescriptorNew();
+		const uint8_t MasterKeyPes19[] = {
+			0xFD, 0x60, 0x4A, 0x3E, 0xFD, 0x69, 0x20, 0xD1,
+			0x93, 0x92, 0x37, 0xD7, 0x60, 0xD8, 0x30, 0xEE,
+			0x65, 0x66, 0xFD, 0x6C, 0xE6, 0x9E, 0x48, 0xF8,
+			0x0A, 0x0D, 0xC1, 0x23, 0x7F, 0xAC, 0x89, 0x05,
+			0x1D, 0xF8, 0x5A, 0x79, 0x10, 0x7E, 0xAD, 0x81,
+			0xAC, 0xAE, 0x9A, 0x6A, 0xAB, 0x16, 0xA6, 0x81,
+			0xC2, 0xD2, 0x18, 0xC0, 0xF4, 0xE6, 0x5C, 0x27,
+			0x74, 0xF6, 0xC1, 0x9F, 0xF5, 0x01, 0x38, 0x72,
+		};
+		pMasterKey = MasterKeyPes19;
+		//(const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes19");
+		uint8_t *pfin = readFile(pcs_file_name, NULL);
+		//try
+		//{
+			decryptWithKeyNew((FileDescriptorNew*)hc_descriptor, pfin, reinterpret_cast<const char*>(pMasterKey));
+		//}
+		//catch(...)
+		//{
+		//	MessageBox(ghw_main, _T("Bad file, cannot load."), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		//	return;
+		//}
+
+		//get number of player, team entries
+		c_num_players = ((FileDescriptorNew*)hc_descriptor)->data[96];
+		c_num_players += (((FileDescriptorNew*)hc_descriptor)->data[97])*256;
+
+		c_num_teams = ((FileDescriptorNew*)hc_descriptor)->data[100];
+		c_num_teams += (((FileDescriptorNew*)hc_descriptor)->data[101])*256;
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x7C;
+		c_players = new player_entry[c_num_players];
+		for(int ii=0;ii<c_num_players;ii++)
+		{
+			fill_player_entry19(c_players[ii], current_byte, hc_descriptor);
+		}
+
+		//place team entries into array of structs
+		current_byte = 0x5BCC7C;
+		c_teams = new team_entry[c_num_teams];
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_ids19(c_teams[ii], current_byte, hc_descriptor);
+		}
+
+		current_byte = 0x6773C4;
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_rosters19(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+
+		current_byte = 0x69EC8C;
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_tactics19(current_byte, hc_descriptor, c_teams, c_num_teams);
 		}
 	}
 
@@ -438,7 +499,10 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 				errorMsg <<_T("\tCOM style ")<<kk+1<<_T(": ") << (int)playerA.com_style[kk] <<_T(" / ") << 
 					(int)playerB.com_style[kk] <<_T("\r\n");
 		}
-		for(int kk=0;kk<28;kk++)
+		int numSkill;
+		if(pesVersion==19) numSkill=39;
+		else numSkill=28;
+		for(int kk=0;kk<numSkill;kk++)
 		{
 			if(playerA.play_skill[kk]!=playerB.play_skill[kk])
 				errorMsg <<_T("\tPlayer skill ")<<kk+1<<_T(": ")<< (int)playerA.play_skill[kk] <<_T(" / ") <<

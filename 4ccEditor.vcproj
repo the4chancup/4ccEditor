@@ -198,6 +198,10 @@
 				RelativePath=".\pes18.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\pes19.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
