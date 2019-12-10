@@ -413,6 +413,9 @@ void fill_team_rosters19(int &current_byte, void* ghdescriptor, team_entry* gtea
 		if(team_id == gteams[t_ind].id) break;
 	}
 
+//	if(team_id==100)
+//		int test=0;
+
 	for(ii=0;ii<40;ii++)
 	{
 		player_id = pDescriptorNew->data[current_byte];

@@ -120,6 +120,8 @@ int giPesVersion = 0;
 int g_bumpAmount = 0;
 const uint8_t* gpMasterKey;
 
+char gc_ver4ccs[] = "19c";
+
 //Brushes
 HBRUSH gTeamColor1 = NULL;
 HBRUSH gTeamColor2 = NULL;
@@ -198,7 +200,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Test Cup V19 Edition (Version A)"),
+		_T("4ccEditor Test Cup V19 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -2751,7 +2753,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 								gb_forceupdate = true;
 								gn_forceupdate = gn_playind[gn_listsel];
 
-								for(num_on_team=0;num_on_team<32;num_on_team++)
+								for(num_on_team=0;num_on_team < gteams->team_max; num_on_team++)
 								{
 									if(!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
 								}
@@ -3430,7 +3432,7 @@ void data_handler(const TCHAR *pcs_file_name)
 		bool match = false;
 		for(jj=0;jj<gnum_teams;jj++)
 		{
-			for(kk=0;kk<32;kk++)
+			for(kk=0;kk < gteams->team_max;kk++)
 			{
 				if(gteams[jj].players[kk]==gplayers[ii].id)
 				{
@@ -3914,7 +3916,7 @@ void show_player_info(int p_ind)
 
 	for(ii=0;ii<gnum_teams;ii++)
 	{
-		for(jj=0;jj<32;jj++)
+		for(jj=0;jj < gteams->team_max;jj++)
 		{
 			if(gteams[ii].players[jj]==gplayers[p_ind].id)
 			{
@@ -4299,6 +4301,7 @@ bool get_form_team_info(int player_index, team_entry &output)
 		
 		SendDlgItemMessage(ghw_main, IDT_PLAY_NUM, WM_GETTEXT, 18, (LPARAM)buffer);
 		output.numbers[tli] = _wtoi(buffer);
+		if(giPesVersion < 19 && output.numbers[tli]>231) output.numbers[tli] = 231;
 
 		//Get info from Team tab
 		SendDlgItemMessage(ghw_tab3, IDT_TCOL_R1, WM_GETTEXT, 4, (LPARAM)buffer);
@@ -4414,11 +4417,11 @@ LRESULT CALLBACK cb_cntl_proc(HWND H, UINT M, WPARAM W, LPARAM L,
 
 		case WM_KEYDOWN:
 		{
-			//When T key is pressed
+			//When T key is pressed - CTRL+SHIFT+T trims the team lists to max 23 players each
 			if( W == 0x54 && (GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000) )
 			{
 				int ii=0;
-				while(ii<32 && gteams[gn_teamsel].players[ii]!=0)
+				while(ii< gteams->team_max && gteams[gn_teamsel].players[ii]!=0)
 				{
 					if(ii>22) gteams[gn_teamsel].players[ii]=0;
 					ii++;
@@ -5138,7 +5141,7 @@ void trim_team()
 	gb_forceupdate = true;
 	gn_forceupdate = gn_playind[gn_listsel];
 
-	for(num_on_team=0;num_on_team<32;num_on_team++)
+	for(num_on_team=0;num_on_team< gteams->team_max;num_on_team++)
 	{
 		if(!gteams[csel].players[num_on_team]) break;
 	}
@@ -5183,7 +5186,7 @@ void team_vis_clear()
 	if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 	{
 		iteam = gplayers[gn_playind[gn_listsel]].team_ind;
-		for(ii=0;ii<32;ii++)
+		for(ii=0;ii< gteams->team_max;ii++)
 		{
 			if( gteams[iteam].players[ii] && gteams[iteam].players[ii]!=gplayers[gn_playind[gn_listsel]].id )
 			{
@@ -5228,7 +5231,7 @@ void team_created_set()
 	if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 	{
 		iteam = gplayers[gn_playind[gn_listsel]].team_ind;
-		for(ii=0;ii<32;ii++)
+		for(ii=0;ii< gteams->team_max;ii++)
 		{
 			if( gteams[iteam].players[ii] && gteams[iteam].players[ii]!=gplayers[gn_playind[gn_listsel]].id )
 			{
@@ -5288,7 +5291,7 @@ void team_fpc_on()
 	if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 	{
 		iteam = gplayers[gn_playind[gn_listsel]].team_ind;
-		for(ii=0;ii<32;ii++)
+		for(ii=0;ii< gteams->team_max;ii++)
 		{
 			if( gteams[iteam].players[ii] && gteams[iteam].players[ii]!=gplayers[gn_playind[gn_listsel]].id )
 			{
@@ -5398,7 +5401,7 @@ void team_fpc_off()
 	if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 	{
 		iteam = gplayers[gn_playind[gn_listsel]].team_ind;
-		for(ii=0;ii<32;ii++)
+		for(ii=0;ii< gteams->team_max;ii++)
 		{
 			if( gteams[iteam].players[ii] && gteams[iteam].players[ii]!=gplayers[gn_playind[gn_listsel]].id )
 			{
@@ -5844,7 +5847,7 @@ void roster_data_output()
 	{
 		_ftprintf(outStream, _T("%s\n"), gteams[iteam].name);
 //for Ved:		mbstowcs(short_name,gteams[iteam].short_name,4); 
-		for(ii=0;ii<32;ii++)
+		for(ii=0;ii< gteams->team_max;ii++)
 		{
 			if( gteams[iteam].players[ii] )
 			{
@@ -5934,7 +5937,7 @@ void scroll_player_down()
 
 void export_squad(HWND hwnd)
 {
-	USES_CONVERSION;
+	USES_CONVERSION; //required for A2W, W2A, A2T, T2A macros
 	int ii, jj, kk, num_on_team, csel;
 
 	csel = SendDlgItemMessage(ghw_main, IDC_TEAM_LIST, CB_GETCURSEL, 0, 0) - 1;
@@ -6011,8 +6014,16 @@ void export_squad(HWND hwnd)
 		//Open file stream
 		std::ofstream output_file(outPath, std::ios::binary);
 
+		//Write out 4CCS version number to allow compatibility checks
+		output_file.write(gc_ver4ccs, 3);
+
+		//Write out PES version we're exporting from
+		char cPesVersion[3];
+		_itoa_s(giPesVersion, cPesVersion, 3, 10);
+		output_file.write(cPesVersion, 2);
+
 		//Find number of players on this team
-		for(num_on_team=0;num_on_team<32;num_on_team++)
+		for(num_on_team=0;num_on_team< gteams->team_max;num_on_team++)
 		{
 			if(!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
 		}
@@ -6034,6 +6045,10 @@ void export_squad(HWND hwnd)
 			//Stop when every player has been exported
 			if(kk==num_on_team) break;
 		}
+
+		//Write out team shirt numbers
+		output_file.write((char*)gteams[gn_teamCbIndToArray[csel]].numbers, sizeof(gteams[gn_teamCbIndToArray[csel]].numbers));
+
 		//Close filestream
 		output_file.close();
 	}
@@ -6041,6 +6056,7 @@ void export_squad(HWND hwnd)
 
 void import_squad(HWND hwnd)
 {
+	USES_CONVERSION; //required for A2W, W2A, A2T, T2A macros
 	int ii, jj, kk, num_on_team, csel;
 
 	csel = SendDlgItemMessage(ghw_main, IDC_TEAM_LIST, CB_GETCURSEL, 0, 0) - 1;
@@ -6062,24 +6078,44 @@ void import_squad(HWND hwnd)
 	{
 		std::ifstream input_file;
 
-		//Check for squad export version compatibility
-		input_file.open(inPath, std::ifstream::ate | std::ios::binary);
-		//int byte_pos = 
-		if( (int)(input_file.tellg()) < 7268)
-		{
-			MessageBox(ghw_main, _T("Invalid 4CCS file!\r\nPlease save a 4CCS for this team using a PES19-compatible version of 4ccEditor."),
-				_T("Version Error!"), MB_ICONERROR | MB_OK); //wrong file version
-			input_file.close();
-			return;
-		}
-		input_file.close();
+		//Initial, fixed size version check: this doesn't actually work in general use because team sizes can vary (!= 23 players)
+		//input_file.open(inPath, std::ifstream::ate | std::ios::binary);
+		////int byte_pos = 
+		//if( (int)(input_file.tellg()) < 7268)
+		//{
+		//	MessageBox(ghw_main, _T("Invalid 4CCS file!\r\nPlease save a 4CCS for this team using a PES19-compatible version of 4ccEditor."),
+		//		_T("Version Error!"), MB_ICONERROR | MB_OK); //wrong file version
+		//	input_file.close();
+		//	return;
+		//}
+		//input_file.close();
 
 		//Open file stream for reading
 		//std::ifstream input_file(inPath, std::ios::binary);
 		input_file.open(inPath, std::ios::binary);
 
+		//Check for squad export version compatibility
+		char c_ver[4];
+		input_file.read(c_ver, 3);
+		c_ver[3] = '\0';
+		if(strcmp(c_ver, gc_ver4ccs)!=0)
+		{
+			TCHAR message[200];
+			_stprintf(message, _T("Invalid 4CCS file!\r\nPlease save a 4CCS for this team using a %s-compatible version of 4ccEditor."), A2T(gc_ver4ccs));
+			MessageBox(ghw_main, message, _T("Version Error!"), MB_ICONERROR | MB_OK); //wrong file version
+			input_file.close();
+			return;
+		}
+
+		//Get version this was imported from
+		char c_pesVer[3];
+		int pesVer;
+		input_file.read(c_pesVer, 2);
+		c_pesVer[2] = '\0';
+		pesVer = atoi(c_pesVer);
+		
 		//Find number of players on this team
-		for(num_on_team=0;num_on_team<32;num_on_team++)
+		for(num_on_team=0;num_on_team< gteams->team_max;num_on_team++)
 		{
 			if(!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
 		}
@@ -6096,6 +6132,41 @@ void import_squad(HWND hwnd)
 					gplayers[ii].PlayerImport(pIn);
 					//No Custom skin in 18
 					if(giPesVersion==18 && gplayers[ii].skin_col==7) gplayers[ii].skin_col=0;
+					//Convert between 19 and 18- play style nunmbers if needed
+					if(giPesVersion==19 && pesVer!=19)
+					{
+					  if(gplayers[ii].play_style==13) gplayers[ii].play_style=4;
+					  else if(gplayers[ii].play_style==14) gplayers[ii].play_style=5;
+					  else if(gplayers[ii].play_style==4) gplayers[ii].play_style=6;
+					  else if(gplayers[ii].play_style==5) gplayers[ii].play_style=9;
+					  else if(gplayers[ii].play_style==6) gplayers[ii].play_style=10;
+					  else if(gplayers[ii].play_style==7) gplayers[ii].play_style=11;
+					  else if(gplayers[ii].play_style==9) gplayers[ii].play_style=12;
+					  else if(gplayers[ii].play_style==8) gplayers[ii].play_style=14;
+					  else if(gplayers[ii].play_style==11) gplayers[ii].play_style=16;
+					  else if(gplayers[ii].play_style==12) gplayers[ii].play_style=18;
+					  else if(gplayers[ii].play_style==10) gplayers[ii].play_style=19;
+					  else if(gplayers[ii].play_style==16) gplayers[ii].play_style=20;
+					  else if(gplayers[ii].play_style==17) gplayers[ii].play_style=21;
+					}
+					else if(giPesVersion!=19 && pesVer==19)
+					{
+					  if(gplayers[ii].play_style==4) gplayers[ii].play_style=13;
+					  else if(gplayers[ii].play_style==5) gplayers[ii].play_style=14;
+					  else if(gplayers[ii].play_style==6) gplayers[ii].play_style=4;
+					  else if(gplayers[ii].play_style==9) gplayers[ii].play_style=5;
+					  else if(gplayers[ii].play_style==10) gplayers[ii].play_style=6;
+					  else if(gplayers[ii].play_style==11) gplayers[ii].play_style=7;
+					  else if(gplayers[ii].play_style==12) gplayers[ii].play_style=9;
+					  else if(gplayers[ii].play_style==14) gplayers[ii].play_style=8;
+					  else if(gplayers[ii].play_style==16) gplayers[ii].play_style=11;
+					  else if(gplayers[ii].play_style==18) gplayers[ii].play_style=12;
+					  else if(gplayers[ii].play_style==19) gplayers[ii].play_style=10;
+					  else if(gplayers[ii].play_style==20) gplayers[ii].play_style=16;
+					  else if(gplayers[ii].play_style==21) gplayers[ii].play_style=17;
+					  else if(gplayers[ii].play_style==7 || gplayers[ii].play_style==8 || gplayers[ii].play_style==13 || 
+						  gplayers[ii].play_style==17) gplayers[ii].play_style=0;
+					}
 					kk++;
 					break;
 				}
@@ -6103,6 +6174,19 @@ void import_squad(HWND hwnd)
 			//Stop when every player has been imported
 			if(kk==num_on_team) break;
 		}
+
+		//Read in team shirt numbers
+		input_file.read((char*)gteams[gn_teamCbIndToArray[csel]].numbers, sizeof(gteams[gn_teamCbIndToArray[csel]].numbers));
+		//Limit shirt numbers to single byte for versions earlier than 19
+		if(giPesVersion < 19)
+		{
+			for(ii=0; ii<gteams[0].team_max; ii++)
+			{
+				if(gteams[gn_teamCbIndToArray[csel]].numbers[ii] > 231)
+					gteams[gn_teamCbIndToArray[csel]].numbers[ii] = 231;
+			}
+		}
+
 		//Close filestream
 		input_file.close();
 		int num_lv_entries = ListView_GetItemCount(GetDlgItem(ghw_main, IDC_NAME_LIST));

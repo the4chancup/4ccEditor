@@ -18,9 +18,18 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	msgOut+=gteams[teamSel].name;
 	msgOut+=_T("\r\n");
 
+	//Settings
 	int manletBonus = 5;
 	int goldRate = 99;
 	int silverRate = 88;
+	int greenGiant = 6;
+	int greenTall = 5;
+	int greenMid = 6;
+	int greenManlet = 6;
+	int redGiant = 0;
+	int redTall = 10;
+	int redMid = 7;
+	int redManlet = 6;
 
 	int numGK = 0;
     //Player ratings
@@ -196,7 +205,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if(jj==25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
                     cardMod++;
                 //One trick card may be free, check if has any
-                if(jj<6 || jj==16)
+                if(jj<6 || jj==16 || jj==28 || jj==29)
 				{
                     hasTrick = true;
 					numTrickOrCom++;
@@ -282,6 +291,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				{
                     errorTot++;
 					errorMsg << _T("GK height over 189cm; ");
+				}
+				else if(player.height > 184 && player.height < 189)
+				{
+                    errorTot++;
+					errorMsg << _T("GKs in this bracket must be 189cm; ");
 				}
             }
             else if(cardCount > cardLimit)
@@ -530,7 +544,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
     if(!usingRed) //Using Green height system
     {
 		msgOut+=_T("Using Green height system\r\n");
-        if(diff = 6 - numGiant)
+        if(diff = greenGiant - numGiant)
         {
             if(diff>0)
             {
@@ -540,7 +554,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numGiant << _T("/5 194cm players; ");
+			errorMsg << _T("Has ") << numGiant << _T("/") << greenGiant << _T(" 194cm players; ");
         }
         if(diff = 5 - numTall)
         {
@@ -552,7 +566,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numTall << _T("/5 185/9cm players; ");
+			errorMsg << _T("Has ") << numTall << _T("/") << greenTall << _T(" 185/9cm players; ");
         }
         if(diff = 6 - numMid)
         {
@@ -564,7 +578,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numMid << _T("/7 180cm players; ");
+			errorMsg << _T("Has ") << numMid << _T("/") << greenMid << _T(" 180cm players; ");
         }
         if(diff = 6 - numManlet)
         {
@@ -576,7 +590,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numManlet << _T("/6 175cm players; ");
+			errorMsg << _T("Has ") << numManlet << _T("/") << greenManlet << _T(" 175cm players; ");
         }
     }
     else //Using Red height system
@@ -585,7 +599,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         if(diff = numGiant)
         {
             errorTot += diff;
-			errorMsg << _T("Has ") << numGiant << _T("/0 194cm players; ");
+			errorMsg << _T("Has ") << numGiant << _T("/") << redGiant << _T(" 194cm players; ");
         }
         if(diff = 10 - numTall)
         {
@@ -597,7 +611,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numTall << _T("/10 185/9cm players; ");
+			errorMsg << _T("Has ") << numTall << _T("/") << redTall << _T(" 185/9cm players; ");
         }
         if(diff = 7 - numMid)
         {
@@ -609,7 +623,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numMid << _T("/7 180cm players; ");
+			errorMsg << _T("Has ") << numMid << _T("/") << redMid << _T(" 180cm players; ");
         }
         if(diff = 6 - numManlet)
         {
@@ -621,7 +635,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numManlet << _T("/6 175cm players; ");
+			errorMsg << _T("Has ") << numManlet << _T("/") << redManlet << _T(" 175cm players; ");
         }
     }
 	if(errorMsg.rdbuf()->in_avail())

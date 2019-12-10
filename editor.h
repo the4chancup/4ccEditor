@@ -602,13 +602,16 @@ struct player_entry
 	}
 };
 
+
 struct team_entry
 {
+	static const int team_max = 40; //Number of player entries per team
+
 	unsigned long id; //Team ID
 	wchar_t name[0x46];
 	char short_name[0x4];
-	unsigned long players[40];
-	unsigned char numbers[40];
+	unsigned long players[team_max];
+	uint16_t numbers[team_max];
 	bool b_edit_name;
 
 	int num_on_team;
@@ -651,8 +654,8 @@ struct team_entry
 
 		b_out = b_out && (wcscmp(this->name, rhs.name)==0);
 		b_out = b_out && (strcmp(this->short_name, rhs.short_name)==0);
-		for(ii=0;ii<32;ii++) b_out = b_out && (this->players[ii]==rhs.players[ii]);
-		for(ii=0;ii<32;ii++) b_out = b_out && (this->numbers[ii]==rhs.numbers[ii]);
+		for(ii=0;ii<this->team_max;ii++) b_out = b_out && (this->players[ii]==rhs.players[ii]);
+		for(ii=0;ii<this->team_max;ii++) b_out = b_out && (this->numbers[ii]==rhs.numbers[ii]);
 		b_out = b_out && this->captain_ind==rhs.captain_ind;
 
 		b_out = b_out && this->color1_red==rhs.color1_red;
