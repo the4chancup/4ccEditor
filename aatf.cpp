@@ -279,7 +279,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 
 			cardLimit = 3 + cardMod;
-            if(player.reg_pos == 0) //GK gets 2 cards, height capped to 185cm
+            if(player.reg_pos == 0) //GK gets 2 cards
             {
 				cardLimit = 2 + cardMod;
                 if(cardCount > cardLimit)
@@ -287,12 +287,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                     errorTot++;
 					errorMsg << _T("Has ") << cardCount << _T(" cards, only allowed ") << cardLimit << _T("; ");
 				}
-				if(player.height > 189)
+				/*if(player.height > 189)
 				{
                     errorTot++;
 					errorMsg << _T("GK height over 189cm; ");
-				}
-				else if(player.height > 184 && player.height < 189)
+				} else*/
+				if(player.height > 184 && player.height < 189)
 				{
                     errorTot++;
 					errorMsg << _T("GKs in this bracket must be 189cm; ");

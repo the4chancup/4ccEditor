@@ -766,7 +766,7 @@ void extract_team_info19(team_entry team, int &current_byte, void* ghdescriptor)
 
 	if(!team.b_changed)
 	{
-		current_byte += 0x1E0;
+		current_byte += 0x1A0;
 		return;
 	}
 	
