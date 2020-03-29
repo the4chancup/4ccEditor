@@ -349,32 +349,29 @@ void fill_team_ids19(team_entry &teams, int &current_byte, void* ghdescriptor)
 	teams.id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++; //4
 
-	current_byte+=0xE; //12
-	teams.color1_red = (pDescriptorNew->data[current_byte]) & 63;
+	current_byte+=0x12; //22
+	teams.color1_red = (pDescriptorNew->data[current_byte] >> 2);
 
-	teams.color1_green = (pDescriptorNew->data[current_byte] >> 6);
-	current_byte++; //13
-	teams.color1_green += (pDescriptorNew->data[current_byte] << 2) & 63;
-	
-	current_byte++; //14
-	teams.color2_red = (pDescriptorNew->data[current_byte]) & 63;
-	
-	teams.color2_green = (pDescriptorNew->data[current_byte] >> 6);
-	current_byte++; //15
-	teams.color2_green += (pDescriptorNew->data[current_byte] << 2) & 63;
-	
-	teams.color2_blue = (pDescriptorNew->data[current_byte] >> 4);
-	current_byte++; //16
-	teams.color2_blue += (pDescriptorNew->data[current_byte] << 4) & 63;
+	current_byte++; //23
+	teams.color1_green = (pDescriptorNew->data[current_byte] & 63);
 
-	teams.color1_blue = (pDescriptorNew->data[current_byte] >> 2);
+	teams.b_edit_name = (pDescriptorNew->data[current_byte] >> 6) & 1;
 	
+	current_byte++; //24
+	teams.color2_green = (pDescriptorNew->data[current_byte] & 63);
+	
+	teams.color2_blue = (pDescriptorNew->data[current_byte] >> 6);
+	current_byte++; //25
+	teams.color2_blue += (pDescriptorNew->data[current_byte] << 2) & 63;
+	
+	current_byte+=0x3; //28
+	teams.color1_blue = (pDescriptorNew->data[current_byte] && 63);
 
-	//current_byte+=0x94;
-	current_byte+=0x3; //19
-	teams.b_edit_name = (pDescriptorNew->data[current_byte] >> 4) & 1;
+	teams.color2_red = (pDescriptorNew->data[current_byte] >> 6);
+	current_byte++; //29
+	teams.color2_red += (pDescriptorNew->data[current_byte] << 2) & 63;
 
-	current_byte+=0x3F;
+	current_byte+=0x3B;
 
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, teams.name, 0x46);
 	current_byte+=0x46;
@@ -446,6 +443,7 @@ void fill_team_rosters19(int &current_byte, void* ghdescriptor, team_entry* gtea
 
 void fill_team_tactics19(int &current_byte, void* ghdescriptor, team_entry* gteams, int gnum_teams)
 {
+	//Total block length: 0x274 bytes
 	FileDescriptorNew* pDescriptorNew = (FileDescriptorNew*)ghdescriptor;
 
 	int t_ind;
@@ -473,10 +471,10 @@ void fill_team_tactics19(int &current_byte, void* ghdescriptor, team_entry* gtea
 		gteams[t_ind].starting11[ii] = pDescriptorNew->data[current_byte];
 		current_byte++;
 	}
-	current_byte+=0x1E;
-
+	current_byte+=0x26;
+	//Captain index at byte 0x215:
 	gteams[t_ind].captain_ind = (char)pDescriptorNew->data[current_byte];
-	current_byte+=0x67;
+	current_byte+=0x5f;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -779,31 +777,30 @@ void extract_team_info19(team_entry team, int &current_byte, void* ghdescriptor)
 	pDescriptorNew->data[current_byte] = (team.id >> 24) & 255; //8/32
 	current_byte++; //4
 	
-	current_byte+=0xE; //12
-/*	pDescriptorNew->data[current_byte] = team.color1_red;
+	current_byte+=0x12; //22
+	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 3) | (team.color1_red << 2);
 
-	pDescriptorNew->data[current_byte] += (team.color1_green << 6);
-	current_byte++; //13
-	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & (~15)) | (team.color1_green >> 2);
-	
-	current_byte++; //14
-	pDescriptorNew->data[current_byte] = team.color2_red;
-	
-	pDescriptorNew->data[current_byte] += (team.color2_green << 6);
-	current_byte++; //15
-	pDescriptorNew->data[current_byte] = (team.color2_green >> 2);
-	
-	pDescriptorNew->data[current_byte] += (team.color2_blue << 4);
-	current_byte++; //16
-	pDescriptorNew->data[current_byte] = (team.color2_blue >> 4);
+	current_byte++; //23
+	pDescriptorNew->data[current_byte] = pDescriptorNew->data[current_byte] & 128;
+	pDescriptorNew->data[current_byte] += team.color1_green;
+	//Set Edited Team Name flag
+	pDescriptorNew->data[current_byte] += (team.b_edit_name << 6);
 
-	pDescriptorNew->data[current_byte] += (team.color1_blue << 2) & 255;
-*/	current_byte+=4; //Skip color saving for now	
-	current_byte+=0x3; //19
-//	pDescriptorNew->data[current_byte] = pDescriptorNew->data[current_byte] | (team.b_edit_name << 4);
-
-	current_byte+=0x3F;
+	current_byte++; //24
+	pDescriptorNew->data[current_byte] = team.color2_green;
+	pDescriptorNew->data[current_byte] += (team.color2_blue << 6) & 255;
 	
+	current_byte++; //25
+	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 240) | (team.color2_blue >> 2);
+	
+	current_byte+=3; //28
+	pDescriptorNew->data[current_byte] = team.color1_blue;
+	pDescriptorNew->data[current_byte] += (team.color2_red << 6) & 255;
+
+	current_byte++; //29
+	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 240) | (team.color2_red >> 2);
+
+	current_byte+=0x3b; //0x58
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	
@@ -873,8 +870,8 @@ void extract_team_tactics19(team_entry team, int &current_byte, void* ghdescript
 	pDescriptorNew->data[current_byte] = (team.id >> 24) & 255; //8/32
 	current_byte++;
 	
-	current_byte+=0x209;
+	current_byte+=0x211;
 	pDescriptorNew->data[current_byte] = team.captain_ind;
 
-	current_byte+=0x67;
+	current_byte+=0x5f;
 }
