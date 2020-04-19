@@ -349,7 +349,23 @@ void fill_team_ids19(team_entry &teams, int &current_byte, void* ghdescriptor)
 	teams.id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++; //4
 
-	current_byte+=0x12; //22
+	teams.manager_id = pDescriptorNew->data[current_byte];
+	current_byte++; //1
+	teams.manager_id += pDescriptorNew->data[current_byte] << 8;
+	current_byte++; //2
+	teams.manager_id += pDescriptorNew->data[current_byte] << 16;
+	current_byte++; //3
+	teams.manager_id += pDescriptorNew->data[current_byte] << 24;
+	current_byte++; //4
+
+	current_byte+=2; //Team emblem
+
+	teams.stadium_id = pDescriptorNew->data[current_byte];
+	current_byte++; //1
+	teams.stadium_id += pDescriptorNew->data[current_byte] << 8;
+	current_byte++; //2
+
+	current_byte+=0xA; //22
 	teams.color1_red = (pDescriptorNew->data[current_byte] >> 2);
 
 	current_byte++; //23
@@ -363,9 +379,12 @@ void fill_team_ids19(team_entry &teams, int &current_byte, void* ghdescriptor)
 	teams.color2_blue = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //25
 	teams.color2_blue += (pDescriptorNew->data[current_byte] << 2) & 63;
+
+	current_byte+=2; //27
+	teams.b_edit_stadium = (pDescriptorNew->data[current_byte] >> 6) & 64; //7th bit of byte 27
 	
-	current_byte+=0x3; //28
-	teams.color1_blue = (pDescriptorNew->data[current_byte] && 63);
+	current_byte++; //28
+	teams.color1_blue = (pDescriptorNew->data[current_byte] & 63);
 
 	teams.color2_red = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //29
@@ -776,8 +795,24 @@ void extract_team_info19(team_entry team, int &current_byte, void* ghdescriptor)
 	current_byte++; //3
 	pDescriptorNew->data[current_byte] = (team.id >> 24) & 255; //8/32
 	current_byte++; //4
+
+	pDescriptorNew->data[current_byte] = team.manager_id & 255; //8/32
+	current_byte++; //1
+	pDescriptorNew->data[current_byte] = (team.manager_id >> 8) & 255; //8/32
+	current_byte++; //2
+	pDescriptorNew->data[current_byte] = (team.manager_id >> 16) & 255; //8/32
+	current_byte++; //3
+	pDescriptorNew->data[current_byte] = (team.manager_id >> 24) & 255; //8/32
+	current_byte++; //4
+
+	current_byte+=2; //Team emblem
+
+	pDescriptorNew->data[current_byte] = team.stadium_id & 255; //8/32
+	current_byte++; //1
+	pDescriptorNew->data[current_byte] = (team.stadium_id >> 8) & 255; //8/32
+	current_byte++; //2
 	
-	current_byte+=0x12; //22
+	current_byte+=0xA; //22
 	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 3) | (team.color1_red << 2);
 
 	current_byte++; //23
@@ -792,8 +827,11 @@ void extract_team_info19(team_entry team, int &current_byte, void* ghdescriptor)
 	
 	current_byte++; //25
 	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 240) | (team.color2_blue >> 2);
+
+	current_byte+=2; //27
+	pDescriptorNew->data[current_byte] = (pDescriptorNew->data[current_byte] & 191) | (team.b_edit_stadium << 6); //7th bit of byte 27
 	
-	current_byte+=3; //28
+	current_byte++; //28
 	pDescriptorNew->data[current_byte] = team.color1_blue;
 	pDescriptorNew->data[current_byte] += (team.color2_red << 6) & 255;
 

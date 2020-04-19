@@ -501,102 +501,108 @@ struct player_entry
 		return pExport;
 	}
 
-	void PlayerImport(player_export pImport)
+	void PlayerImport(player_export pImport, bool importStats=true, bool importAes=true)
 	{
-		this->nation = pImport.nation;
-		this->height = pImport.height;
-		this->weight = pImport.weight;
-		this->gc1 = pImport.gc1;
-		this->gc2 = pImport.gc2;
-		this->atk = pImport.atk; 
-		this->def = pImport.def; 
-		this->gk = pImport.gk; //Goalkeeping 
-		this->drib = pImport.drib; //Dribbling 
-		this->mo_fk = pImport.mo_fk; //Motion: Free Kick
-		this->finish = pImport.finish; //Finishing 
-		this->lowpass = pImport.lowpass; //Low Pass 
-		this->loftpass = pImport.loftpass; //Lofted Pass 
-		this->header = pImport.header; //Header 
-		this->form = pImport.form; //Form 
-		this->b_edit_player = pImport.b_edit_player; //Edited/Created player 
-		this->swerve = pImport.swerve; //Swerve 
-		this->catching = pImport.catching; //Catching 
-		this->clearing = pImport.clearing; //Clearing 
-		this->reflex = pImport.reflex; //Reflexes 
-		this->injury = pImport.injury; //Injury Resistance 
-		this->b_edit_basicset = pImport.b_edit_basicset; //Whether the player's basic settings are changed
-		this->body_ctrl = pImport.body_ctrl; //Body Control 
-		this->phys_cont = pImport.phys_cont; //Physical Contact 
-		this->kick_pwr = pImport.kick_pwr; //Kicking Power
-		this->exp_pwr = pImport.exp_pwr; //Explosive Power 
-		this->mo_armd = pImport.mo_armd; //Motion: Arm Movement (dribbling) 
-		this->b_edit_regpos = pImport.b_edit_regpos;//Registered Position edit
-		this->age = pImport.age; //Age 
-		this->reg_pos = pImport.reg_pos; //Registered Position 
-		this->play_style = pImport.play_style; //Playing Styles 
-		this->ball_ctrl = pImport.ball_ctrl; //Ball Control 
-		this->ball_win = pImport.ball_win; //Ball Winning 
-		this->weak_acc = pImport.weak_acc; //Weak Foot Accuracy 
-		this->jump = pImport.jump; //Jump 
-		this->mo_armr = pImport.mo_armr; //Motion: Arm Movement (running) 
-		this->mo_ck = pImport.mo_ck; //Motion: Corner Kick 
-		this->cover = pImport.cover; //Coverage 
-		this->weak_use = pImport.weak_use; //Weak Foot Usage
-		memcpy(this->play_pos,pImport.play_pos,sizeof(pImport.play_pos)); //Playable Position 
-		this->mo_hunchd = pImport.mo_hunchd; //Motion: Hunching (dribbling) 
-		this->mo_hunchr = pImport.mo_hunchr; //Motion: Hunching (running) 
-		this->mo_pk = pImport.mo_pk; //Motion: Penalty Kick 
-		this->place_kick = pImport.place_kick; //Place Kicking 
-		this->b_edit_playpos = pImport.b_edit_playpos; //Playable Position edit
-		this->b_edit_ability = pImport.b_edit_ability; //Ability edit
-		this->b_edit_skill = pImport.b_edit_skill; //Player Skills edit
-		this->stamina = pImport.stamina; //Stamina 
-		this->speed = pImport.speed; //Speed 
-		this->b_edit_style = pImport.b_edit_style; //Playing Styles edit
-		this->b_edit_com = pImport.b_edit_com; //COM Playing Styles edit
-		this->b_edit_motion = pImport.b_edit_motion; //Motion edit
-		this->b_base_copy = pImport.b_base_copy; //Is Base Copy?
-		this->strong_foot = pImport.strong_foot; //Stronger Foot 
-		memcpy(this->com_style, pImport.com_style, sizeof(pImport.com_style)); //COM Playing Styles
-		memcpy(this->play_skill, pImport.play_skill, sizeof(pImport.play_skill)); //Player Skills 
-		memcpy(this->name, pImport.name, sizeof(pImport.name)); //Player Name
-		memcpy(this->shirt_name, pImport.shirt_name, sizeof(pImport.shirt_name)); //Shirt Name
-		this->b_edit_face = pImport.b_edit_face; //Edited Face 
-		this->b_edit_hair = pImport.b_edit_hair; //Edited Hairstyle 
-		this->b_edit_phys = pImport.b_edit_phys; //Edited Physique
-		this->b_edit_strip = pImport.b_edit_strip; //Edited Strip Style
-		this->boot_id = pImport.boot_id; //Boots
-		this->glove_id = pImport.glove_id; //Goalkeeper gloves
-		this->copy_id = pImport.copy_id; //Base Copy Player
-		this->neck_len = pImport.neck_len; //Neck Length 
-		this->neck_size = pImport.neck_size; //Neck Size
-		this->shldr_hi = pImport.shldr_hi; //Shoulder Height 
-		this->shldr_wid = pImport.shldr_wid; //Shoulder Width 
-		this->chest = pImport.chest; //Chest Measurement 
-		this->waist = pImport.waist; //Waist Size 
-		this->arm_size = pImport.arm_size; //Arm Size 
-		this->arm_len = pImport.arm_len; //Arm Length
-		this->thigh = pImport.thigh; //Thigh Size 
-		this->calf = pImport.calf; //Calf Size
-		this->leg_len = pImport.leg_len; //Leg Length 
-		this->head_len = pImport.head_len; //Head Length 
-		this->head_wid = pImport.head_wid; //Head Width 
-		this->head_dep = pImport.head_dep; //Head Depth 
-		this->wrist_col_l = pImport.wrist_col_l; //Wrist Tape: Color left 
-		this->wrist_col_r = pImport.wrist_col_r; //Wrist Tape: Color right 
-		this->wrist_tape = pImport.wrist_tape; //Wrist Taping 
-		this->spec_col = pImport.spec_col; //Spectacles frame color 
-		this->spec_style = pImport.spec_style; //Spectacles style
-		this->sleeve = pImport.sleeve; //Sleeves 
-		this->inners = pImport.inners; //Long-Sleeved Inners 
-		this->socks = pImport.socks; //Sock Length 
-		this->undershorts = pImport.undershorts; //Undershorts 
-		this->tucked = pImport.tucked; //Shirttail 
-		this->ankle_tape = pImport.ankle_tape; //Ankle Taping 
-		this->gloves = pImport.gloves; //Player Gloves 
-		this->gloves_col = pImport.gloves_col; //Player Gloves color 
-		this->skin_col = pImport.skin_col; //Skin color 
-		this->iris_col = pImport.iris_col; //Iris color 
+		if(importStats)
+		{
+			this->height = pImport.height;
+			this->weight = pImport.weight;
+			this->atk = pImport.atk; 
+			this->def = pImport.def; 
+			this->gk = pImport.gk; //Goalkeeping 
+			this->drib = pImport.drib; //Dribbling 
+			this->mo_fk = pImport.mo_fk; //Motion: Free Kick
+			this->finish = pImport.finish; //Finishing 
+			this->lowpass = pImport.lowpass; //Low Pass 
+			this->loftpass = pImport.loftpass; //Lofted Pass 
+			this->header = pImport.header; //Header 
+			this->form = pImport.form; //Form 
+			this->b_edit_player = pImport.b_edit_player; //Edited/Created player 
+			this->swerve = pImport.swerve; //Swerve 
+			this->catching = pImport.catching; //Catching 
+			this->clearing = pImport.clearing; //Clearing 
+			this->reflex = pImport.reflex; //Reflexes 
+			this->injury = pImport.injury; //Injury Resistance 
+			this->b_edit_basicset = pImport.b_edit_basicset; //Whether the player's basic settings are changed
+			this->body_ctrl = pImport.body_ctrl; //Body Control 
+			this->phys_cont = pImport.phys_cont; //Physical Contact 
+			this->kick_pwr = pImport.kick_pwr; //Kicking Power
+			this->exp_pwr = pImport.exp_pwr; //Explosive Power 
+			this->b_edit_regpos = pImport.b_edit_regpos;//Registered Position edit
+			this->reg_pos = pImport.reg_pos; //Registered Position 
+			this->play_style = pImport.play_style; //Playing Styles 
+			this->ball_ctrl = pImport.ball_ctrl; //Ball Control 
+			this->ball_win = pImport.ball_win; //Ball Winning 
+			this->weak_acc = pImport.weak_acc; //Weak Foot Accuracy 
+			this->jump = pImport.jump; //Jump 
+			this->cover = pImport.cover; //Coverage 
+			this->weak_use = pImport.weak_use; //Weak Foot Usage
+			memcpy(this->play_pos,pImport.play_pos,sizeof(pImport.play_pos)); //Playable Position 
+			this->place_kick = pImport.place_kick; //Place Kicking 
+			this->b_edit_playpos = pImport.b_edit_playpos; //Playable Position edit
+			this->b_edit_ability = pImport.b_edit_ability; //Ability edit
+			this->b_edit_skill = pImport.b_edit_skill; //Player Skills edit
+			this->stamina = pImport.stamina; //Stamina 
+			this->speed = pImport.speed; //Speed 
+			this->b_edit_style = pImport.b_edit_style; //Playing Styles edit
+			this->b_edit_com = pImport.b_edit_com; //COM Playing Styles edit
+			this->strong_foot = pImport.strong_foot; //Stronger Foot 
+			memcpy(this->com_style, pImport.com_style, sizeof(pImport.com_style)); //COM Playing Styles
+			memcpy(this->play_skill, pImport.play_skill, sizeof(pImport.play_skill)); //Player Skills
+		}
+		if(importAes)
+		{
+			this->nation = pImport.nation;
+			this->gc1 = pImport.gc1;
+			this->gc2 = pImport.gc2;
+			this->mo_armd = pImport.mo_armd; //Motion: Arm Movement (dribbling) 
+			this->mo_hunchd = pImport.mo_hunchd; //Motion: Hunching (dribbling) 
+			this->mo_hunchr = pImport.mo_hunchr; //Motion: Hunching (running) 
+			this->mo_pk = pImport.mo_pk; //Motion: Penalty Kick
+			this->mo_armr = pImport.mo_armr; //Motion: Arm Movement (running) 
+			this->mo_ck = pImport.mo_ck; //Motion: Corner Kick 
+			this->age = pImport.age; //Age 
+			this->b_edit_motion = pImport.b_edit_motion; //Motion edit
+			this->b_base_copy = pImport.b_base_copy; //Is Base Copy?
+			memcpy(this->name, pImport.name, sizeof(pImport.name)); //Player Name
+			memcpy(this->shirt_name, pImport.shirt_name, sizeof(pImport.shirt_name)); //Shirt Name
+			this->b_edit_face = pImport.b_edit_face; //Edited Face 
+			this->b_edit_hair = pImport.b_edit_hair; //Edited Hairstyle 
+			this->b_edit_phys = pImport.b_edit_phys; //Edited Physique
+			this->b_edit_strip = pImport.b_edit_strip; //Edited Strip Style
+			this->boot_id = pImport.boot_id; //Boots
+			this->glove_id = pImport.glove_id; //Goalkeeper gloves
+			this->copy_id = pImport.copy_id; //Base Copy Player
+			this->neck_len = pImport.neck_len; //Neck Length 
+			this->neck_size = pImport.neck_size; //Neck Size
+			this->shldr_hi = pImport.shldr_hi; //Shoulder Height 
+			this->shldr_wid = pImport.shldr_wid; //Shoulder Width 
+			this->chest = pImport.chest; //Chest Measurement 
+			this->waist = pImport.waist; //Waist Size 
+			this->arm_size = pImport.arm_size; //Arm Size 
+			this->arm_len = pImport.arm_len; //Arm Length
+			this->thigh = pImport.thigh; //Thigh Size 
+			this->calf = pImport.calf; //Calf Size
+			this->leg_len = pImport.leg_len; //Leg Length 
+			this->head_len = pImport.head_len; //Head Length 
+			this->head_wid = pImport.head_wid; //Head Width 
+			this->head_dep = pImport.head_dep; //Head Depth 
+			this->wrist_col_l = pImport.wrist_col_l; //Wrist Tape: Color left 
+			this->wrist_col_r = pImport.wrist_col_r; //Wrist Tape: Color right 
+			this->wrist_tape = pImport.wrist_tape; //Wrist Taping 
+			this->spec_col = pImport.spec_col; //Spectacles frame color 
+			this->spec_style = pImport.spec_style; //Spectacles style
+			this->sleeve = pImport.sleeve; //Sleeves 
+			this->inners = pImport.inners; //Long-Sleeved Inners 
+			this->socks = pImport.socks; //Sock Length 
+			this->undershorts = pImport.undershorts; //Undershorts 
+			this->tucked = pImport.tucked; //Shirttail 
+			this->ankle_tape = pImport.ankle_tape; //Ankle Taping 
+			this->gloves = pImport.gloves; //Player Gloves 
+			this->gloves_col = pImport.gloves_col; //Player Gloves color 
+			this->skin_col = pImport.skin_col; //Skin color 
+			this->iris_col = pImport.iris_col; //Iris color 
+		}
 
 		this->b_changed = true;
 	}
@@ -608,11 +614,14 @@ struct team_entry
 	static const int team_max = 40; //Number of player entries per team
 
 	unsigned long id; //Team ID
+	unsigned long manager_id;
+	int stadium_id;
 	wchar_t name[0x46];
 	char short_name[0x4];
 	unsigned long players[team_max];
 	uint16_t numbers[team_max];
 	bool b_edit_name;
+	bool b_edit_stadium;
 
 	int num_on_team;
 
@@ -635,6 +644,7 @@ struct team_entry
 		b_changed = false;
 		b_show = true;
 		b_edit_name = false;
+		b_edit_stadium = false;
 		memset(name,0,sizeof(name));
 		memset(short_name,0,sizeof(short_name));
 		for(int ii=0; ii<11; ii++) starting11[ii]=0;
@@ -645,12 +655,18 @@ struct team_entry
 		color2_red = 0;
 		color2_blue = 0;
 		color2_green = 0;
+
+		manager_id = 0;
+		stadium_id = 0;
 	}
 
 	bool operator==(const team_entry& rhs)
 	{
 		int ii;
 		bool b_out = this->id==rhs.id;
+
+		b_out = b_out && this->manager_id==rhs.manager_id;
+		b_out = b_out && this->stadium_id==rhs.stadium_id;
 
 		b_out = b_out && (wcscmp(this->name, rhs.name)==0);
 		b_out = b_out && (strcmp(this->short_name, rhs.short_name)==0);
