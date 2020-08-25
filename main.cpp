@@ -201,7 +201,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Spring 20 Edition (Version B)"),
+		_T("4ccEditor Autumn 20 Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -2586,6 +2586,11 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 								//export settings for prev player into temp struct 2
 								player_export prevPlyrExport = gplayers[gn_playind[gn_listsel-1]].PlayerExport();
 
+								//Have player copy ids match new slot
+								unsigned long tmp_id = currPlyrExport.copy_id;
+								currPlyrExport.copy_id = prevPlyrExport.copy_id;
+								prevPlyrExport.copy_id = tmp_id;
+
 								//swap temp struct 2 into (old) current player, set b_changed flag
 								gplayers[gn_playind[gn_listsel]].PlayerImport(prevPlyrExport);
 								gplayers[gn_playind[gn_listsel]].b_changed = true;
@@ -2629,6 +2634,11 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 								player_export currPlyrExport = gplayers[gn_playind[gn_listsel]].PlayerExport();
 								//export settings for next player into temp struct 2
 								player_export nextPlyrExport = gplayers[gn_playind[gn_listsel+1]].PlayerExport();
+
+								//Have player copy ids match new slot
+								unsigned long tmp_id = currPlyrExport.copy_id;
+								currPlyrExport.copy_id = nextPlyrExport.copy_id;
+								nextPlyrExport.copy_id = tmp_id;
 
 								//swap temp struct 2 into (old) current player, set b_changed flag
 								gplayers[gn_playind[gn_listsel]].PlayerImport(nextPlyrExport);
@@ -5502,23 +5512,27 @@ void fpc_toggle()
 		_tcscpy_s(fpcBoot, 3, _T("55"));
 		_tcscpy_s(fpcGkGlove, 3, _T("11"));
 	}
-	else
+	else if(giPesVersion<19)
 	{
 		_tcscpy_s(fpcBoot, 3, _T("38"));
 		_tcscpy_s(fpcGkGlove, 3, _T("12"));
 	}
 
 	GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-	if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
+	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
+	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, FPC is set
 	{
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
-		SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		if( !_tcscmp(buffer, fpcGkGlove) )
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-		if(giPesVersion>=18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED); 
+		if(giPesVersion<19)
+		{
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
+			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+			if( !_tcscmp(buffer, fpcGkGlove) )
+				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
+		}
+		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED); 
 	}
 	else //Otherwise, set to FPC invis
 	{
@@ -5530,11 +5544,15 @@ void fpc_toggle()
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-		SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
-		if(giPesVersion>=18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
+		if(giPesVersion<19)
+		{
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
+		}
+		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
 	}
 }
 

@@ -32,29 +32,33 @@ int read_data(int start_bit, int bits_to_read, int& current_byte, FileDescriptor
 void write_data(uint8_t input, int start_bit, int bits_to_write, int& current_byte, FileDescriptorNew* pDescriptorNew)
 {
 	int shift;
-	int pow_of_two[] = {1,2,4,8,16,32,64,128};
+	uint8_t pow_of_two[] = {1,2,4,8,16,32,64,128};
 
 	int bit = start_bit;
-	if(bit == 0) pDescriptorNew->data[current_byte] = 0;
+	uint8_t byte_val = pDescriptorNew->data[current_byte];
+	//if(bit == 0) pDescriptorNew->data[current_byte] = 0;
 	for(int ii=0; ii<bits_to_write; ii++)
 	{
 		if(bit == 8)
 		{
 			bit = 0;
+			pDescriptorNew->data[current_byte] = byte_val;
 			current_byte++;
-			pDescriptorNew->data[current_byte] = 0;
+			byte_val = pDescriptorNew->data[current_byte];
+			//pDescriptorNew->data[current_byte] = 0;
 		}
 		shift = (ii%8) - bit;
 		if(shift>=0)
-			pDescriptorNew->data[current_byte] += ((input >> shift) & pow_of_two[bit]);
+			byte_val = (byte_val & ~pow_of_two[bit]) + ((input >> shift) & pow_of_two[bit]);
 		else
-			pDescriptorNew->data[current_byte] += ((input << -shift) & pow_of_two[bit]);
+			byte_val = (byte_val & ~pow_of_two[bit]) + ((input << -shift) & pow_of_two[bit]);
 		bit++;
 	}
+	pDescriptorNew->data[current_byte] = byte_val;
 	if(bit == 8)
 	{
 		current_byte++;
-		pDescriptorNew->data[current_byte] = 0;
+		//pDescriptorNew->data[current_byte] = 0;
 	}
 }
 
@@ -226,7 +230,7 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 	//Appearance entries
 	//playerID
 	current_byte+=4;
-
+	//0x04:0
 	players.b_edit_face = pDescriptorNew->data[current_byte] & 1;
 	players.b_edit_hair = (pDescriptorNew->data[current_byte] >> 1) & 1;
 	players.b_edit_phys = (pDescriptorNew->data[current_byte] >> 2) & 1;
@@ -240,11 +244,11 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 
 	players.glove_id = pDescriptorNew->data[current_byte] >> 2;
 	current_byte++;
-	players.glove_id += (pDescriptorNew->data[current_byte] & 15) << 6;
+	players.glove_id += (pDescriptorNew->data[current_byte]) << 6; //Extend to be 14 bits, using Unk B space //&15
 
 	//Unknown B - 4/4
 	current_byte++;
-
+	//0x08:0 
 	players.copy_id = pDescriptorNew->data[current_byte];
 	current_byte++;
 	players.copy_id += pDescriptorNew->data[current_byte] << 8;
@@ -253,32 +257,32 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 	current_byte++;
 	players.copy_id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++;
-
+	//0x0C:0
 	players.neck_len = pDescriptorNew->data[current_byte] & 15;
 
 	players.neck_size = pDescriptorNew->data[current_byte] >> 4;
 	current_byte++;
-
+	//0x0D:0
 	players.shldr_hi = pDescriptorNew->data[current_byte] & 15;
 
 	players.shldr_wid = pDescriptorNew->data[current_byte] >> 4;
 	current_byte++;
-
+	//0x0E:0
 	players.chest = pDescriptorNew->data[current_byte] & 15;
 
 	players.waist = pDescriptorNew->data[current_byte] >> 4;
 	current_byte++;
-
+	//0x0F:0
 	players.arm_size = pDescriptorNew->data[current_byte] & 15;
 
 	players.arm_len = pDescriptorNew->data[current_byte] >> 4;
 	current_byte++;
-
+	//0x10:0
 	players.thigh = pDescriptorNew->data[current_byte] & 15;
 
 	players.calf = pDescriptorNew->data[current_byte] >> 4;
 	current_byte++;
-
+	//0x11:0
 	players.leg_len = pDescriptorNew->data[current_byte] & 15;
 
 	players.head_len = pDescriptorNew->data[current_byte] >> 4;
@@ -305,7 +309,7 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 	players.tucked = (pDescriptorNew->data[current_byte] >> 6) & 1;
 	players.ankle_tape = (pDescriptorNew->data[current_byte] >> 7) & 1;
 	current_byte++;
-
+	//0x16:0
 	players.gloves = pDescriptorNew->data[current_byte] & 1;
 	players.gloves_col = (pDescriptorNew->data[current_byte] >> 1) & 7;
 	//Unknown D
@@ -313,7 +317,7 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 
 	//Unknown E
 	current_byte+=22;
-
+	//0x2D:0
 	players.skin_col = pDescriptorNew->data[current_byte] & 7;
 	//No custom skin in 18
 	if(players.skin_col==7)
@@ -326,7 +330,7 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 
 	//Unknown G
 	current_byte+=18;
-
+	//0x40:0
 	players.iris_col = pDescriptorNew->data[current_byte] & 15;
 	//Unknown H
 	current_byte++;
@@ -685,7 +689,7 @@ void extract_player_entry19(player_entry player, int &current_byte, void* ghdesc
 	
 	pDescriptorNew->data[current_byte] += (player.glove_id << 2) & 252; //6/10
 	current_byte++;
-	pDescriptorNew->data[current_byte] = (player.glove_id >> 6) & 15; //4/10
+	pDescriptorNew->data[current_byte] = (player.glove_id >> 6); //8/14 - extended to be 14 bits, using Unk B space //& 15
 	
 	//Unknown B - 4/4
 	current_byte++;
@@ -751,8 +755,8 @@ void extract_player_entry19(player_entry player, int &current_byte, void* ghdesc
 	pDescriptorNew->data[current_byte] += player.ankle_tape << 7; //1/1
 	current_byte++;
 	
-	pDescriptorNew->data[current_byte] = player.gloves; //1/1
-	pDescriptorNew->data[current_byte] += player.gloves_col << 1; //3/3
+	write_data(player.gloves,	  0, 1, current_byte, pDescriptorNew);
+	write_data(player.gloves_col, 1, 3, current_byte, pDescriptorNew);
 	//Unknown D - 4/4
 	current_byte++;
 	
@@ -761,14 +765,14 @@ void extract_player_entry19(player_entry player, int &current_byte, void* ghdesc
 	
 	//No custom in 18
 	if(player.skin_col==7) player.skin_col=0;
-	pDescriptorNew->data[current_byte] = player.skin_col; //3/3
+	write_data(player.skin_col,	0, 3, current_byte, pDescriptorNew);
 	//Unknown F - 5/5
 	current_byte++;
 	
 	//Unknown G - 18 bytes
 	current_byte+=18;
 	
-	pDescriptorNew->data[current_byte] = player.iris_col; //4/4
+	write_data(player.iris_col,	0, 4, current_byte, pDescriptorNew);
 	//Unknown H - 4/4
 	current_byte++;
 	
