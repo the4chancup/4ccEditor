@@ -52,7 +52,7 @@ BOOL CALLBACK scale_children(HWND,LPARAM);
 BOOL CALLBACK draw_children(HWND,LPARAM);
 
 void DoFileOpen(HWND, TCHAR* = NULL);
-void DoFileSave(HWND, TCHAR* = NULL);
+void DoFileSave(HWND);
 void data_handler(const TCHAR *);
 void save_handler(const TCHAR *);
 
@@ -96,7 +96,7 @@ int SD_GetScrollPos(HWND hwnd, int bar, UINT code);
 
 //----------------------------------------------------------------------
 /*Global variables*/
-
+char gc_ver4ccs[] = "20a";
 HINSTANCE ghinst;	//Main window instance
 HINSTANCE hPesDecryptDLL; //Handle to libpesXcrypter.dll 
 HWND ghw_main;		//Handle to main window
@@ -120,8 +120,6 @@ int g_prevx=0;
 int giPesVersion = 0;
 int g_bumpAmount = 0;
 const uint8_t* gpMasterKey;
-
-char gc_ver4ccs[] = "19c";
 
 //Brushes
 HBRUSH gTeamColor1 = NULL;
@@ -201,7 +199,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 20 Edition (Version B)"),
+		_T("4ccEditor 21 Preview Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -253,7 +251,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			SendMessage(H, WM_SETICON, ICON_BIG, (LPARAM)hi_big);
 			SendMessage(H, WM_SETICON, ICON_SMALL, (LPARAM)hi_sml);
 
-			HFONT hfDefault, hFont;
+			HFONT hfDefault;
 			HWND hw_new;
 			HWND hw_bud;
 
@@ -350,7 +348,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("77"));
 
 			//ghw_basic = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_BASIC), H, NULL);
-			int x1=309-18, x2=376, x3=394-18, x4=403-18, x5=430, x6=475, y1, y2, ydiff, xc, yc;
+			int x1=309-18, x2=376, x3=394-18, x4=403-18, x5=430, x6=475, xc, y1, y2, ydiff;
 
 			hw_new = CreateWindowEx(0, _T("Button"), _T("General Info"), 
 				BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
@@ -1046,6 +1044,16 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 				x1+144, y1+ydiff*10, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_INTE, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_cntl_proc);
+			//New for 20+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Long Range Shooting"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*11, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_LRSH, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+
+			hw_new = CreateWindowEx(0, _T("Button"), _T("Through Passing"), 
+				BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x1+144, y1+ydiff*12, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_THPA, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_cntl_proc);
 
 			hw_new = CreateWindowEx(0, _T("Button"), _T("Ability"), 
 				BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
@@ -1169,15 +1177,45 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				x1, y1+ydiff*22, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T43, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_static_proc);
 
-			hw_new = CreateWindowEx(0, _T("Static"), _T("Weak Foot Usage:"), 
+			hw_new = CreateWindowEx(0, _T("Static"), _T("Tight Possession:"), 
 				SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 				x1, y1+ydiff*23, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T44, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_static_proc);
 
-			hw_new = CreateWindowEx(0, _T("Static"), _T("Weak Foot Accuracy:"), 
+			hw_new = CreateWindowEx(0, _T("Static"), _T("Aggression:"), 
 				SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 				x1, y1+ydiff*24, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T45, GetModuleHandle(NULL), NULL);	
 			setup_control(hw_new, ghFont, scale_static_proc);
+
+			hw_new = CreateWindowEx(0, _T("Static"), _T("Weak Foot\nUsage:"), 
+				SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+				323, y1+ydiff*23-12, 80, 17*2, ghw_tab1, (HMENU)IDC_STATIC_T90, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_static_proc);
+
+			hw_new = CreateWindowEx(0, _T("Static"), _T("Weak Foot\nAccuracy:"), 
+				SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+				323, y1+ydiff*24-4, 80, 17*2, ghw_tab1, (HMENU)IDC_STATIC_T91, GetModuleHandle(NULL), NULL);	
+			setup_control(hw_new, ghFont, scale_static_proc);
+
+			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
+				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				323+90, y1+ydiff*23-4, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_WKUS, GetModuleHandle(NULL), NULL);
+			hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
+				UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
+				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_WKUS, GetModuleHandle(NULL), NULL);
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+			setup_control(hw_bud, ghFont, scale_cntl_proc);
+			SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
+
+			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
+				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				323+90, y1+ydiff*24+4, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_WKAC, GetModuleHandle(NULL), NULL);
+			hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
+				UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
+				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_WKAC, GetModuleHandle(NULL), NULL);
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+			setup_control(hw_bud, ghFont, scale_cntl_proc);
+			SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
 
 			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
 				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
@@ -1409,25 +1447,27 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			setup_control(hw_bud, ghFont, scale_cntl_proc);
 			SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
 
-			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
-				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
-				x2, y2+ydiff*23, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_WKUS, GetModuleHandle(NULL), NULL);
-			hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
-				UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
-				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_WKUS, GetModuleHandle(NULL), NULL);
-			setup_control(hw_new, ghFont, scale_cntl_proc);
-			setup_control(hw_bud, ghFont, scale_cntl_proc);
-			SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
+			//New for 20+
 
 			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
 				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
-				x2, y2+ydiff*24, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_WKAC, GetModuleHandle(NULL), NULL);
+				x2, y2+ydiff*23, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_TIPO, GetModuleHandle(NULL), NULL);
 			hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
 				UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
-				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_WKAC, GetModuleHandle(NULL), NULL);
+				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_TIPO, GetModuleHandle(NULL), NULL);
 			setup_control(hw_new, ghFont, scale_cntl_proc);
 			setup_control(hw_bud, ghFont, scale_cntl_proc);
-			SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
+			SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
+
+			hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
+				ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+				x2, y2+ydiff*24, 44, 18, ghw_tab1, (HMENU)IDT_ABIL_AGGR, GetModuleHandle(NULL), NULL);
+			hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
+				UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
+				0, 0, 0, 0, ghw_tab1, (HMENU)IDC_ABIL_AGGR, GetModuleHandle(NULL), NULL);
+			setup_control(hw_new, ghFont, scale_cntl_proc);
+			setup_control(hw_bud, ghFont, scale_cntl_proc);
+			SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
 			
 			/*for(ii=IDD_TAB_ONE+1; ii<=IDC_STATIC_T47; ii++)
 			{
@@ -1453,7 +1493,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			SendDlgItemMessage(ghw_tab1, IDS_PLAY_CB, TBM_SETRANGE,(WPARAM)TRUE,(LPARAM)MAKELONG(0,2));
 			SendDlgItemMessage(ghw_tab1, IDS_PLAY_GK, TBM_SETRANGE,(WPARAM)TRUE,(LPARAM)MAKELONG(0,2));*/
 
-			for(ii=IDT_ABIL_ATKP;ii<IDC_ABIL_COVE;ii++)
+			for(ii=IDT_ABIL_ATKP;ii<IDC_ABIL_AGGR;ii++)
 			{
 				SendDlgItemMessage(ghw_tab1, ii+1, UDM_SETRANGE, 0, MAKELPARAM(99, 40));
 				SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("40"));				
@@ -2303,7 +2343,6 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 		break;
 		case WM_SIZE:
 		{
-			HWND hEdit;
 			RECT rcClient;
 			resize_info ri;
 
@@ -2721,7 +2760,6 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 					giPesVersion = 17;
 					DoFileOpen(H, _T("Open PES17 EDIT file"));
 				break;
-				case ID_FILE_OPEN_EN:
 				case ID_FILE_OPEN_18_EN:
 					giPesVersion = 18;
 					DoFileOpen(H, _T("Open PES18 EDIT file"));
@@ -2730,17 +2768,19 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 					giPesVersion = 19;
 					DoFileOpen(H, _T("Open PES19 EDIT file"));
 				break;
+				case ID_FILE_OPEN_20_EN:
+					giPesVersion = 20;
+					DoFileOpen(H, _T("Open PES20 EDIT file"));
+				break;
+				case ID_FILE_OPEN_EN:
+				case ID_FILE_OPEN_21_EN:
+					giPesVersion = 21;
+					DoFileOpen(H, _T("Open PES21 EDIT file"));
+				break;
 				case ID_FILE_SAVE_EN:
 					if(ghdescriptor)
 					{
-						if(giPesVersion==16)
-							DoFileSave(H, _T("Save PES16 EDIT file"));
-						else if(giPesVersion==17)
-							DoFileSave(H, _T("Save PES17 EDIT file"));
-						else if(giPesVersion==18)
-							DoFileSave(H, _T("Save PES18 EDIT file"));
-						else
-							DoFileSave(H, _T("Save PES19 EDIT file"));
+						DoFileSave(H);
 					}
 				break;
 				case IDM_PLAY_STAT:
@@ -2900,7 +2940,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 							else
 								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("77"));
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)_T("4"));
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)_T("3"));
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)_T("1"));
 					}
 				}
 				break;
@@ -3026,19 +3066,21 @@ void DoFileOpen(HWND hwnd, TCHAR* pcs_title)
 	}
 }
 
-void DoFileSave(HWND hwnd, TCHAR* pcs_title)
+void DoFileSave(HWND hwnd)
 {
 	OPENFILENAME ofn;
 	TCHAR cs_file_name[MAX_PATH] = _T("");
 
 	ZeroMemory(&ofn, sizeof(ofn));
+	TCHAR cs_save_title[30];
+	_stprintf_s(cs_save_title, 30, _T("Save PES%d EDIT file"), giPesVersion);
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = hwnd;
 	ofn.lpstrFile = cs_file_name;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	ofn.lpstrTitle = pcs_title;
+	ofn.lpstrTitle = cs_save_title;
 
 	if(GetSaveFileName(&ofn))
 	{
@@ -3094,6 +3136,22 @@ void data_handler(const TCHAR *pcs_file_name)
 		gn_teamArrayIndToCb = NULL;
 	}
 
+	//Disable extra skill checkboxes
+	for(ii=28;ii<41;ii++)
+	{
+		Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
+		Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
+	}
+	//Disable extra ability editboxes
+	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO), FALSE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO));
+	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T44), FALSE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T44));
+	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_AGGR), FALSE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_AGGR));
+	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T45), FALSE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T45));
+
 	if(giPesVersion==16)
 	{
 		ghdescriptor = (void*)createFileDescriptorOld();
@@ -3137,13 +3195,6 @@ void data_handler(const TCHAR *pcs_file_name)
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
-		}
-
-		//Disable extra skill checkboxes
-		for(ii=28;ii<39;ii++)
-		{
-			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
-			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE);
 		}
 		
 		//get number of player, team entries
@@ -3226,13 +3277,6 @@ void data_handler(const TCHAR *pcs_file_name)
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
-		}
-
-		//Disable extra skill checkboxes
-		for(ii=28;ii<39;ii++)
-		{
-			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
-			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
 		}
 
 		//get number of player, team entries
@@ -3323,13 +3367,6 @@ void data_handler(const TCHAR *pcs_file_name)
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
 		}
 
-		//Disable extra skill checkboxes
-		for(ii=28;ii<39;ii++)
-		{
-			Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
-			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
-		}
-
 		//get number of player, team entries
 		gnum_players = ((FileDescriptorNew*)ghdescriptor)->data[96];
 		gnum_players += (((FileDescriptorNew*)ghdescriptor)->data[97])*256;
@@ -3365,7 +3402,7 @@ void data_handler(const TCHAR *pcs_file_name)
 			fill_team_tactics18(current_byte, ghdescriptor, gteams, gnum_teams);
 		}
 	}
-	else // PES 19
+	else if(giPesVersion==19) // PES 19
 	{
 		ghdescriptor = (void*)createFileDescriptorNew();
 		gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes19");
@@ -3422,7 +3459,7 @@ void data_handler(const TCHAR *pcs_file_name)
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
 		}
 
-		//Enable extra skill checkboxes
+		//Enable extra skill checkboxes up to 39
 		for(ii=28;ii<39;ii++)
 		{
 			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), TRUE); 
@@ -3461,6 +3498,117 @@ void data_handler(const TCHAR *pcs_file_name)
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			fill_team_tactics19(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+	}
+	else // PES 20/21
+	{
+		ghdescriptor = (void*)createFileDescriptorNew();
+		if(giPesVersion==20)
+			gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes20");
+		else
+			gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes21");
+		uint8_t *pfin = readFile(pcs_file_name, NULL);
+		//try
+		//{
+			decryptWithKeyNew((FileDescriptorNew*)ghdescriptor, pfin, reinterpret_cast<const char*>(gpMasterKey));
+		//}
+		//catch(...)
+		//{
+		//	MessageBox(ghw_main, _T("Bad file, cannot load."), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		//	return;
+		//}
+
+		//Ensure Custom Skin option is removed
+		if(SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_GETCOUNT, 0, 0) == 8)
+			SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_DELETESTRING, (WPARAM)7, 0);
+
+		//Enable Physical Contact skill edit control
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36));
+
+		//Enable extra ability editboxes
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T44), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T44));
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_AGGR), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_AGGR));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T45), TRUE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T45));
+
+		//Change Body Control label to "Unwavering Balance"
+		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Unwavering Balance:"));
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35));
+
+		//Fill Play Style combobox:	
+		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) < 22)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("None"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Roaming Flank"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Crossing Specialist"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Orchestrator"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fullback Finisher"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+		}
+
+		//Enable extra skill checkboxes
+		for(ii=28;ii<41;ii++)
+		{
+			Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), TRUE); 
+		}
+
+		//get number of player, team entries
+		gnum_players = ((FileDescriptorNew*)ghdescriptor)->data[96];
+		gnum_players += (((FileDescriptorNew*)ghdescriptor)->data[97])*256;
+
+		gnum_teams = ((FileDescriptorNew*)ghdescriptor)->data[100];
+		gnum_teams += (((FileDescriptorNew*)ghdescriptor)->data[101])*256;
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x7C;
+		gplayers = new player_entry[gnum_players];
+		for(ii=0;ii<gnum_players;ii++)
+		{
+			fill_player_entry20(gplayers[ii], current_byte, ghdescriptor);
+		}
+
+		//place team entries into array of structs
+		current_byte = 0x8ED2FC;
+		gteams = new team_entry[gnum_teams];
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_ids20(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		current_byte = 0x9D4648;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_rosters20(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+
+		current_byte = 0xA09880;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			fill_team_tactics20(current_byte, ghdescriptor, gteams, gnum_teams);
 		}
 	}
 
@@ -3565,7 +3713,6 @@ void save_handler(const TCHAR *pcs_file_name)
 		//Extract player info & appearance from array of structs
 		int ii, current_byte = 0x4C, appearance_byte = 0x2AB9CC;
 		//char strcheck[0x72]; //DEBUG
-		int t2;
 		for(ii=0;ii<gnum_players;ii++)
 		{
 			extract_player_entry16(gplayers[ii], current_byte, appearance_byte, ghdescriptor);
@@ -3660,7 +3807,7 @@ void save_handler(const TCHAR *pcs_file_name)
 		output = encryptWithKeyNew((FileDescriptorNew*)ghdescriptor, &outputSize, reinterpret_cast<const char*>(gpMasterKey));
 		writeFile(pcs_file_name, output, outputSize);
 	}
-	else // PES 19
+	else if(giPesVersion==19)
 	{
 		//Extract player info & appearance from array of structs
 		int ii, current_byte = 0x7C;
@@ -3684,6 +3831,38 @@ void save_handler(const TCHAR *pcs_file_name)
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			extract_team_tactics19(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		//Write out data to file
+		int outputSize;
+		uint8_t *output;
+		output = encryptWithKeyNew((FileDescriptorNew*)ghdescriptor, &outputSize, reinterpret_cast<const char*>(gpMasterKey));
+		writeFile(pcs_file_name, output, outputSize);
+	}
+	else //PES 20/21
+	{
+		//Extract player info & appearance from array of structs
+		int ii, current_byte = 0x7C;
+		for(ii=0;ii<gnum_players;ii++)
+		{
+			extract_player_entry20(gplayers[ii], current_byte, ghdescriptor);
+		}
+
+		//Extract team info from array of structs
+		current_byte = 0x8ED2FC;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_team_info20(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0x9D4648;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_teamplayer_info20(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0xA09880;
+		for(ii=0;ii<gnum_teams;ii++)
+		{
+			extract_team_tactics20(gteams[ii], current_byte, ghdescriptor);
 		}
 
 		//Write out data to file
@@ -3771,6 +3950,7 @@ void show_player_info(int p_ind)
 
 	int numSkill;
 	if(giPesVersion==19) numSkill=39;
+	else if(giPesVersion>=20) numSkill=41;
 	else numSkill=28;
 	for(ii=0;ii<numSkill;ii++)
 	{
@@ -3848,6 +4028,15 @@ void show_player_info(int p_ind)
 
 	_itow_s(gplayers[p_ind].cover, buffer, 3, 10); //ERROR HERE
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_SETTEXT, 0, (LPARAM)buffer);
+
+	if(giPesVersion>=20)
+	{
+		_itow_s(gplayers[p_ind].tight_pos, buffer, 3, 10);
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_TIPO, WM_SETTEXT, 0, (LPARAM)buffer);
+
+		_itow_s(gplayers[p_ind].aggres, buffer, 3, 10);
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_AGGR, WM_SETTEXT, 0, (LPARAM)buffer);
+	}
 
 	_itow_s(gplayers[p_ind].weak_use + 1, buffer, 3, 10);
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -4084,6 +4273,7 @@ player_entry get_form_player_info(int index)
 
 	int numSkill;
 	if(giPesVersion==19) numSkill=39;
+	else if(giPesVersion>=20) numSkill=41;
 	else numSkill=28;
 	for(ii=0;ii<numSkill;ii++)
 	{
@@ -4160,6 +4350,15 @@ player_entry get_form_player_info(int index)
 
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.cover = _wtoi(buffer);
+
+	if(giPesVersion>=20)
+	{
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_TIPO, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.tight_pos = _wtoi(buffer);
+
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_AGGR, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.aggres = _wtoi(buffer);
+	}
 
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.weak_use = _wtoi(buffer) - 1;
@@ -4899,7 +5098,7 @@ LRESULT CALLBACK tab_three_dlg_proc(HWND H, UINT M, WPARAM W, LPARAM L,
 		{
 			if(gplayers)
 			{
-				int p_ind, t_ind, red, green, blue;
+				int red, green, blue;
 				wchar_t buffer[5];
 				if((HWND)L == GetDlgItem(H, IDB_TCOLOR1))
 				{
@@ -5738,6 +5937,16 @@ void common_shortcuts(WPARAM W)
 	{
 		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_19_EN), 0);
 	}
+	//ctrl+0 for Open 20 dialog
+	else if( W == 0x30 && (GetKeyState(VK_CONTROL) & 0x8000) )
+	{
+		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_20_EN), 0);
+	}
+	//ctrl+1 for Open 21 dialog
+	else if( W == 0x31 && (GetKeyState(VK_CONTROL) & 0x8000) )
+	{
+		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_21_EN), 0);
+	}
 	//ctrl+S for Save dialog
 	else if( W == 0x53 && (GetKeyState(VK_CONTROL) & 0x8000) )
 	{
@@ -6250,7 +6459,7 @@ void import_squad(HWND hwnd)
 						//Convert between 19 and 18- play style nunmbers if needed
 						if(gb_importStats)
 						{
-							if(giPesVersion==19 && pesVer!=19)
+							if(giPesVersion>=19 && pesVer<19)
 							{
 							  if(gplayers[ii].play_style==13) gplayers[ii].play_style=4;
 							  else if(gplayers[ii].play_style==14) gplayers[ii].play_style=5;
@@ -6266,7 +6475,7 @@ void import_squad(HWND hwnd)
 							  else if(gplayers[ii].play_style==16) gplayers[ii].play_style=20;
 							  else if(gplayers[ii].play_style==17) gplayers[ii].play_style=21;
 							}
-							else if(giPesVersion!=19 && pesVer==19)
+							else if(giPesVersion<19 && pesVer>=19)
 							{
 							  if(gplayers[ii].play_style==4) gplayers[ii].play_style=13;
 							  else if(gplayers[ii].play_style==5) gplayers[ii].play_style=14;

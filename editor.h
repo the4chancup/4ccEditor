@@ -20,6 +20,7 @@
 
 //----------------------------------------------------------------------
 /*Data structures*/
+//char gc_ver4ccs[] = "20a";
 struct player_export
 {
 	unsigned int nation;
@@ -66,6 +67,12 @@ struct player_export
 	unsigned char mo_hunchr; //Motion: Hunching (running) 
 	unsigned char mo_pk; //Motion: Penalty Kick 
 	unsigned char place_kick; //Place Kicking 
+	unsigned char star; //Star rating						(19+)
+	unsigned char mo_drib; //Motion: Dribbling				(20+) 
+	unsigned char tight_pos; //Tight Possession				(20+)
+	unsigned char aggres; //Aggression						(20+)
+	unsigned char play_attit; //Playing Attitude			(20+)
+
 	bool b_edit_playpos; //Playable Position edit
 	bool b_edit_ability; //Ability edit
 	bool b_edit_skill; //Player Skills edit
@@ -76,8 +83,9 @@ struct player_export
 	bool b_edit_motion; //Motion edit
 	bool b_base_copy; //Is Base Copy?
 	unsigned char strong_foot; //Stronger Foot 
+	unsigned char strong_hand; //Stronger hand				(20+)
 	bool com_style[7]; //COM Playing Styles
-	bool play_skill[39]; //Player Skills 
+	bool play_skill[41]; //Player Skills 
 	/*
 	0 Scissors Feint
 	1 Flip flap
@@ -118,9 +126,11 @@ struct player_export
 	36 Penalty Specialist
 	37 GK Penalty Specialist
 	38 Interception
+	39 Long Range Shooting (20+)
+	40 Through Passing (20+)
 	*/
-	wchar_t name[46]; //Player Name
-	char shirt_name[18]; //Shirt Name
+	wchar_t name[61]; //Player Name
+	char shirt_name[20]; //Shirt Name
 
 	//Appearance
 	bool b_edit_face; //Edited Face 
@@ -161,106 +171,11 @@ struct player_export
 	unsigned char iris_col; //Iris color 
 };
 
-struct player_entry
+struct player_entry : player_export
 {
 	unsigned long id;
-	unsigned int nation;
-	unsigned char height;
-	unsigned char weight;
-	unsigned char gc1;
-	unsigned char gc2;
-	unsigned char atk; //Attacking Prowess 
-	unsigned char def; //Defensive Prowess 
-	unsigned char gk; //Goalkeeping 
-	unsigned char drib; //Dribbling 
-	unsigned char mo_fk; //Motion: Free Kick
-	unsigned char finish; //Finishing 
-	unsigned char lowpass; //Low Pass 
-	unsigned char loftpass; //Lofted Pass 
-	unsigned char header; //Header 
-	unsigned char form; //Form 
-	bool b_edit_player; //Edited/Created player 
-	unsigned char swerve; //Swerve 
-	unsigned char catching; //Catching 
-	unsigned char clearing; //Clearing 
-	unsigned char reflex; //Reflexes 
-	unsigned char injury; //Injury Resistance 
-	bool b_edit_basicset; //Whether the player's basic settings are changed
-	unsigned char body_ctrl; //Body Control 
-	unsigned char phys_cont; //Physical Contact 
-	unsigned char kick_pwr; //Kicking Power
-	unsigned char exp_pwr; //Explosive Power 
-	unsigned char mo_armd; //Motion: Arm Movement (dribbling) 
-	bool b_edit_regpos;//Registered Position edit
-	unsigned char age; //Age 
-	unsigned char reg_pos; //Registered Position 
-	unsigned char play_style; //Playing Styles 
-	unsigned char ball_ctrl; //Ball Control 
-	unsigned char ball_win; //Ball Winning 
-	unsigned char weak_acc; //Weak Foot Accuracy 
-	unsigned char jump; //Jump 
-	unsigned char mo_armr; //Motion: Arm Movement (running) 
-	unsigned char mo_ck; //Motion: Corner Kick 
-	unsigned char cover; //Coverage 
-	unsigned char weak_use; //Weak Foot Usage
-	unsigned char play_pos[13]; //Playable Position 
-	unsigned char mo_hunchd; //Motion: Hunching (dribbling) 
-	unsigned char mo_hunchr; //Motion: Hunching (running) 
-	unsigned char mo_pk; //Motion: Penalty Kick 
-	unsigned char place_kick; //Place Kicking 
-	bool b_edit_playpos; //Playable Position edit
-	bool b_edit_ability; //Ability edit
-	bool b_edit_skill; //Player Skills edit
-	unsigned char stamina; //Stamina 
-	unsigned char speed; //Speed 
-	bool b_edit_style; //Playing Styles edit
-	bool b_edit_com; //COM Playing Styles edit
-	bool b_edit_motion; //Motion edit
-	bool b_base_copy; //Is Base Copy?
-	unsigned char strong_foot; //Stronger Foot 
-	bool com_style[7]; //COM Playing Styles
-	bool play_skill[39]; //Player Skills 
-	wchar_t name[46]; //Player Name
-	char shirt_name[18]; //Shirt Name
-
 	//Appearance
 	unsigned long app_id; //Player ID again
-	bool b_edit_face; //Edited Face 
-	bool b_edit_hair; //Edited Hairstyle 
-	bool b_edit_phys; //Edited Physique
-	bool b_edit_strip; //Edited Strip Style
-	unsigned int boot_id; //Boots
-	unsigned int glove_id; //Goalkeeper gloves
-	unsigned long copy_id; //Base Copy Player
-	int neck_len; //Neck Length 
-	int neck_size; //Neck Size
-	int shldr_hi; //Shoulder Height 
-	int shldr_wid; //Shoulder Width 
-	int chest; //Chest Measurement 
-	int waist; //Waist Size 
-	int arm_size; //Arm Size 
-	int arm_len; //Arm Length
-	int thigh; //Thigh Size 
-	int calf; //Calf Size
-	int leg_len; //Leg Length 
-	int head_len; //Head Length 
-	int head_wid; //Head Width 
-	int head_dep; //Head Depth 
-	unsigned char wrist_col_l; //Wrist Tape: Color left 
-	unsigned char wrist_col_r; //Wrist Tape: Color right 
-	unsigned char wrist_tape; //Wrist Taping 
-	unsigned char spec_col; //Spectacles frame color 
-	unsigned char spec_style; //Spectacles style
-	unsigned char sleeve; //Sleeves 
-	unsigned char inners; //Long-Sleeved Inners 
-	unsigned char socks; //Sock Length 
-	unsigned char undershorts; //Undershorts 
-	bool tucked; //Shirttail 
-	bool ankle_tape; //Ankle Taping 
-	bool gloves; //Player Gloves 
-	unsigned char gloves_col; //Player Gloves color 
-	unsigned char skin_col; //Skin color 
-	unsigned char iris_col; //Iris color 
 
 	bool b_changed;
 	bool b_show;
@@ -285,7 +200,7 @@ struct player_entry
 
 		for(ii=0;ii<13;ii++) b_out = b_out && (this->play_pos[ii]==rhs.play_pos[ii]);
 		for(ii=0;ii<7;ii++) b_out = b_out && (this->com_style[ii]==rhs.com_style[ii]);
-		for(ii=0;ii<39;ii++) b_out = b_out && (this->play_skill[ii]==rhs.play_skill[ii]);
+		for(ii=0;ii<41;ii++) b_out = b_out && (this->play_skill[ii]==rhs.play_skill[ii]);
 		b_out = b_out && (wcscmp(this->name, rhs.name)==0);
 		b_out = b_out && (strcmp(this->shirt_name, rhs.shirt_name)==0);
 		b_out = b_out && (this->id==rhs.id);
@@ -371,32 +286,14 @@ struct player_entry
 		b_out = b_out &&(this->wrist_col_l==rhs.wrist_col_l);
 		b_out = b_out &&(this->wrist_col_r==rhs.wrist_col_r);
 		b_out = b_out &&(this->wrist_tape==rhs.wrist_tape);
-/*		b_out = b_out && (this->id==rhs.id)&&(this->age==rhs.age)&&(this->ankle_tape==rhs.ankle_tape)&&
-			(this->app_id==rhs.app_id)&&(this->arm_len==rhs.arm_len)&&(this->arm_size==rhs.arm_size)&&
-			(this->atk==rhs.atk)&&(this->b_base_copy==rhs.b_base_copy)&&(this->b_edit_face==rhs.b_edit_face)&&
-			(this->b_edit_hair==rhs.b_edit_hair)&&(this->b_edit_phys==rhs.b_edit_phys)&&
-			(this->b_edit_player==rhs.b_edit_player)&&(this->b_edit_strip==rhs.b_edit_strip)&&
-			(this->ball_ctrl==rhs.ball_ctrl)&&(this->ball_win==rhs.ball_win)&&(this->body_ctrl==rhs.body_ctrl)&&
-			(this->boot_id==rhs.boot_id)&&(this->calf==rhs.calf)&&(this->catching==rhs.catching)&&(this->chest==rhs.chest)&&
-			(this->clearing==rhs.clearing)&&(this->copy_id==rhs.copy_id)&&(this->cover==rhs.cover)&&(this->def==rhs.def)&&
-			(this->drib==rhs.drib)&&(this->exp_pwr==rhs.exp_pwr)&&(this->finish==rhs.finish)&&(this->form==rhs.form)&&
-			(this->gc1==rhs.gc1)&&(this->gc2==rhs.gc2)&&(this->gk==rhs.gk)&&(this->glove_id==rhs.glove_id)&&
-			(this->gloves==rhs.gloves)&&(this->gloves_col==rhs.gloves_col)&&(this->head_dep==rhs.head_dep)&&
-			(this->head_len==rhs.head_len)&&(this->head_wid==rhs.head_wid)&&(this->header==rhs.header)&&
-			(this->height==rhs.height)&&(this->injury==rhs.injury)&&(this->inners==rhs.inners)&&(this->iris_col==rhs.iris_col)&&
-			(this->jump==rhs.jump)&&(this->kick_pwr==rhs.kick_pwr)&&(this->leg_len==rhs.leg_len)&&(this->loftpass==rhs.loftpass)&&
-			(this->lowpass==rhs.lowpass)&&(this->mo_armd==rhs.mo_armd)&&(this->mo_armr==rhs.mo_armr)&&(this->mo_ck==rhs.mo_ck)&&
-			(this->mo_fk==rhs.mo_fk)&&(this->mo_hunchd==rhs.mo_hunchd)&&(this->mo_hunchr=rhs.mo_hunchr)&&
-			(this->mo_pk==rhs.mo_pk)&&(this->nation==rhs.nation)&&(this->neck_len==rhs.neck_len)&&
-			(this->neck_size==rhs.neck_size)&&(this->phys_cont==rhs.phys_cont)&&(this->place_kick==rhs.place_kick)&&
-			(this->play_style==rhs.play_style)&&(this->reflex==rhs.reflex)&&(this->reg_pos==rhs.reg_pos)&&
-			(this->shldr_hi==rhs.shldr_hi)&&(this->shldr_wid==rhs.shldr_wid)&&(this->skin_col==rhs.skin_col)&&
-			(this->sleeve==rhs.sleeve)&&(this->socks==rhs.socks)&&(this->spec_col==rhs.spec_col)&&
-			(this->spec_style==rhs.spec_style)&&(this->speed==rhs.speed)&&(this->stamina==rhs.stamina)&&
-			(this->strong_foot==rhs.strong_foot)&&(this->swerve==rhs.swerve)&&(this->thigh==rhs.thigh)&&
-			(this->tucked==rhs.tucked)&&(this->undershorts==rhs.undershorts)&&(this->waist==rhs.waist)&&
-			(this->weak_acc==rhs.weak_acc)&&(this->weak_use==rhs.weak_use)&&(this->weight==rhs.weight)&&
-			(this->wrist_col_l==rhs.wrist_col_l)&&(this->wrist_col_r==rhs.wrist_col_r)&&(this->wrist_tape==rhs.wrist_tape);*/
+
+		b_out = b_out &&(this->tight_pos==rhs.tight_pos);
+		b_out = b_out &&(this->aggres==rhs.aggres);
+		//
+		b_out = b_out &&(this->star==rhs.star);
+		b_out = b_out &&(this->mo_drib==rhs.mo_drib);		
+		b_out = b_out &&(this->play_attit==rhs.play_attit);
+
 		return b_out;
 	}
 
@@ -498,6 +395,13 @@ struct player_entry
 		pExport.skin_col = this->skin_col; //Skin color 
 		pExport.iris_col = this->iris_col; //Iris color 
 
+		pExport.tight_pos = this->tight_pos;
+		pExport.aggres = this->aggres;
+		//
+		pExport.star = this->star;
+		pExport.mo_drib = this->mo_drib;		
+		pExport.play_attit = this->play_attit;
+
 		return pExport;
 	}
 
@@ -549,6 +453,12 @@ struct player_entry
 			this->strong_foot = pImport.strong_foot; //Stronger Foot 
 			memcpy(this->com_style, pImport.com_style, sizeof(pImport.com_style)); //COM Playing Styles
 			memcpy(this->play_skill, pImport.play_skill, sizeof(pImport.play_skill)); //Player Skills
+
+			this->tight_pos = pImport.tight_pos;
+			this->aggres = pImport.aggres;
+			//
+			this->star = pImport.star;		
+			this->play_attit = pImport.play_attit;
 		}
 		if(importAes)
 		{
@@ -601,9 +511,11 @@ struct player_entry
 			this->gloves = pImport.gloves; //Player Gloves 
 			this->gloves_col = pImport.gloves_col; //Player Gloves color 
 			this->skin_col = pImport.skin_col; //Skin color 
-			this->iris_col = pImport.iris_col; //Iris color 
-		}
+			this->iris_col = pImport.iris_col; //Iris color
 
+			//
+			this->mo_drib = pImport.mo_drib;
+		}
 		this->b_changed = true;
 	}
 };
@@ -729,10 +641,22 @@ void extract_team_info19(team_entry, int &, void*);
 void extract_teamplayer_info19(team_entry, int &, void*);
 void extract_team_tactics19(team_entry, int &, void*);
 
+void fill_player_entry20(player_entry &, int &, void*);
+void fill_team_ids20(team_entry &, int &, void*);
+void fill_team_rosters20(int &, void*, team_entry*, int);
+void fill_team_tactics20(int &, void*, team_entry*, int);
+void extract_player_entry20(player_entry, int &, void*);
+void extract_team_info20(team_entry, int &, void*);
+void extract_teamplayer_info20(team_entry, int &, void*);
+void extract_team_tactics20(team_entry, int &, void*);
+
 void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
 
 void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*);
 
+//data_util.cpp functions
+int read_data(int, int, int&, FileDescriptorNew*);
+void write_data(int, int, int, int&, FileDescriptorNew*);
 
 //extern void* ghdescriptor;
 //extern team_entry* gteams;

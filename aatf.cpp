@@ -22,7 +22,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int manletBonus = 5;
 
 	int goldRate = 99;
-	int silverRate = 88;
+	int silverRate = 89;
+	int reqNumGold = 1;
+	int reqNumSilver = 4;
 
 	int greenGiant = 6;
 	int greenTall = 5;
@@ -223,7 +225,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numTall++;
         else if(player.height == 189 && player.reg_pos == 0) //GK
             numTall++;
-        else if(player.height > 193 && player.height < 200)
+        else if(player.height == 194) // && player.height < 200)
             numGiant++;
         else
 		{
@@ -318,7 +320,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					targetRate2 += manletBonus;
 				}
             }
-			if(player.injury+1 > 1)
+			if(player.height > 175 && player.injury+1 > 2)
+			{
+				errorTot++;
+				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be 2; ");
+			}
+			else if(player.height < 175 && player.injury+1 > 1)
 			{
 				errorTot++;
 				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be 1; ");
@@ -329,10 +336,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numSilver++;
 			targetRate = silverRate;
 			targetRate2 = silverRate;
-            if(numSilver>2)
+            if(numSilver>4)
 			{
                 errorTot++;
-				errorMsg << _T("Already has 2 Silver medals; ");
+				errorMsg << _T("Already has 4 Silver medals; ");
 			}
             if(player.form+1 != 8)
 			{
@@ -344,11 +351,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot play as GK; ");
 			}
-			if(player.height > 185) //HA get penalty
+			/*if(player.height > 185) //HA get penalty
 			{
 				targetRate -= 2;
 				targetRate2 -= 2;
-			}
+			}*/
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(1, numCom); //1 free COM
 			cardLimit = 5 + cardMod;
@@ -374,10 +381,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			targetRate = goldRate;
 			targetRate2 = goldRate;
 
-            if(numGold>2)
+            if(numGold>1)
 			{
                 errorTot++;
-				errorMsg << _T("Already has 2 Gold medals; ");
+				errorMsg << _T("Already has 1 Gold medals; ");
 			}
             if(player.form+1 != 8)
 			{
@@ -389,12 +396,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot play as GK; ");
 			}
-			if(player.height > 185) //Medal HA penalty
+			/*if(player.height > 185) //Medal HA penalty
 			{
 				targetRate -= 4;
 				targetRate2 -= 4;
-			}
-            cardMod += min(3, numTrick); //3 free tricks
+			}*/
+            cardMod += min(4, numTrick); //3 free tricks
 			cardMod += min(2, numCom); //2 free COMs
 
 			cardLimit = 6 + cardMod;
@@ -655,20 +662,20 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	}
     
     //Check ability stats
-    if(numReg!=19)
+    if(numReg != (23-reqNumSilver-reqNumGold))
     {
         errorTot++;
-        errorMsg << _T("Number of Regular players is ") << numReg << _T(", should be 19; ");
+        errorMsg << _T("Number of Regular players is ") << numReg << _T(", should be ") << 23-reqNumSilver-reqNumGold << _T("; ");
     }
-    if(numSilver!=2)
+    if(numSilver != reqNumSilver)
     {
         errorTot++;
-        errorMsg << _T("Number of Silver medals is ") << numSilver << _T(", should be 2; ");
+        errorMsg << _T("Number of Silver medals is ") << numSilver << _T(", should be ") << reqNumSilver << _T("; ");
     }
-    if(numGold!=2)
+    if(numGold != reqNumGold)
     {
         errorTot++;
-        errorMsg << _T("Number of Gold medals is ") << numGold << _T(", should be 2; ");
+        errorMsg << _T("Number of Gold medals is ") << numGold << _T(", should be ") << reqNumGold << _T("; ");
     }
 	if(errorMsg.rdbuf()->in_avail())
 		errorMsg << _T("\r\n");
@@ -677,7 +684,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	SetWindowText(GetDlgItem(hAatfbox, IDT_AATFOUT), msgOut.c_str());
 	if(errorTot)
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Yep. This one's going in my cringe compilation."));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("It's all so tiresome."));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("BASED AND RULESPILLED"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("You have received one (1) Official R-word Pass."));
 }

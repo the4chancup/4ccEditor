@@ -29,6 +29,8 @@ BEGIN
 		MENUITEM "&Load 17 Edit file (encrypted)\tCtrl+7",	ID_FILE_OPEN_17_EN
 		MENUITEM "&Load 18 Edit file (encrypted)\tCtrl+8",	ID_FILE_OPEN_18_EN
 		MENUITEM "&Load 19 Edit file (encrypted)\tCtrl+9",	ID_FILE_OPEN_19_EN
+		MENUITEM "&Load 20 Edit file (encrypted)\tCtrl+0",	ID_FILE_OPEN_20_EN
+		MENUITEM "&Load 21 Edit file (encrypted)\tCtrl+1",	ID_FILE_OPEN_21_EN
         MENUITEM "&Save Edit file (encrypted)\tCtrl+S",	ID_FILE_SAVE_EN
         MENUITEM SEPARATOR
         MENUITEM "E&xit",						ID_FILE_EXIT

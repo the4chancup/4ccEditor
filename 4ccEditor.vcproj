@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\data_util.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -200,6 +204,10 @@
 			</File>
 			<File
 				RelativePath=".\pes19.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\pes20.cpp"
 				>
 			</File>
 		</Filter>
