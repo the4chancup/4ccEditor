@@ -42,7 +42,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	players.cover		= read_data(0, 7, current_byte, pDescriptorNew); //GK Reach
 	players.age			= read_data(7, 6, current_byte, pDescriptorNew);
 	players.reg_pos		= read_data(5, 4, current_byte, pDescriptorNew);
-    //Unknown A - 1 bit
+    //Unknown A - 1/1
 	players.play_style	= read_data(2, 5, current_byte, pDescriptorNew);
 	players.mo_fk		= read_data(7, 5, current_byte, pDescriptorNew);
 	players.star		= read_data(4, 3, current_byte, pDescriptorNew);
@@ -80,7 +80,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	players.b_edit_style = read_data(1, 1, current_byte, pDescriptorNew);
 	players.b_edit_com = read_data(2, 1, current_byte, pDescriptorNew);
 	players.b_edit_motion = read_data(3, 1, current_byte, pDescriptorNew);
-	//Unknown C - 1/1
+	//Unknown C - 4/1
 	players.strong_foot	= read_data(5, 1, current_byte, pDescriptorNew);
 	players.strong_hand	= read_data(6, 1, current_byte, pDescriptorNew);
 	//COM playing styles
@@ -133,7 +133,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	players.play_skill[25]	= read_data(4, 1, current_byte, pDescriptorNew); //Captaincy
 	players.play_skill[26]	= read_data(5, 1, current_byte, pDescriptorNew); //Super sub
 	players.play_skill[27]	= read_data(6, 1, current_byte, pDescriptorNew); //Fighting spirit
-	current_byte++; //Unknown D 1/1
+	current_byte++; //Unknown D 7/1
 
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, players.name, 61);
 	current_byte+=61;
@@ -145,7 +145,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 
 	//Appearance entries
 	//playerID
-	current_byte+=4;
+	current_byte+=4; 
 	//0x04:0
 	players.b_edit_face	= read_data(0, 1, current_byte, pDescriptorNew);
 	players.b_edit_hair	= read_data(1, 1, current_byte, pDescriptorNew);
@@ -379,8 +379,8 @@ void extract_player_entry20(player_entry player, int &current_byte, void* ghdesc
 	write_data(player.weak_acc,		6, 2, current_byte, pDescriptorNew);
 	write_data(player.drib,			0, 7, current_byte, pDescriptorNew);
 	write_data(player.injury,			7, 2, current_byte, pDescriptorNew);
-	write_data(player.play_attit,		1, 2, current_byte, pDescriptorNew);
-	write_data(player.mo_drib,			3, 2, current_byte, pDescriptorNew);
+	write_data(player.play_attit,		1, 2, current_byte, pDescriptorNew); //Playing attitude
+	write_data(player.mo_drib,			3, 2, current_byte, pDescriptorNew); //Dribbling motion
 	write_data(player.play_pos[12],	5, 2, current_byte, pDescriptorNew); //GK
 	write_data(player.play_pos[9],		7, 2, current_byte, pDescriptorNew); //CB
 	write_data(player.play_pos[10],	1, 2, current_byte, pDescriptorNew); //LB

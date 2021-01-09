@@ -69,16 +69,4 @@ uint8_t *readFile(const TCHAR *path, uint32_t *sizePtr);
 
 void writeFile(const TCHAR *path, const uint8_t *data, int size);
 
-/*
-struct FileDescriptor *createFileDescriptor();
-void destroyFileDescriptor(struct FileDescriptor *desc);
-
-void decryptWithKey(struct FileDescriptor *descriptor, const uint8_t *input, const char *masterKey);
-uint8_t *encryptWithKey(const struct FileDescriptor *descriptor, int *size, const char *masterKey);
-
-
-
-void decrypt_edit(const TCHAR *, struct FileDescriptor *);
-void encrypt_edit(const TCHAR *, struct FileDescriptor *);
-*/
 #endif /* _CRYPT_H */

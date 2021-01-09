@@ -210,6 +210,10 @@
 				RelativePath=".\pes20.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\window.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -230,6 +234,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\window.h"
 				>
 			</File>
 		</Filter>

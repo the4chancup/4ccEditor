@@ -291,8 +291,9 @@ struct player_entry : player_export
 		b_out = b_out &&(this->aggres==rhs.aggres);
 		//
 		b_out = b_out &&(this->star==rhs.star);
-		b_out = b_out &&(this->mo_drib==rhs.mo_drib);		
+		b_out = b_out &&(this->mo_drib==rhs.mo_drib);
 		b_out = b_out &&(this->play_attit==rhs.play_attit);
+		b_out = b_out &&(this->strong_hand==rhs.strong_hand);
 
 		return b_out;
 	}
@@ -401,6 +402,7 @@ struct player_entry : player_export
 		pExport.star = this->star;
 		pExport.mo_drib = this->mo_drib;		
 		pExport.play_attit = this->play_attit;
+		pExport.strong_hand = this->strong_hand;
 
 		return pExport;
 	}
@@ -459,6 +461,7 @@ struct player_entry : player_export
 			//
 			this->star = pImport.star;		
 			this->play_attit = pImport.play_attit;
+			this->strong_hand = pImport.strong_hand;
 		}
 		if(importAes)
 		{
@@ -657,8 +660,3 @@ void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*);
 //data_util.cpp functions
 int read_data(int, int, int&, FileDescriptorNew*);
 void write_data(int, int, int, int&, FileDescriptorNew*);
-
-//extern void* ghdescriptor;
-//extern team_entry* gteams;
-//extern int gnum_players;
-//extern int gnum_teams;

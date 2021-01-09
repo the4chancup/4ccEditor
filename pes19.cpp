@@ -73,7 +73,7 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 	//Unknown E - 1/1
 	players.swerve		= read_data(7, 7, current_byte, pDescriptorNew);
 	players.speed		= read_data(6, 7, current_byte, pDescriptorNew);
-	current_byte++; // Star Rating 3/3
+	players.star		= read_data(5, 3, current_byte, pDescriptorNew);
 	players.stamina		= read_data(0, 7, current_byte, pDescriptorNew);
 	players.gk			= read_data(7, 7, current_byte, pDescriptorNew);
 	players.mo_pk		= read_data(6, 3, current_byte, pDescriptorNew);
@@ -516,7 +516,7 @@ void extract_player_entry19(player_entry player, int &current_byte, void* ghdesc
 	//Unknown E - 1/1
 	write_data(player.swerve,		7, 7, current_byte, pDescriptorNew);
 	write_data(player.speed,		6, 7, current_byte, pDescriptorNew);
-	current_byte++; // Star Rating 3/3
+	write_data(player.star,			5, 3, current_byte, pDescriptorNew);
 	write_data(player.stamina,		0, 7, current_byte, pDescriptorNew);
 	write_data(player.gk,			7, 7, current_byte, pDescriptorNew);
 	write_data(player.mo_pk,		6, 3, current_byte, pDescriptorNew);
