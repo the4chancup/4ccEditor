@@ -655,7 +655,7 @@ void extract_team_tactics20(team_entry, int &, void*);
 
 void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
 
-void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*);
+void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, void*);
 
 //data_util.cpp functions
 int read_data(int, int, int&, FileDescriptorNew*);

@@ -155,7 +155,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor 10th Anniversary Edition (Version A)"),
+		_T("4ccEditor 10th Anniversary Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -4626,7 +4626,27 @@ BOOL CALLBACK aatf_comp_dlg_proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM 
 		case WM_INITDIALOG:
 		{
 			TCHAR* cs_file_path = (TCHAR*)lParam;
-			save_comparator(hwnd, giPesVersion, gplayers, gnum_players, gteams, gnum_teams, cs_file_path);
+			void *hc_descriptor = NULL;
+			__try
+			{
+				save_comparator(hwnd, giPesVersion, gplayers, gnum_players, gteams, gnum_teams, cs_file_path, hc_descriptor);
+			}
+			__except(EXCEPTION_EXECUTE_HANDLER)
+			{
+				TCHAR errBuffer[MAX_PATH] = _T("");
+				_stprintf_s(errBuffer, MAX_PATH, _T("File decryption failed with code %d.\nThe EDIT file is from a different PES version and cannot be used for comparison."),
+					GetExceptionCode());
+				MessageBox(ghw_main, errBuffer, _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+				if(hc_descriptor) 
+				{
+					if(giPesVersion>=18)
+						destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
+					else
+						destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
+					hc_descriptor = NULL;
+				}
+				EndDialog(hwnd, IDB_AATFOK);
+			}
 		}
 		break;
         case WM_COMMAND:

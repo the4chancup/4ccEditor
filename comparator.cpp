@@ -13,11 +13,10 @@
   typedef std::wstringstream tstringstream;
 #endif
 
-void compare_data_handler(const TCHAR*, int);
+void compare_data_handler(const TCHAR*, int, void*);
 tstring do_comparison(int, player_entry*, int, team_entry*, int);
 tstring compare_single_team(int, int, player_entry*, int, team_entry*);
 
-void *hc_descriptor;
 player_entry* c_players = NULL;
 team_entry* c_teams = NULL;
 int c_num_players, c_num_teams;
@@ -32,7 +31,7 @@ extern pf_decryptWithKeyNew decryptWithKeyNew;
 extern pf_encryptWithKeyOld encryptWithKeyOld;
 extern pf_encryptWithKeyNew encryptWithKeyNew;
 
-void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, int gnum_players, team_entry* gteams, int gnum_teams, TCHAR *cs_file_name)
+void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, int gnum_players, team_entry* gteams, int gnum_teams, TCHAR *cs_file_name, void *hc_descriptor)
 {
 //	//Open dialog box to get file path
 //	OPENFILENAME ofn;
@@ -53,7 +52,7 @@ void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, 
 //
 //	if(GetOpenFileName(&ofn))
 	{
-		compare_data_handler(cs_file_name, nPesVersion);
+		compare_data_handler(cs_file_name, nPesVersion, hc_descriptor);
 
 		//Do comparison between players, teams
 		tstring result = do_comparison(nPesVersion, gplayers, gnum_players, gteams, gnum_teams);
@@ -84,7 +83,7 @@ void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, 
 	}
 }
 
-void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
+void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion, void* hc_descriptor)
 {
 	int ii, current_byte, appearance_byte;
 	const uint8_t* pMasterKey;
@@ -244,7 +243,7 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
 			fill_team_tactics18(current_byte, hc_descriptor, c_teams, c_num_teams);
 		}
 	}
-	else // PES 19
+	else if(nPesVersion==19)
 	{
 		hc_descriptor = (void*)createFileDescriptorNew();
 		pMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes19");
@@ -292,6 +291,51 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion)
 		for(int ii=0;ii<c_num_teams;ii++)
 		{
 			fill_team_tactics19(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+	}
+	else // PES 20/21
+	{
+		hc_descriptor = (void*)createFileDescriptorNew();
+		if(nPesVersion==20)
+			pMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes20");
+		else
+			pMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes21");
+		uint8_t *pfin = readFile(pcs_file_name, NULL);
+		decryptWithKeyNew((FileDescriptorNew*)hc_descriptor, pfin, reinterpret_cast<const char*>(pMasterKey));
+
+		//get number of player, team entries
+		c_num_players = ((FileDescriptorNew*)hc_descriptor)->data[96];
+		c_num_players += (((FileDescriptorNew*)hc_descriptor)->data[97])*256;
+
+		c_num_teams = ((FileDescriptorNew*)hc_descriptor)->data[100];
+		c_num_teams += (((FileDescriptorNew*)hc_descriptor)->data[101])*256;
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x7C;
+		c_players = new player_entry[c_num_players];
+		for(int ii=0;ii<c_num_players;ii++)
+		{
+			fill_player_entry20(c_players[ii], current_byte, hc_descriptor);
+		}
+
+		//place team entries into array of structs
+		current_byte = 0x8ED2FC;
+		c_teams = new team_entry[c_num_teams];
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_ids20(c_teams[ii], current_byte, hc_descriptor);
+		}
+
+		current_byte = 0x9D4648;
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_rosters20(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+
+		current_byte = 0xA09880;
+		for(int ii=0;ii<c_num_teams;ii++)
+		{
+			fill_team_tactics20(current_byte, hc_descriptor, c_teams, c_num_teams);
 		}
 	}
 
@@ -467,6 +511,8 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 			errorMsg << _T("\tstrong_foot: ") << (int)playerA.strong_foot <<_T(" / ") << (int)playerB.strong_foot <<_T("\r\n");
 		if(playerA.swerve!=playerB.swerve)
 			errorMsg << _T("\tswerve: ") << (int)playerA.swerve <<_T(" / ") << (int)playerB.swerve <<_T("\r\n");
+		if(pesVersion>19 && playerA.aggres!=playerB.aggres)
+			errorMsg << _T("\taggression: ") << (int)playerA.aggres <<_T(" / ") << (int)playerB.aggres <<_T("\r\n");
 
 		if(playerA.form!=playerB.form)
 			errorMsg << _T("\tForm: ") << (int)playerA.form <<_T(" / ") << (int)playerB.form <<_T("\r\n");
@@ -490,6 +536,7 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 		}
 		int numSkill;
 		if(pesVersion==19) numSkill=39;
+		else if(pesVersion>19) numSkill=41;
 		else numSkill=28;
 		for(int kk=0;kk<numSkill;kk++)
 		{

@@ -1967,10 +1967,15 @@ void setup_tab3(HWND H)
 		SWP_NOZORDER|SWP_NOOWNERZORDER|SWP_NOACTIVATE);
 	SetWindowSubclass(ghw_tab3, tab_three_dlg_proc, 0, (DWORD_PTR)chd_rect);
 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Team Colors"), 
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
+		10, 5, 207, 168, ghw_tab3, (HMENU)IDC_STATIC_T1, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
 	x1 = 20;
 	x2 = 100;
-	y1 = 12;
-	y2 = 82;
+	y1 = 25;
+	y2 = 95;
 	ydiff=22;
 
 	//Red 1
@@ -2027,7 +2032,7 @@ void setup_tab3(HWND H)
 	//Color 1 button
 	hw_new = CreateWindowEx(0, _T("Button"), NULL, 
 		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		155, 19, 50, 50, ghw_tab3, (HMENU)IDB_TCOLOR1, GetModuleHandle(NULL), NULL);	
+		155, y1+6, 50, 50, ghw_tab3, (HMENU)IDB_TCOLOR1, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	//Red 2
@@ -2084,12 +2089,17 @@ void setup_tab3(HWND H)
 	//Color 2 button
 	hw_new = CreateWindowEx(0, _T("Button"), NULL, 
 		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		155, 19+y2-y1, 50, 50, ghw_tab3, (HMENU)IDB_TCOLOR2, GetModuleHandle(NULL), NULL);	
+		155, y2+6, 50, 50, ghw_tab3, (HMENU)IDB_TCOLOR2, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Team Data"), 
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
+		10, 178, 207, 70, ghw_tab3, (HMENU)IDC_STATIC_T1, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	x1 = 20;
 	x2 = 100;
-	y2 = 282;
+	y2 = 198;
 
 	//Manager ID
 	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
