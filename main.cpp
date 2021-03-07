@@ -155,7 +155,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor 21 Preview Edition (Version B)"),
+		_T("4ccEditor 10th Anniversary Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1042,7 +1042,10 @@ void DoFileOpen(HWND hwnd, TCHAR* pcs_title)
 		__except(EXCEPTION_EXECUTE_HANDLER) //If file loading fails (usually due to trying to open the wrong type of file for the chosen loader, 
 											// e.g. opening a PES21 save file with the PES19 loading function), report the error and fail gracefully
 		{
-			MessageBox(ghw_main, _T("This load function cannot handle this file type."), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+			TCHAR errBuffer[MAX_PATH] = _T("");
+			_stprintf_s(errBuffer, MAX_PATH, _T("File loading failed with code %d.\nThe EDIT file may be from a different PES version or may be malformed."),
+				GetExceptionCode());
+			MessageBox(ghw_main, errBuffer, _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
 			//Clear all entries, as no save has been loaded
 			if(ghdescriptor) 
 			{
@@ -1554,10 +1557,10 @@ void data_handler(const TCHAR *pcs_file_name)
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Orchestrator"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
-			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Fullback Finisher"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
 			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
@@ -1898,7 +1901,8 @@ void show_player_info(int p_ind)
 {
 	int ii,jj;
 	bool match=false;
-	wchar_t buffer[18];
+	wchar_t buffer[21];
+	memset(buffer,0,sizeof(buffer));
 	//ZeroMemory(buffer,12);
 
 	SendDlgItemMessage(ghw_main, IDT_PLAY_NAME, WM_SETTEXT, 0, (LPARAM)gplayers[p_ind].name);
@@ -1906,7 +1910,7 @@ void show_player_info(int p_ind)
 	_itow_s(gplayers[p_ind].id, buffer, 12, 10);
 	SendDlgItemMessage(ghw_main, IDT_PLAY_ID, WM_SETTEXT, 0, (LPARAM)buffer);
 
-	mbstowcs(buffer, gplayers[p_ind].shirt_name, 18);
+	mbstowcs(buffer, gplayers[p_ind].shirt_name, 20);
 	SendDlgItemMessage(ghw_main, IDT_PLAY_SHIRT, WM_SETTEXT, 0, (LPARAM)buffer);
 
 	_itow_s(gplayers[p_ind].nation, buffer, 12, 10);
@@ -1925,6 +1929,7 @@ void show_player_info(int p_ind)
 	else Button_SetCheck(GetDlgItem(ghw_main, IDB_PLAY_EDIT),BST_UNCHECKED);
 
 	SendDlgItemMessage(ghw_main, IDC_PLAY_FOOT, CB_SETCURSEL, (WPARAM)gplayers[p_ind].strong_foot, 0);
+	SendDlgItemMessage(ghw_tab2, IDC_PLAY_HAND, CB_SETCURSEL, (WPARAM)gplayers[p_ind].strong_hand, 0);
 	
 	SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_SETCURSEL, (WPARAM)gplayers[p_ind].reg_pos, 0);
 
@@ -2216,8 +2221,9 @@ void show_player_info(int p_ind)
 }
 player_entry get_form_player_info(int index)
 {
-	wchar_t buffer[18], wc;
+	wchar_t buffer[21], wc;
 	int ii, shirtNameLen;
+	memset(buffer,0,sizeof(buffer));
 	//player_entry output;
 	//if(index<0 || index > gnum_players) return output; //DEBUG, fix
 
@@ -2230,8 +2236,9 @@ player_entry get_form_player_info(int index)
 	output.id = _wtoi(buffer);
 
 	if(giPesVersion==16) shirtNameLen=16;
-	else shirtNameLen=18;
-	SendDlgItemMessage(ghw_main, IDT_PLAY_SHIRT, WM_GETTEXT, shirtNameLen, (LPARAM)buffer);
+	else if(giPesVersion<20) shirtNameLen=18;
+	else shirtNameLen=20;
+	SendDlgItemMessage(ghw_main, IDT_PLAY_SHIRT, WM_GETTEXT, shirtNameLen+1, (LPARAM)buffer);
 	ii = 0;
 	while(buffer[ii]) 
 	{
@@ -2257,6 +2264,7 @@ player_entry get_form_player_info(int index)
 	else output.b_edit_player=false;
 
 	output.strong_foot = SendDlgItemMessage(ghw_main, IDC_PLAY_FOOT, CB_GETCURSEL, 0, 0);
+	output.strong_hand = SendDlgItemMessage(ghw_tab2, IDC_PLAY_HAND, CB_GETCURSEL, 0, 0);
 	
 	output.reg_pos = SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0);
 
@@ -3714,6 +3722,8 @@ void toggle_hid()
 	ShowWindow(GetDlgItem(ghw_tab2, IDC_STATIC_T89), value);
 	ShowWindow(GetDlgItem(ghw_tab2, IDT_MOTI_DRIB), value);
 	ShowWindow(GetDlgItem(ghw_tab2, IDC_MOTI_DRIB), value);
+	ShowWindow(GetDlgItem(ghw_tab2, IDT_PLAY_HAND), value);
+	ShowWindow(GetDlgItem(ghw_tab2, IDC_PLAY_HAND), value);
 }
 
 void set_stats()
@@ -4441,7 +4451,24 @@ void import_squad(HWND hwnd)
 							  else if(gplayers[ii].play_style==16) gplayers[ii].play_style=20;
 							  else if(gplayers[ii].play_style==17) gplayers[ii].play_style=21;
 							}
-							else if(giPesVersion<19 && pesVer>=19)
+
+							if(giPesVersion>=20 && pesVer<20)
+							{
+								if(gplayers[ii].play_style==15) gplayers[ii].play_style=18;
+								else if(gplayers[ii].play_style==16) gplayers[ii].play_style=15;
+								else if(gplayers[ii].play_style==17) gplayers[ii].play_style=16;
+								else if(gplayers[ii].play_style==18) gplayers[ii].play_style=17;
+							}
+
+							if(giPesVersion<20 && pesVer>=20)
+							{
+								if(gplayers[ii].play_style==18) gplayers[ii].play_style=15;
+								else if(gplayers[ii].play_style==15) gplayers[ii].play_style=16;
+								else if(gplayers[ii].play_style==16) gplayers[ii].play_style=17;
+								else if(gplayers[ii].play_style==17) gplayers[ii].play_style=18;
+							}
+
+							if(giPesVersion<19 && pesVer>=19)
 							{
 							  if(gplayers[ii].play_style==4) gplayers[ii].play_style=13;
 							  else if(gplayers[ii].play_style==5) gplayers[ii].play_style=14;

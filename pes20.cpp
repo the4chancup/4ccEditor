@@ -138,7 +138,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, players.name, 61);
 	current_byte+=61;
 
-	strcpy_s(players.shirt_name, 20, (const char*)&(pDescriptorNew->data[current_byte]));
+	strcpy_s(players.shirt_name, 21, (const char*)&(pDescriptorNew->data[current_byte]));
 	current_byte+=61;
 
 	current_byte+=64; //Print Name (National Team) 
@@ -461,7 +461,7 @@ void extract_player_entry20(player_entry player, int &current_byte, void* ghdesc
 	WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 61, NULL, NULL);
 	current_byte+=61;
 	
-	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 20, player.shirt_name);
+	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 21, player.shirt_name);
 	current_byte+=61;
 
 	current_byte+=64; //Print Name (National Team)

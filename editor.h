@@ -130,7 +130,7 @@ struct player_export
 	40 Through Passing (20+)
 	*/
 	wchar_t name[61]; //Player Name
-	char shirt_name[20]; //Shirt Name
+	char shirt_name[21]; //Shirt Name
 
 	//Appearance
 	bool b_edit_face; //Edited Face 

@@ -20,11 +20,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	//Settings
 	int manletBonus = 5;
+	int giantPen = 0;
 
 	int goldRate = 99;
-	int silverRate = 89;
-	int reqNumGold = 1;
-	int reqNumSilver = 4;
+	int silverRate = 88;
+	int reqNumGold = 2;
+	int reqNumSilver = 2;
 
 	int greenGiant = 6;
 	int greenTall = 5;
@@ -93,6 +94,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         rating = max(player.place_kick, rating);
         rating = max(player.stamina, rating);
         rating = max(player.speed, rating);
+		if(pesVersion>19) rating = max(player.aggres, rating);
+		
+		if(player.injury+1 > 3)
+		{
+			errorTot++;
+            errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", cannot exceed 3; ");
+		}
 
 		//Check if registered pos has playable set to A
         if(player.reg_pos == 12 && player.play_pos[0] != 2)
@@ -172,6 +180,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             if(player.play_pos[jj] > 0)
 				countA++;
         }
+
         //If more than 1 A, 1 card less for each
         if(countA > 1)
         {
@@ -188,6 +197,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		int numCom = 0;
 		int numSkill;
 		if(pesVersion==19) numSkill=39;
+		else if(pesVersion>19) numSkill=41;
 		else numSkill=28;
         for(int jj=0;jj<numSkill;jj++)
         {
@@ -225,7 +235,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numTall++;
         else if(player.height == 189 && player.reg_pos == 0) //GK
             numTall++;
-        else if(player.height == 194) // && player.height < 200)
+        else if(player.height > 193 && player.height < 200)
             numGiant++;
         else
 		{
@@ -245,6 +255,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			errorMsg << _T("Weight out of range (") << max(30,player.height-129) << _T(",") << player.height-81 << _T("); ");
 		}
 
+		/* REGULAR */
 		if(rating < silverRate-2) //Regular player
         {
             numReg++;
@@ -274,6 +285,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			
             if(player.reg_pos == 0) //GK gets 2 cards
             {
+				cardMod += min(0, numTrick); //0 free tricks
 				cardLimit = 2 + cardMod;
                 if(cardCount > cardLimit)
 				{
@@ -320,26 +332,23 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					targetRate2 += manletBonus;
 				}
             }
-			if(player.height > 175 && player.injury+1 > 2)
-			{
-				errorTot++;
-				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be 2; ");
-			}
-			else if(player.height < 175 && player.injury+1 > 1)
+			if(player.injury+1 > 1)
 			{
 				errorTot++;
 				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be 1; ");
 			}
-        }            
+		}
+		/* SILVER */
         else if(rating < goldRate-4) //Silver player
         {
             numSilver++;
 			targetRate = silverRate;
 			targetRate2 = silverRate;
-            if(numSilver>4)
+
+            if(numSilver > reqNumSilver)
 			{
                 errorTot++;
-				errorMsg << _T("Already has 4 Silver medals; ");
+				errorMsg << _T("Too many Silver medals; ");
 			}
             if(player.form+1 != 8)
 			{
@@ -351,11 +360,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot play as GK; ");
 			}
-			/*if(player.height > 185) //HA get penalty
+			if(player.height > 185) //HA get penalty
 			{
 				targetRate -= 2;
 				targetRate2 -= 2;
-			}*/
+			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(1, numCom); //1 free COM
 			cardLimit = 5 + cardMod;
@@ -375,16 +384,17 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be 3; ");
 			}
         }
+		/* GOLD */
         else //rating == 99 //Gold player
         {
             numGold++;
 			targetRate = goldRate;
 			targetRate2 = goldRate;
 
-            if(numGold>1)
+            if(numGold > reqNumGold)
 			{
                 errorTot++;
-				errorMsg << _T("Already has 1 Gold medals; ");
+				errorMsg << _T("Too many Gold medals; ");
 			}
             if(player.form+1 != 8)
 			{
@@ -396,12 +406,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot play as GK; ");
 			}
-			/*if(player.height > 185) //Medal HA penalty
+			if(player.height > 185) //Medal HA penalty
 			{
 				targetRate -= 4;
 				targetRate2 -= 4;
-			}*/
-            cardMod += min(4, numTrick); //3 free tricks
+			}
+            cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(2, numCom); //2 free COMs
 
 			cardLimit = 6 + cardMod;
@@ -544,6 +554,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		{
             errorTot++;
 			errorMsg << _T("Defensive Prowess is ") << player.def << _T(", should be ") << targetRate2 << _T(" or less; ");
+        }
+		if(pesVersion>19 && player.aggres > targetRate)
+		{
+            errorTot++;
+			errorMsg << _T("Aggression is ") << player.aggres << _T(", should be ") << targetRate << _T("; ");
         }
 		if(errorMsg.rdbuf()->in_avail())
 		{
