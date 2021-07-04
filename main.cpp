@@ -155,7 +155,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor 10th Anniversary Edition (Version B)"),
+		_T("4ccEditor 10th Anniversary Edition (Version C)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1188,6 +1188,17 @@ void data_handler(const TCHAR *pcs_file_name)
 	SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T43), _T("Coverage:"));
 	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43));
 
+	//Set ranges of motion scroll buttons to default
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_HUND, UDM_SETRANGE, 0, MAKELPARAM(1, 3));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_ARMD, UDM_SETRANGE, 0, MAKELPARAM(1, 8));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_HUNR, UDM_SETRANGE, 0, MAKELPARAM(1, 3));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_ARMR, UDM_SETRANGE, 0, MAKELPARAM(1, 8));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_CK, UDM_SETRANGE, 0, MAKELPARAM(1, 6));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_FK, UDM_SETRANGE, 0, MAKELPARAM(1, 16));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_PK, UDM_SETRANGE, 0, MAKELPARAM(1, 4));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC1, UDM_SETRANGE, 0, MAKELPARAM(0, 122));
+	SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC2, UDM_SETRANGE, 0, MAKELPARAM(0, 122));
+
 	if(giPesVersion==16)
 	{
 		ghdescriptor = (void*)createFileDescriptorOld();
@@ -1538,6 +1549,17 @@ void data_handler(const TCHAR *pcs_file_name)
 		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T43), _T("GK Reach:"));
 		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43));
 
+		//Set ranges of motion scroll buttons
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_HUND, UDM_SETRANGE, 0, MAKELPARAM(1, 5));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_ARMD, UDM_SETRANGE, 0, MAKELPARAM(1, 10));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_HUNR, UDM_SETRANGE, 0, MAKELPARAM(1, 5));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_ARMR, UDM_SETRANGE, 0, MAKELPARAM(1, 10));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_CK, UDM_SETRANGE, 0, MAKELPARAM(1, 10));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_FK, UDM_SETRANGE, 0, MAKELPARAM(1, 20));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_PK, UDM_SETRANGE, 0, MAKELPARAM(1, 7));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC1, UDM_SETRANGE, 0, MAKELPARAM(0, 162));
+		SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC2, UDM_SETRANGE, 0, MAKELPARAM(0, 162));
+
 		//Fill Play Style combobox:	
 		if(SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCOUNT, 0, 0) < 22)
 		{
@@ -1867,6 +1889,8 @@ void save_handler(const TCHAR *pcs_file_name)
 		uint8_t *output;
 		output = encryptWithKeyNew((FileDescriptorNew*)ghdescriptor, &outputSize, reinterpret_cast<const char*>(gpMasterKey));
 		writeFile(pcs_file_name, output, outputSize);
+		//Add function to DLL to free allocated memory
+		//freeEncryptArray(output);
 	}
 }
 
@@ -1929,7 +1953,8 @@ void show_player_info(int p_ind)
 	else Button_SetCheck(GetDlgItem(ghw_main, IDB_PLAY_EDIT),BST_UNCHECKED);
 
 	SendDlgItemMessage(ghw_main, IDC_PLAY_FOOT, CB_SETCURSEL, (WPARAM)gplayers[p_ind].strong_foot, 0);
-	SendDlgItemMessage(ghw_tab2, IDC_PLAY_HAND, CB_SETCURSEL, (WPARAM)gplayers[p_ind].strong_hand, 0);
+	if(giPesVersion>=20)
+		SendDlgItemMessage(ghw_tab2, IDC_PLAY_HAND, CB_SETCURSEL, (WPARAM)gplayers[p_ind].strong_hand, 0);
 	
 	SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_SETCURSEL, (WPARAM)gplayers[p_ind].reg_pos, 0);
 
@@ -2152,6 +2177,12 @@ void show_player_info(int p_ind)
 	_itow_s(gplayers[p_ind].gc2, buffer, 18, 10);
 	SendDlgItemMessage(ghw_tab2, IDT_MOTI_GC2, WM_SETTEXT, 0, (LPARAM)buffer);
 
+	if(giPesVersion>=20)
+	{
+		_itow_s(gplayers[p_ind].mo_drib, buffer, 18, 10);
+		SendDlgItemMessage(ghw_tab2, IDT_MOTI_DRIB, WM_SETTEXT, 0, (LPARAM)buffer);
+	}
+
 	for(ii=0;ii<gnum_teams;ii++)
 	{
 		for(jj=0;jj < gteams->team_max;jj++)
@@ -2222,7 +2253,7 @@ void show_player_info(int p_ind)
 player_entry get_form_player_info(int index)
 {
 	wchar_t buffer[21], wc;
-	int ii, shirtNameLen;
+	int ii, shirtNameLen, playerNameLen;
 	memset(buffer,0,sizeof(buffer));
 	//player_entry output;
 	//if(index<0 || index > gnum_players) return output; //DEBUG, fix
@@ -2230,7 +2261,9 @@ player_entry get_form_player_info(int index)
 	player_entry output = gplayers[index]; //need to handle case it is empty
 	output.b_changed = true;
 
-	SendDlgItemMessage(ghw_main, IDT_PLAY_NAME, WM_GETTEXT, (WPARAM)46, (LPARAM)output.name);
+	if(giPesVersion<20) playerNameLen=46;
+	else playerNameLen=61;
+	SendDlgItemMessage(ghw_main, IDT_PLAY_NAME, WM_GETTEXT, (WPARAM)playerNameLen, (LPARAM)output.name);
 
 	SendDlgItemMessage(ghw_main, IDT_PLAY_ID, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.id = _wtoi(buffer);
@@ -2385,6 +2418,12 @@ player_entry get_form_player_info(int index)
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.injury = _wtoi(buffer) - 1;
 
+	SendDlgItemMessage(ghw_tab1, IDT_STAR, WM_GETTEXT, 18, (LPARAM)buffer);
+	output.star = _wtoi(buffer);
+
+	SendDlgItemMessage(ghw_tab1, IDT_PLAY_ATT, WM_GETTEXT, 18, (LPARAM)buffer);
+	output.play_attit = _wtoi(buffer);
+
 	if(Button_GetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_FACE))==BST_CHECKED) output.b_edit_face=true;
 	else output.b_edit_face=false;
 	if(Button_GetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_HAIR))==BST_CHECKED) output.b_edit_hair=true;
@@ -2509,6 +2548,9 @@ player_entry get_form_player_info(int index)
 
 	SendDlgItemMessage(ghw_tab2, IDT_MOTI_GC2, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.gc2 = _wtoi(buffer);
+
+	SendDlgItemMessage(ghw_tab2, IDT_MOTI_DRIB, WM_GETTEXT, 18, (LPARAM)buffer);
+	output.mo_drib = _wtoi(buffer);
 
 	return output;
 }
@@ -3032,39 +3074,56 @@ LRESULT CALLBACK tab_two_dlg_proc(HWND H, UINT M, WPARAM W, LPARAM L,
 						int val;
 						wchar_t buffer[4];
 
-						val = rand() % 3 + 1;
+						int hunchMax = 3;
+						int armMax = 8;
+						int ckMax = 6;
+						int fkMax = 16;
+						int pkMax = 4;
+						int gcMax = 122;
+						if(giPesVersion>=20)
+						{
+							hunchMax = 5;
+							armMax = 10;
+							ckMax = 10;
+							fkMax = 20;
+							pkMax = 7;
+							gcMax = 162;
+						}
+
+
+						val = rand() % hunchMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_HUND, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 8 + 1;
+						val = rand() % armMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_ARMD, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 3 + 1;
+						val = rand() % hunchMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_HUNR, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 8 + 1;
+						val = rand() % armMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_ARMR, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 6 + 1;
+						val = rand() % ckMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_CK, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 16 + 1;
+						val = rand() % fkMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_FK, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 4 + 1;
+						val = rand() % pkMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_PK, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 122 + 1;
+						val = rand() % gcMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_GC1, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						val = rand() % 122 + 1;
+						val = rand() % gcMax + 1;
 						_itow_s(val, buffer, 4, 10);
 						SendDlgItemMessage(H, IDT_MOTI_GC2, WM_SETTEXT, 0, (LPARAM)buffer);
 					}
@@ -3678,7 +3737,7 @@ void fpc_toggle()
 	{
 		if(giPesVersion<18) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)7, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		if( SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) )
+		if( SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion<18 ) //GK sleeves are different in pre-Fox versions
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
 		else
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);

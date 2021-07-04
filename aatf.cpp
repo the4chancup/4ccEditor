@@ -261,6 +261,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numReg++;
 			targetRate = 77;
 			targetRate2 = 77;
+			if(player.reg_pos == 0) //GK target rate is 77
+            {
+				targetRate = 77;
+			}
 
 			if(player.height >= 180)
 			{
@@ -281,7 +285,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Form is ") << player.form+1 << _T(", should be 4; ");
 			}
-
 			
             if(player.reg_pos == 0) //GK gets 2 cards
             {
@@ -309,29 +312,21 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				}
 			}
             
-			if(player.reg_pos == 0) //GK gets target rate is 77
+            if(rating != targetRate)
             {
-				targetRate = 77;
-				if(player.height <= 175)
-				{
-					targetRate += manletBonus;
-					targetRate2 += manletBonus;
-				}
-			}
-            else if(rating != targetRate)
-            {
-                if(rating != targetRate+manletBonus || player.height > 175)
-				{
-                    errorTot++;
-					errorMsg << _T("Illegal Ability scores; ");
-				}
-                else
+                if(rating == targetRate+manletBonus && player.height == 175)
 				{
                     usingRed = true;
 					targetRate += manletBonus;
 					targetRate2 += manletBonus;
 				}
+				else
+				{
+                    errorTot++;
+					errorMsg << _T("Illegal Ability scores; ");
+				}
             }
+
 			if(player.injury+1 > 1)
 			{
 				errorTot++;
@@ -553,9 +548,14 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         if(player.def > targetRate2)
 		{
             errorTot++;
-			errorMsg << _T("Defensive Prowess is ") << player.def << _T(", should be ") << targetRate2 << _T(" or less; ");
+			errorMsg << _T("Defensive Prowess is ") << player.def << _T(", should be ") << targetRate << _T(" or less; ");
         }
-		if(pesVersion>19 && player.aggres > targetRate)
+		if(pesVersion>19 && player.tight_pos != targetRate)
+		{
+            errorTot++;
+			errorMsg << _T("Tight Possession is ") << player.tight_pos << _T(", should be ") << targetRate << _T("; ");
+        }
+		if(pesVersion>19 && player.aggres != targetRate)
 		{
             errorTot++;
 			errorMsg << _T("Aggression is ") << player.aggres << _T(", should be ") << targetRate << _T("; ");
