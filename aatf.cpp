@@ -314,7 +314,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             
             if(rating != targetRate)
             {
-                if(rating == targetRate+manletBonus && player.height == 175)
+                if(rating == targetRate+manletBonus && player.height <= 175)
 				{
                     usingRed = true;
 					targetRate += manletBonus;
