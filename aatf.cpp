@@ -357,8 +357,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			if(player.height > 185) //HA get penalty
 			{
-				targetRate -= 2;
-				targetRate2 -= 2;
+				targetRate -= 3;
+				targetRate2 -= 3;
 			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(1, numCom); //1 free COM
@@ -403,8 +403,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			if(player.height > 185) //Medal HA penalty
 			{
-				targetRate -= 4;
-				targetRate2 -= 4;
+				targetRate -= 6;
+				targetRate2 -= 6;
 			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(2, numCom); //2 free COMs
