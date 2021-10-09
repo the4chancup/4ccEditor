@@ -20,7 +20,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	//Settings
 	int manletBonus = 5;
-	int giantPen = 0;
+	int goldGiantPen = 6;
+	int silverGiantPen = 3;
 
 	int goldRate = 99;
 	int silverRate = 88;
@@ -256,7 +257,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		/* REGULAR */
-		if(rating < silverRate-2) //Regular player
+		if(rating < silverRate-silverGiantPen) //Regular player
         {
             numReg++;
 			targetRate = 77;
@@ -334,7 +335,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 		}
 		/* SILVER */
-        else if(rating < goldRate-4) //Silver player
+        else if(rating < goldRate-goldGiantPen) //Silver player
         {
             numSilver++;
 			targetRate = silverRate;
@@ -357,8 +358,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			if(player.height > 185) //HA get penalty
 			{
-				targetRate -= 3;
-				targetRate2 -= 3;
+				targetRate -= silverGiantPen;
+				targetRate2 -= silverGiantPen;
 			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(1, numCom); //1 free COM
@@ -403,8 +404,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			if(player.height > 185) //Medal HA penalty
 			{
-				targetRate -= 6;
-				targetRate2 -= 6;
+				targetRate -= goldGiantPen;
+				targetRate2 -= goldGiantPen;
 			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(2, numCom); //2 free COMs
