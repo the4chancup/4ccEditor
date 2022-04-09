@@ -1199,40 +1199,6 @@ void setup_tab1(HWND H)
 	setup_control(hw_bud, ghFont, scale_cntl_proc);
 	SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
 
-	hw_new = CreateWindowEx(0, _T("Static"), _T("Star rating:"), 
-		SS_NOPREFIX | WS_CHILD, 
-		323, y1+ydiff*20, 80, 17*2, ghw_tab1, (HMENU)IDS_STAR, GetModuleHandle(NULL), NULL);	
-	setup_control(hw_new, ghFont, scale_static_proc);
-
-	hw_new = CreateWindowEx(0, _T("Static"), _T("Playing Att:"), 
-		SS_NOPREFIX | WS_CHILD, 
-		323, y1+ydiff*21, 80, 17*2, ghw_tab1, (HMENU)IDS_PLAY_ATT, GetModuleHandle(NULL), NULL);	
-	setup_control(hw_new, ghFont, scale_static_proc);
-
-	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
-		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD, 
-		323+90, y1+ydiff*20, 44, 18, ghw_tab1, (HMENU)IDT_STAR, GetModuleHandle(NULL), NULL);
-	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
-		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD, 
-		0, 0, 0, 0, ghw_tab1, (HMENU)IDC_STAR, GetModuleHandle(NULL), NULL);
-	setup_control(hw_new, ghFont, scale_cntl_proc);
-	setup_control(hw_bud, ghFont, scale_cntl_proc);
-	SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
-	SendDlgItemMessage(ghw_tab1, IDC_STAR, UDM_SETRANGE, 0, MAKELPARAM(7, 0));
-	SendDlgItemMessage(ghw_tab1, IDT_STAR, WM_SETTEXT, 0, (LPARAM)_T("0"));
-
-	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
-		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD, 
-		323+90, y1+ydiff*21, 44, 18, ghw_tab1, (HMENU)IDT_PLAY_ATT, GetModuleHandle(NULL), NULL);
-	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
-		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD, 
-		0, 0, 0, 0, ghw_tab1, (HMENU)IDC_PLAY_ATT, GetModuleHandle(NULL), NULL);
-	setup_control(hw_new, ghFont, scale_cntl_proc);
-	setup_control(hw_bud, ghFont, scale_cntl_proc);
-	SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
-	SendDlgItemMessage(ghw_tab1, IDC_PLAY_ATT, UDM_SETRANGE, 0, MAKELPARAM(3, 0));
-	SendDlgItemMessage(ghw_tab1, IDT_PLAY_ATT, WM_SETTEXT, 0, (LPARAM)_T("0"));
-
 	for(int ii=IDT_ABIL_ATKP;ii<IDC_ABIL_AGGR;ii++)
 	{
 		SendDlgItemMessage(ghw_tab1, ii+1, UDM_SETRANGE, 0, MAKELPARAM(99, 40));
@@ -1825,15 +1791,15 @@ void setup_tab2(HWND H)
 
 	//PES 20+ Dribbling motion
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Dribbling:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD, 
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		420, y1+10+ydiff*1, 60, 17, ghw_tab2, (HMENU)IDC_STATIC_T89, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
-		ES_NUMBER | WS_TABSTOP | WS_CHILD,
+		ES_NUMBER | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
 		485, y2+10+ydiff*1, 40, 18, ghw_tab2, (HMENU)IDT_MOTI_DRIB, GetModuleHandle(NULL), NULL);
 	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
-		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD, 
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
 		0, 0, 0, 0, ghw_tab2, (HMENU)IDC_MOTI_DRIB, GetModuleHandle(NULL), NULL);
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 	setup_control(hw_bud, ghFont, scale_cntl_proc);
@@ -1842,17 +1808,56 @@ void setup_tab2(HWND H)
 	SendDlgItemMessage(ghw_tab2, IDT_MOTI_DRIB, WM_SETTEXT, 0, (LPARAM)_T("0"));
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Hand:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD, 
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		420, y2+10+ydiff*2+4, 35, 17, ghw_tab2, (HMENU)IDT_PLAY_HAND, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""), 
-		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_TABSTOP, 
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_TABSTOP | WS_VISIBLE, 
 		465, y2+10+ydiff*2, 60, 100, ghw_tab2, (HMENU)IDC_PLAY_HAND, GetModuleHandle(NULL), NULL);
 	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Right"));
 	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Left"));
 	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
 	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Misc"), 
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP, 
+		372, 5, 164, 80, ghw_tab2, (HMENU)IDC_STATIC_T97, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Star rating:"), 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		385, 26, 80, 17, ghw_tab2, (HMENU)IDS_STAR, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Playing Att:"), 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		385, 26+28, 80, 17, ghw_tab2, (HMENU)IDS_PLAY_ATT, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
+		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+		454, 24, 40, 18, ghw_tab2, (HMENU)IDT_STAR, GetModuleHandle(NULL), NULL);
+	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
+		0, 0, 0, 0, ghw_tab2, (HMENU)IDC_STAR, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	setup_control(hw_bud, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
+	SendDlgItemMessage(ghw_tab2, IDC_STAR, UDM_SETRANGE, 0, MAKELPARAM(7, 0));
+	SendDlgItemMessage(ghw_tab2, IDT_STAR, WM_SETTEXT, 0, (LPARAM)_T("0"));
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
+		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
+		454, 24+28, 40, 18, ghw_tab2, (HMENU)IDT_PLAY_ATT, GetModuleHandle(NULL), NULL);
+	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
+		0, 0, 0, 0, ghw_tab2, (HMENU)IDC_PLAY_ATT, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	setup_control(hw_bud, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 1, 0);
+	SendDlgItemMessage(ghw_tab2, IDC_PLAY_ATT, UDM_SETRANGE, 0, MAKELPARAM(3, 0));
+	SendDlgItemMessage(ghw_tab2, IDT_PLAY_ATT, WM_SETTEXT, 0, (LPARAM)_T("0"));
 
 	/*chd_rect = new RECT;
 	GetWindowRect(ghw_tab2, chd_rect);

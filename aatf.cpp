@@ -20,8 +20,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	//Settings
 	int manletBonus = 5;
-	int goldGiantPen = 6;
-	int silverGiantPen = 3;
+	int silverManletBonus = 2;
+	int goldGiantPen = 4;
+	int silverGiantPen = 2;
 
 	int goldRate = 99;
 	int silverRate = 88;
@@ -236,7 +237,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numTall++;
         else if(player.height == 189 && player.reg_pos == 0) //GK
             numTall++;
-        else if(player.height > 193 && player.height < 200)
+        else if(player.height > 193 && player.height < 195)
             numGiant++;
         else
 		{
@@ -360,6 +361,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
+			}
+			else if(player.height <= 175)
+            {
+				//usingRed = true;
+				targetRate += silverManletBonus;
+				targetRate2 += silverManletBonus;
 			}
             cardMod += min(3, numTrick); //3 free tricks
 			cardMod += min(1, numCom); //1 free COM
@@ -585,7 +592,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             {
                 errorTot -= diff;
             }
-			errorMsg << _T("Has ") << numGiant << _T("/") << greenGiant << _T(" 194-199cm players; ");
+			errorMsg << _T("Has ") << numGiant << _T("/") << greenGiant << _T(" 194cm players; ");
         }
         if(diff = 5 - numTall)
         {

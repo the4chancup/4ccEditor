@@ -3,6 +3,10 @@
 #include "resource.h"
 #include "editor.h"
 #include "window.h"
+#include <string>
+#include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
+#include <mmsystem.h>
 
 //----------------------------------------------------------------------
 /*Function prototypes*/
@@ -58,6 +62,7 @@ void fpc_toggle();
 void toggle_hid();
 void set_stats();
 void bump_stats();
+void copy_stats();
 //void setup_control(HWND,HFONT,SUBCLASSPROC); (Now in window.h)
 //void setup_combo(HWND,HFONT,SUBCLASSPROC);
 void common_shortcuts(WPARAM);
@@ -79,7 +84,7 @@ HINSTANCE hPesDecryptDLL;	//Handle to libpesXcrypter.dll
 HWND ghw_main;				//Handle to main window
 HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3;
 HFONT ghFont;
-HWND ghw_stat=NULL, ghw_bump=NULL, ghw_import=NULL;
+HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_import=NULL;
 HWND ghw_DlgCurrent = NULL;
 HWND ghAatfbox=NULL;
 void* ghdescriptor = NULL; //void, cast as FileDescriptorOld or FileDescriptorNew depending on version
@@ -155,7 +160,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 21 Edition (Version B)"),
+		_T("4ccEditor Spring 22 Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -700,6 +705,9 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				break;
 				case IDM_PLAY_BUMP:
 					bump_stats();
+				break;
+				case IDM_PLAY_COPY:
+					copy_stats();
 				break;
 				case IDM_PLAY_FTOG:
 					fpc_toggle();
@@ -2077,12 +2085,12 @@ void show_player_info(int p_ind)
 	if(giPesVersion>=19)
 	{
 		_itow_s(gplayers[p_ind].star, buffer, 3, 10);
-		SendDlgItemMessage(ghw_tab1, IDT_STAR, WM_SETTEXT, 0, (LPARAM)buffer);
+		SendDlgItemMessage(ghw_tab2, IDT_STAR, WM_SETTEXT, 0, (LPARAM)buffer);
 	}
 	if(giPesVersion>=20)
 	{
 		_itow_s(gplayers[p_ind].play_attit, buffer, 3, 10);
-		SendDlgItemMessage(ghw_tab1, IDT_PLAY_ATT, WM_SETTEXT, 0, (LPARAM)buffer);
+		SendDlgItemMessage(ghw_tab2, IDT_PLAY_ATT, WM_SETTEXT, 0, (LPARAM)buffer);
 	}
 
 	Button_SetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_FACE),gplayers[p_ind].b_edit_face);
@@ -2418,10 +2426,10 @@ player_entry get_form_player_info(int index)
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.injury = _wtoi(buffer) - 1;
 
-	SendDlgItemMessage(ghw_tab1, IDT_STAR, WM_GETTEXT, 18, (LPARAM)buffer);
+	SendDlgItemMessage(ghw_tab2, IDT_STAR, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.star = _wtoi(buffer);
 
-	SendDlgItemMessage(ghw_tab1, IDT_PLAY_ATT, WM_GETTEXT, 18, (LPARAM)buffer);
+	SendDlgItemMessage(ghw_tab2, IDT_PLAY_ATT, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.play_attit = _wtoi(buffer);
 
 	if(Button_GetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_FACE))==BST_CHECKED) output.b_edit_face=true;
@@ -3807,6 +3815,15 @@ void bump_stats()
 	}
 }
 
+void copy_stats()
+{
+	if (!IsWindow(ghw_copy) && gplayers) //If dialog isn't already open
+	{ 
+		ghw_copy = CreateDialog(ghinst, MAKEINTRESOURCE(IDD_STAT_COPY), ghw_main, copyDlgProc); //Create the unit converter modeless dialog box
+		ShowWindow(ghw_copy, SW_SHOW); //Display it
+	}
+}
+
 BOOL CALLBACK scale_children(HWND hwnd, LPARAM lParam)
 {
 	SendMessage(hwnd, UM_SCALE, NULL, lParam);
@@ -4009,6 +4026,11 @@ void common_shortcuts(WPARAM W)
 		if(gplayers)
 			scroll_player_down();
 	}
+	//ctrl+shift+B for an important message
+	else if( W == 0x42 && (GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000) )
+	{
+		PlaySound(TEXT("lib\\sound.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	}
 	//ctrl+B for bump player stats dialog
 	else if( W == 0x42 && (GetKeyState(VK_CONTROL) & 0x8000) )
 	{
@@ -4137,6 +4159,96 @@ BOOL CALLBACK bumpDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 }
 
 
+BOOL CALLBACK copyDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) //Set all player stats dialog box
+{
+	switch (Message) 
+	{ 
+		case WM_INITDIALOG: //when box first opens
+		{
+			TCHAR buffer[7];
+
+			GetDlgItemText(ghw_main, IDT_PLAY_ID, buffer, 7);
+			SetDlgItemText(hwnd, IDT_STAT_SOUR, buffer);
+			SetDlgItemText(hwnd, IDT_STAT_DEST, buffer);
+
+			//SetFocus(GetDlgItem(hwnd, IDT_STAT));
+
+			SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
+		}
+		break; 
+		
+		case WM_COMMAND:	
+			switch(LOWORD(wParam))
+            {
+				case IDC_OK: //If the "OK" button is pressed,
+				{
+					int srcPID, destPID;
+					int srcIndex=-1, destIndex=-1;
+					player_export srcPlyrExport;
+					wchar_t buffer[21];
+
+					//Update current player entry
+					player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+					if( !(gplayers[gn_playind[gn_listsel]] == pe_current) )
+					{
+						if( wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name) )
+							pe_current.b_edit_player = true;
+						gplayers[gn_playind[gn_listsel]] = pe_current;
+					}
+
+					//Get source and destination PIDs:
+					SendDlgItemMessage(hwnd, IDT_STAT_SOUR, WM_GETTEXT, 18, (LPARAM)buffer);
+					srcPID = _wtoi(buffer);
+					SendDlgItemMessage(hwnd, IDT_STAT_DEST, WM_GETTEXT, 18, (LPARAM)buffer);
+					destPID = _wtoi(buffer);
+
+					//Find the source and destination players by PID
+					for(int ii=0;ii<gnum_players;ii++)
+					{
+						if(srcIndex > -1 && destIndex > -1) break;
+						if(gplayers[ii].id == srcPID)
+						{
+							srcIndex = ii;
+							srcPlyrExport = gplayers[srcIndex].PlayerExport();
+						}
+						if(gplayers[ii].id == destPID)
+						{
+							destIndex = ii;
+						}
+					}
+					if(srcIndex == -1 || destIndex == -1) break;
+
+					//Overwrite stats of dest player (leave Aes alone), set b_changed flag
+					gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
+					gplayers[destIndex].b_changed = true;
+
+					//Refresh display of currently selected player
+					show_player_info(gn_playind[gn_listsel]);
+
+					//SendMessage(hwnd, WM_CLOSE, 0, 0);
+				}
+				break;
+
+				case IDC_CANCEL: //If the "OK" button is pressed,
+				{
+					SendMessage(hwnd, WM_CLOSE, 0, 0);
+				}
+				break;
+			}
+		break;
+
+		case WM_CLOSE:
+			DestroyIcon((HICON)GetClassLongPtr(hwnd, GCLP_HICONSM)); //Destroy the allocated icon to free the GDI resource
+			SetClassLongPtr(hwnd, GCLP_HICONSM, NULL); //Set icon pointer to NULL
+			ghw_stat = NULL;
+			DestroyWindow(hwnd);
+		default:
+            return FALSE;
+    }
+    return TRUE;
+}
+
+
 BOOL CALLBACK importDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) //import player stats dialog box
 {
 	switch(Message)
@@ -4186,6 +4298,130 @@ void roster_data_output()
 
 	TCHAR* poss[] = {_T("GK"),_T("CB"),_T("LB"),_T("RB"),_T("DMF"),_T("CMF"),_T("LMF"),_T("RMF"),_T("AMF"),
 						_T("LWF"),_T("RWF"),_T("SS"),_T("CF")};
+	TCHAR** playstyle;
+	TCHAR* playstyle20[] = {_T("None"),
+							  _T("Goal Poacher"),
+							  _T("Dummy Runner"),
+							  _T("Fox in the Box"),
+							  _T("Target Man"),
+							  _T("Creative Playmaker"),
+							  _T("Prolific Winger"),
+							  _T("Roaming Flank"),
+							  _T("Crossing Specialist"),
+							  _T("Classic No. 10"),
+							  _T("Hole Player"),
+							  _T("Box to Box"),
+							  _T("The Destroyer"),
+							  _T("Orchestrator"),
+							  _T("Anchor Man"),
+							  _T("Offensive Fullback"),
+							  _T("Fullback Finisher"),
+							  _T("Defensive Fullback"),
+							  _T("Build Up"),
+							  _T("Extra Frontman"),
+							  _T("Offensive Goalkeeper"),
+							  _T("Defensive Goalkeeper")};
+	TCHAR* playstyle19[] = {_T("None"),
+							  _T("Goal Poacher"),
+							  _T("Dummy Runner"),
+							  _T("Fox in the Box"),
+							  _T("Target Man"),
+							  _T("Creative Playmaker"),
+							  _T("Prolific Winger"),
+							  _T("Roaming Flank"),
+							  _T("Crossing Specialist"),
+							  _T("Classic No. 10"),
+							  _T("Hole Player"),
+							  _T("Box to Box"),
+							  _T("The Destroyer"),
+							  _T("Orchestrator"),
+							  _T("Anchor Man"),
+							  _T("Build Up"),
+							  _T("Offensive Fullback"),
+							  _T("Fullback Finisher"),
+							  _T("Defensive Fullback"),
+							  _T("Extra Frontman"),
+							  _T("Offensive Goalkeeper"),
+							  _T("Defensive Goalkeeper")};
+	TCHAR* playstyle18[] = {_T("None"),
+						  _T("Goal Poacher"),
+						  _T("Dummy Runner"),
+						  _T("Fox in the Box"),
+						  _T("Prolific Winger"),
+						  _T("Classic No. 10"),
+						  _T("Hole Player"),
+						  _T("Box to Box"),
+						  _T("Anchor Man"),
+						  _T("The Destroyer"),
+						  _T("Extra Frontman"),
+						  _T("Offensive Fullback"),
+						  _T("Defensive Fullback")
+						  _T("Target Man"),
+						  _T("Creative Playmaker"),
+						  _T("Build Up"),
+						  _T("Offensive Goalkeeper"),
+						  _T("Defensive Goalkeeper")};
+	if(giPesVersion>=20)
+	{
+		playstyle = playstyle20;
+	}
+	else if(giPesVersion==19)
+	{
+		playstyle = playstyle19;
+	}
+	else
+	{
+		playstyle = playstyle18;
+	}
+	TCHAR* playskills[] = {_T("Scissors Feint"),
+	_T("Flip Flap"),
+	_T("Marseille Turn"),
+	_T("Sombrero"),
+	_T("Cut Behind & Turn"),
+	_T("Scotch Move"),
+	_T("Heading"),
+	_T("Long Range Drive"),
+	_T("Knuckle Shot"),
+	_T("Acro Finishing"),
+	_T("Heel Trick"),
+	_T("First Time Shot"),
+	_T("One Touch Pass"),
+	_T("Weighted Pass"),
+	_T("Pinpoint Crossing"),
+	_T("Outside Curler"),
+	_T("Rabona"),
+	_T("Low Lofted Pass"),
+	_T("Low Punt Trajectory"),
+	_T("Long Throw"),
+	_T("GK Long Throw"),
+	_T("Malicia"),
+	_T("Man Marking"),
+	_T("Track Back"),
+	_T("Acro Clear"),
+	_T("Captaincy"),
+	_T("Super Sub"),
+	_T("Fighting Spirit"),
+	_T("Double Touch"),
+	_T("Crossover Turn"),
+	_T("Step on Skill"),
+	_T("Chip Shot"),
+	_T("Dipping Shots"),
+	_T("Rising Shots"),
+	_T("No Look Pass"),
+	_T("GK High Punt Trajectory"),
+	_T("Penalty Specialist"),
+	_T("GK Penalty Specialist"),
+	_T("Interception"),
+	_T("Long Range Shooting"),
+	_T("Through Passing")};
+
+	TCHAR* comstyles[] = {_T("Trickster"),
+	_T("Mazing Runner"),
+	_T("Speeding Bullet"),
+	_T("Incisive Run"),
+	_T("Long Ball Expert"),
+	_T("Early Cross"),
+	_T("Long Ranger")};
 
 	FILE *outStream = _tfopen(_T("EDIT.tsv"), _T("w, ccs=UTF-8")); //ccs=UNICODE
 
@@ -4207,17 +4443,57 @@ void roster_data_output()
 				{
 					if( gteams[iteam].players[ii]==gplayers[jj].id )
 					{
-						TCHAR buffer[12];
-						
+						TCHAR buffer[6];
+						std::wstring outstr = L"";
+						//memset(outstr,0,sizeof(outstr));
+						/*
 						//Label medal players
 						if(gplayers[jj].finish == 99) _tcscpy(buffer,_T("GOLD "));
 						else if(gplayers[jj].finish > 85) _tcscpy(buffer,_T("SILVER "));
 						else _tcscpy(buffer,_T(""));
 						//Label team captain
 						if(gteams[iteam].captain_ind == ii) _tcscat(buffer, _T("(C)"));
+						*/
+						//Print Ability score
+						_itot_s(gplayers[jj].finish, buffer, 6, 10);
+						outstr += buffer;
+						outstr += _T("\t");
+
+						//Print height
+						_itot_s(gplayers[jj].height, buffer, 6, 10);
+						outstr += buffer;
+						outstr += _T("\t");
+
+						//Print play style
+						int ind = gplayers[jj].play_style;
+						if(giPesVersion==16 && ind>16) ind--;
+						outstr += playstyle[ind];
+
+						//Print player skill(s)
+						int numSkill;
+						if(giPesVersion==19) numSkill=39;
+						else if(giPesVersion>=20) numSkill=41;
+						else numSkill=28;
+						for(int kk=0;kk<numSkill;kk++)
+						{
+							if(gplayers[jj].play_skill[kk])
+							{
+								outstr += _T("\t");
+								outstr += playskills[kk];
+							}
+						}
+						//Print COM style(s)
+						for(int kk=0;kk<7;kk++)
+						{
+							if(gplayers[jj].com_style[kk])
+							{
+								outstr += _T("\t");
+								outstr += comstyles[kk];
+							}
+						}
 
 						_ftprintf(outStream, _T("%d\t%s\t%s\t%s\n"), gteams[iteam].numbers[ii], gplayers[jj].name,
-									poss[gplayers[jj].reg_pos], buffer);
+							poss[gplayers[jj].reg_pos], outstr.c_str());
 //for Ved:					_ftprintf(outStream, _T("%s,%s,%s%d\n"), poss[gplayers[jj].reg_pos], gplayers[jj].name,
 //									short_name,ii+1);
 						break;
