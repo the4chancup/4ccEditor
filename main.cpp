@@ -160,7 +160,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Spring 22 Edition (Version A)"),
+		_T("4ccEditor Spring 22 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -4458,6 +4458,10 @@ void roster_data_output()
 						_itot_s(gplayers[jj].finish, buffer, 6, 10);
 						outstr += buffer;
 						outstr += _T("\t");
+
+						//Label captain
+						if(gteams[iteam].captain_ind == ii) outstr += L"(C)\t";
+						else outstr += L"\t";
 
 						//Print height
 						_itot_s(gplayers[jj].height, buffer, 6, 10);

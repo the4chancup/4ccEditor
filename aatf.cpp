@@ -362,9 +362,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
 			}
-			else if(player.height <= 175)
+			else if(player.height <= 175 && rating == targetRate + silverManletBonus)
             {
-				//usingRed = true;
+				usingRed = true;
 				targetRate += silverManletBonus;
 				targetRate2 += silverManletBonus;
 			}
