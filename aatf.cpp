@@ -637,7 +637,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         if(diff = numGiant)
         {
             errorTot += diff;
-			errorMsg << _T("Has ") << numGiant << _T("/") << redGiant << _T(" 194-199cm players; ");
+			errorMsg << _T("Has ") << numGiant << _T("/") << redGiant << _T(" 194cm players; ");
         }
         if(diff = 10 - numTall)
         {
