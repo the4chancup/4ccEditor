@@ -579,32 +579,32 @@ void setup_tab1(HWND H)
 
 	x1=168+11, y1=24, ydiff=20, xc=126+11;
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Scissors Feint"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Scissors Feint*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_SCIS, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Flip Flap"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Flip Flap*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_FLIP, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Marseille Turn"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Marseille Turn*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*2, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_MARS, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Sombrero"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Sombrero*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*3, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_SOMB, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Cut Behind && Turn"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Cut Behind && Turn*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*4, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_CUTB, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Scotch Move"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Scotch Move*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*5, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_SCOT, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
@@ -659,7 +659,7 @@ void setup_tab1(HWND H)
 		x1, y1+ydiff*15, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_OUTS, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Rabona"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Rabona*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*16, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_RABO, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
@@ -720,17 +720,17 @@ void setup_tab1(HWND H)
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	//New for 19
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Double Touch"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Double Touch*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1+144, y1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_DOUB, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Crossover Turn"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Crossover Turn*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1+144, y1+ydiff*1, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_CROS, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("Step on Skill"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Step on Skill*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1+144, y1+ydiff*2, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_STEP, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
@@ -750,7 +750,7 @@ void setup_tab1(HWND H)
 		x1+144, y1+ydiff*5, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_RISI, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
-	hw_new = CreateWindowEx(0, _T("Button"), _T("No Look Pass"), 
+	hw_new = CreateWindowEx(0, _T("Button"), _T("No Look Pass*"), 
 		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
 		x1+144, y1+ydiff*6, xc, 17, ghw_tab1, (HMENU)IDB_SKIL_NOLO, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
