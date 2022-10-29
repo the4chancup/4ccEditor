@@ -224,9 +224,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             cardMod -= (countA - 1);
         }
 
-		if(player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
-			cardMod++;
-
 		//Count cards
 		int numTrick = 0;
 		int numCom = 0;
