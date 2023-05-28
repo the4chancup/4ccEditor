@@ -63,6 +63,7 @@ void toggle_hid();
 void set_stats();
 void bump_stats();
 void copy_stats();
+void swap_stats();
 //void setup_control(HWND,HFONT,SUBCLASSPROC); (Now in window.h)
 //void setup_combo(HWND,HFONT,SUBCLASSPROC);
 void common_shortcuts(WPARAM);
@@ -84,7 +85,7 @@ HINSTANCE hPesDecryptDLL;	//Handle to libpesXcrypter.dll
 HWND ghw_main;				//Handle to main window
 HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3;
 HFONT ghFont;
-HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_import=NULL;
+HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_swap = NULL, ghw_import=NULL;
 HWND ghw_DlgCurrent = NULL;
 HWND ghAatfbox=NULL;
 void* ghdescriptor = NULL; //void, cast as FileDescriptorOld or FileDescriptorNew depending on version
@@ -709,6 +710,9 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				case IDM_PLAY_COPY:
 					copy_stats();
 				break;
+				case IDM_PLAY_SWAP:
+					swap_stats();
+					break;
 				case IDM_PLAY_FTOG:
 					fpc_toggle();
 				break;
@@ -3824,6 +3828,15 @@ void copy_stats()
 	}
 }
 
+void swap_stats()
+{
+	if (!IsWindow(ghw_swap) && gplayers) //If dialog isn't already open
+	{
+		ghw_swap = CreateDialog(ghinst, MAKEINTRESOURCE(IDD_STAT_SWAP), ghw_main, swapDlgProc); //Create the unit converter modeless dialog box
+		ShowWindow(ghw_swap, SW_SHOW); //Display it
+	}
+}
+
 BOOL CALLBACK scale_children(HWND hwnd, LPARAM lParam)
 {
 	SendMessage(hwnd, UM_SCALE, NULL, lParam);
@@ -4246,6 +4259,100 @@ BOOL CALLBACK copyDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             return FALSE;
     }
     return TRUE;
+}
+
+BOOL CALLBACK swapDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) //Swap all player stats dialog box
+{
+	switch (Message)
+	{
+	case WM_INITDIALOG: //when box first opens
+	{
+		TCHAR buffer[7];
+
+		GetDlgItemText(ghw_main, IDT_PLAY_ID, buffer, 7);
+		SetDlgItemText(hwnd, IDT_STAT_FPID, buffer);
+		SetDlgItemText(hwnd, IDT_STAT_SPID, buffer);
+
+		//SetFocus(GetDlgItem(hwnd, IDT_STAT));
+
+		SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
+	}
+	break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_OK: //If the "OK" button is pressed,
+		{
+			int srcPID, destPID;
+			int srcIndex = -1, destIndex = -1;
+			player_export srcPlyrExport;
+			player_export destPlyrExport;
+			wchar_t buffer[21];
+
+			//Update current player entry
+			player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+			if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+			{
+				if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
+					pe_current.b_edit_player = true;
+				gplayers[gn_playind[gn_listsel]] = pe_current;
+			}
+
+			//Get source and destination PIDs:
+			SendDlgItemMessage(hwnd, IDT_STAT_FPID, WM_GETTEXT, 18, (LPARAM)buffer);
+			srcPID = _wtoi(buffer);
+			SendDlgItemMessage(hwnd, IDT_STAT_SPID, WM_GETTEXT, 18, (LPARAM)buffer);
+			destPID = _wtoi(buffer);
+
+			//Find the source and destination players by PID
+			for (int ii = 0; ii < gnum_players; ii++)
+			{
+				if (srcIndex > -1 && destIndex > -1) break;
+				if (gplayers[ii].id == srcPID)
+				{
+					srcIndex = ii;
+					srcPlyrExport = gplayers[srcIndex].PlayerExport();
+				}
+				if (gplayers[ii].id == destPID)
+				{
+					destIndex = ii;
+					destPlyrExport = gplayers[destIndex].PlayerExport();
+				}
+			}
+			if (srcIndex == -1 || destIndex == -1) break;
+
+			//Overwrite stats of dest player (leave Aes alone), set b_changed flag
+			gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
+			gplayers[destIndex].b_changed = true;
+
+			gplayers[srcIndex].PlayerImport(destPlyrExport, true, false);
+			gplayers[srcIndex].b_changed = true;
+
+			//Refresh display of currently selected player
+			show_player_info(gn_playind[gn_listsel]);
+
+			//SendMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+		break;
+
+		case IDC_CANCEL: //If the "OK" button is pressed,
+		{
+			SendMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+		break;
+		}
+		break;
+
+	case WM_CLOSE:
+		DestroyIcon((HICON)GetClassLongPtr(hwnd, GCLP_HICONSM)); //Destroy the allocated icon to free the GDI resource
+		SetClassLongPtr(hwnd, GCLP_HICONSM, NULL); //Set icon pointer to NULL
+		ghw_stat = NULL;
+		DestroyWindow(hwnd);
+	default:
+		return FALSE;
+	}
+	return TRUE;
 }
 
 
