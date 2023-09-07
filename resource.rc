@@ -44,12 +44,13 @@ BEGIN
     END
 	POPUP "&Team"
     BEGIN
-        MENUITEM "&Clear visual settings flags\tCtrl+F",IDM_TEAM_CLEAR
-		MENUITEM "Set &edited/created flag",	IDM_TEAM_CREAT
-        MENUITEM "Set &FPC invisibility",		IDM_TEAM_FPCON
-		MENUITEM "&Remove FPC invisibility",	IDM_TEAM_FPOFF
-		MENUITEM "&Save squad",	IDM_TEAM_SAVES
-		MENUITEM "&Load squad",	IDM_TEAM_LOADS
+        MENUITEM "&Clear visual settings flags\tCtrl+F",	IDM_TEAM_CLEAR
+		MENUITEM "Set &edited/created flag",				IDM_TEAM_CREAT
+        MENUITEM "Set &FPC invisibility",					IDM_TEAM_FPCON
+		MENUITEM "&Remove FPC invisibility",				IDM_TEAM_FPOFF
+		MENUITEM "&Set boot/glove ID",						IDM_TEAM_BOGLO
+		MENUITEM "&Save squad",								IDM_TEAM_SAVES
+		MENUITEM "&Load squad",								IDM_TEAM_LOADS
     END
 	POPUP "&Database"
     BEGIN
@@ -117,6 +118,26 @@ BEGIN
 	EDITTEXT		IDT_STAT_DEST,115,25,25,12,ES_NUMBER|WS_TABSTOP
 END
 
+
+IDD_BOGLO_SET DIALOG 0, 0, 160, 130
+STYLE WS_POPUP | WS_CAPTION | WS_BORDER | WS_SYSMENU
+CAPTION "Set boot/glove IDs"
+FONT 9, "Segoe UI"
+BEGIN
+	DEFPUSHBUTTON   "&Set", IDC_OK, 20, 110, 50, 12, WS_TABSTOP //Default-selected pushbutton
+	PUSHBUTTON		"C&lose", IDC_CANCEL, 90, 110, 50, 12, WS_TABSTOP //pushbutton
+
+	GROUPBOX			"Boot IDs", IDT_BOOT_BOX, 20, 7, 120, 40
+	AUTORADIOBUTTON		"Unchanged", IDT_BOOT_OPT1, 25, 17, 80, 10, WS_GROUP
+	AUTORADIOBUTTON		"Set incremental value:", IDT_BOOT_OPT2, 25, 27, 80, 10
+	EDITTEXT			IDT_BOOT_START, 110, 26, 25, 12, WS_TABSTOP
+
+	GROUPBOX			"Glove IDs", IDT_GLOVE_BOX, 20, 50, 120, 50
+	AUTORADIOBUTTON		"Unchanged", IDT_GLOVE_OPT1, 25, 60, 50, 10, WS_GROUP
+	AUTORADIOBUTTON		"Set like boot IDs", IDT_GLOVE_OPT2, 25, 70, 80, 10
+	AUTORADIOBUTTON		"Set all to the same ID:", IDT_GLOVE_OPT3, 25, 80, 80, 10
+	EDITTEXT			IDT_GLOVE_ID, 110, 79, 25, 12, WS_TABSTOP
+END
 
 IDD_DATA_IMPORT DIALOG DISCARDABLE 0, 0, 160, 50
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
