@@ -751,7 +751,8 @@ void extract_player_entry16(player_entry player, int &current_byte, int &appear_
 	
 	char tbuffer[16];
 	memset(tbuffer, 0, 16);
-	strcpy_s(tbuffer, 16, player.shirt_name);
+	//strcpy_s(tbuffer, 16, player.shirt_name);
+	strncpy_s(tbuffer, 16, player.shirt_name, 16-1);
 	memcpy(&(pDescriptorOld->data[current_byte]), tbuffer, 16);
 	//strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 16, player.shirt_name); //FIX THIS
 	current_byte+=16;

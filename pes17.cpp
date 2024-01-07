@@ -758,7 +758,8 @@ void extract_player_entry17(player_entry player, int &current_byte, void* ghdesc
 	//(LPSTR)&(pDescriptorOld->data[current_byte])
 	current_byte+=46;
 	
-	strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 18, player.shirt_name); //FIX THIS
+	//strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 18, player.shirt_name); //FIX THIS
+	strncpy_s((char *)&(pDescriptorOld->data[current_byte]), 18, player.shirt_name, 18-1);
 	current_byte+=18;
 	
 	//Appearance entries

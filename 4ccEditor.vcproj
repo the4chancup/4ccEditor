@@ -70,6 +70,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="GdiScaling.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -144,6 +145,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="GdiScaling.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"

@@ -606,7 +606,11 @@ void extract_player_entry19(player_entry player, int &current_byte, void* ghdesc
 	//(LPSTR)&(pDescriptorNew->data[current_byte])
 	current_byte+=46;
 	
-	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 18, player.shirt_name); //FIX THIS
+	//strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 18, player.shirt_name); //FIX THIS
+	//it is possible to get the truncating behavior by specifying count equal to the size of the destination array minus one: 
+	//it will copy the first count bytes and append the null terminator as always 
+	//strncpy_s(dst, sizeof dst, src, (sizeof dst)-1);
+	strncpy_s((char *)&(pDescriptorNew->data[current_byte]), 18, player.shirt_name, 18-1);
 	current_byte+=18;
 	
 	//Appearance entries
