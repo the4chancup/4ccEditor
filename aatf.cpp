@@ -21,10 +21,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	//============================
 	//Settings
 	int manletBonus = 5;
-	int silverManletBonus = 5;
+	int silverManletBonus = 3;
 	int goldManletBonus = 0;
-	int silverGiantPen = 2;
-	int goldGiantPen = 4;
+	int silverGiantPen = 0;
+	int goldGiantPen = 3;
 
 	int goldRate = 99;
 	int silverRate = 88;
@@ -55,9 +55,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int silverCOM = 1;
 	int goldCOM = 2;
 
-	int greenGiant = 5;
+	int greenGiant = 6;
 	int greenTall = 5;
-	int greenMid = 7;
+	int greenMid = 6;
 	int greenManlet = 6;
 
 	int redGiant = 0;
@@ -240,6 +240,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             if(player.play_skill[jj])
             {
                 cardCount++;
+		//SPECIAL Winter 24: Malicia (21) is a free card
+		if(jj==21) cardMod++;
                 //Captain gets free captaincy card
 				if(jj==25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
                     cardMod++;
