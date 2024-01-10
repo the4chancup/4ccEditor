@@ -281,7 +281,8 @@ void fill_player_entry18(player_entry &players, int &current_byte, void* ghdescr
 
 	players.glove_id = pDescriptorNew->data[current_byte] >> 2;
 	current_byte++;
-	players.glove_id += (pDescriptorNew->data[current_byte] & 15) << 6;
+	//players.glove_id += (pDescriptorNew->data[current_byte] & 15) << 6;
+	players.glove_id += (pDescriptorNew->data[current_byte]) << 6; //Extend to be 14 bits, using Unk B space
 
 	//Unknown B - 4/4
 	current_byte++;
@@ -793,7 +794,8 @@ void extract_player_entry18(player_entry player, int &current_byte, void* ghdesc
 	
 	pDescriptorNew->data[current_byte] += (player.glove_id << 2) & 252; //6/10
 	current_byte++;
-	pDescriptorNew->data[current_byte] = (player.glove_id >> 6) & 15; //4/10
+	//pDescriptorNew->data[current_byte] = (player.glove_id >> 6) & 15; //4/10
+	pDescriptorNew->data[current_byte] = (player.glove_id >> 6); //8/14 - extended to be 14 bits, using Unk B space
 	
 	//Unknown B - 4/4
 	current_byte++;

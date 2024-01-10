@@ -65,7 +65,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int redMid = 7;
 	int redManlet = 6;
 
-	int heightGiant = 191;
+	int heightGiant = 194;
 	int heightTall = 185;
 	int heightTallGK = 189;
 	int heightMid = 180;
@@ -361,7 +361,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             
             if(rating != targetRate)
             {
-                if(rating == targetRate+manletBonus && player.height <= heightManlet)
+                if(player.height <= heightManlet && rating > targetRate)
 				{
                     usingRed = true;
 					targetRate += manletBonus;
@@ -418,7 +418,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
 			}
-			else if(player.height <= heightManlet && rating == targetRate + silverManletBonus)
+			else if(player.height <= heightManlet && rating > targetRate)
             {
 				usingRed = true;
 				targetRate += silverManletBonus;
@@ -482,7 +482,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate -= goldGiantPen;
 				targetRate2 -= goldGiantPen;
 			}
-			else if(player.height <= heightManlet && rating == targetRate + goldManletBonus)
+			else if(player.height <= heightManlet && rating > targetRate)
             {
 				usingRed = true;
 				targetRate += goldManletBonus;
