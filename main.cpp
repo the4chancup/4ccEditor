@@ -93,7 +93,7 @@ int* gn_playind = NULL; //positions in gplayers array of each item in player lis
 team_entry* gteams = NULL;
 int* gn_teamCbIndToArray = NULL; //positions in gteams array of each item in team combobox
 int* gn_teamArrayIndToCb = NULL; //vice versa
-int gnum_players, gnum_teams, gn_listsel=-1, gn_teamsel=-1, gn_forceupdate;
+int gnum_players, gnum_teams, gn_listsel=-1, gn_teamsel=-1, gn_forceupdate=-1;
 bool gb_forceupdate = false;
 bool gb_firstsave = true;
 bool gb_importStats = true, gb_importAes = true; //Squad import options
@@ -160,7 +160,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Winter 24 Edition (Version B)"),
+		_T("4ccEditor Winter 24 Edition (Version C)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1172,6 +1172,8 @@ void data_handler(const TCHAR *pcs_file_name)
 		gn_teamArrayIndToCb = NULL;
 	}
 	gb_forceupdate = false;
+	gn_forceupdate = -1; //These two vars are redundant - should remove gb_forceupdate and just use gb_forceupdate > 1
+	gn_listsel = -1; //No selection after load/reload
 
 	//Disable extra skill checkboxes
 	for(ii=28;ii<41;ii++)
@@ -2312,9 +2314,9 @@ void show_player_info(int p_ind)
 	}
 	else //No currently selected player (no players on team), blank out fields
 	{
-		SendDlgItemMessage(ghw_main, IDT_PLAY_NAME, WM_SETTEXT, 0, (LPARAM)L'');
+		SendDlgItemMessage(ghw_main, IDT_PLAY_NAME, WM_SETTEXT, 0, (LPARAM)L"");
 
-		SendDlgItemMessage(ghw_main, IDT_PLAY_ID, WM_SETTEXT, 0, (LPARAM)L'');
+		SendDlgItemMessage(ghw_main, IDT_PLAY_ID, WM_SETTEXT, 0, (LPARAM)L"");
 
 		buffer[0] = L'\0';
 		//buffer[1] = L'\0';
