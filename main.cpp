@@ -63,6 +63,7 @@ void toggle_hid();
 void set_stats();
 void bump_stats();
 void copy_stats();
+void set_boot_glove_ids();
 void swap_stats();
 //void setup_control(HWND,HFONT,SUBCLASSPROC); (Now in window.h)
 //void setup_combo(HWND,HFONT,SUBCLASSPROC);
@@ -85,7 +86,7 @@ HINSTANCE hPesDecryptDLL;	//Handle to libpesXcrypter.dll
 HWND ghw_main;				//Handle to main window
 HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3;
 HFONT ghFont;
-HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_swap = NULL, ghw_import=NULL;
+HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_import=NULL, ghw_swap = NULL, ghw_boglo=NULL;
 HWND ghw_DlgCurrent = NULL;
 HWND ghAatfbox=NULL;
 void* ghdescriptor = NULL; //void, cast as FileDescriptorOld or FileDescriptorNew depending on version
@@ -733,6 +734,9 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				case IDM_TEAM_FPOFF:
 					if(gplayers) team_fpc_off();
 				break;
+				case IDM_TEAM_BOGLO:
+					if (gplayers) set_boot_glove_ids();
+					break;
 				case IDM_TEAM_SAVES:
 					if(gn_teamsel > -1) export_squad(H);
 					else MessageBox(H,_T("Please select a team to be saved."),NULL,MB_ICONWARNING);
@@ -4182,6 +4186,15 @@ void copy_stats()
 	}
 }
 
+void set_boot_glove_ids()
+{
+	if (!IsWindow(ghw_boglo) && gplayers) //If dialog isn't already open
+	{
+		ghw_boglo = CreateDialog(ghinst, MAKEINTRESOURCE(IDD_BOGLO_SET), ghw_main, bogloDlgProc); //Create the unit converter modeless dialog box
+		ShowWindow(ghw_boglo, SW_SHOW); //Display it
+	}
+}
+
 void swap_stats()
 {
 	if (!IsWindow(ghw_swap) && gplayers) //If dialog isn't already open
@@ -5339,6 +5352,133 @@ void import_squad(HWND hwnd)
 		//Close filestream
 		input_file.close();
 	}
+}
+
+BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) //Set current team's player boots and gloves
+{
+	switch (Message)
+	{
+	case WM_INITDIALOG: //when box first opens
+	{
+		TCHAR buffer[20];
+				
+		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+		SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
+		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
+		SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
+		SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
+
+		SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
+	}
+	break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_OK: //If the "OK" button is pressed,
+		{
+			int bootID, gloveID, team, playerCounter;
+			player_export srcPlyrExport;
+			wchar_t buffer[18];
+
+			//Update current player entry
+			player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+			if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+			{
+				if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
+					pe_current.b_edit_player = true;
+				gplayers[gn_playind[gn_listsel]] = pe_current;
+			}
+
+			//Get current team ID:						
+			SendDlgItemMessage(ghw_main, IDT_TEAM_ID, WM_GETTEXT, 18, (LPARAM)buffer);
+			team = _wtoi(buffer);
+
+			//If "Boot: set incremental value" is set
+			if (SendDlgItemMessage(hwnd, IDT_BOOT_OPT2, BM_GETCHECK, 0, 0)) {
+
+				//Get starting boot:
+				SendDlgItemMessage(hwnd, IDT_BOOT_START, WM_GETTEXT, 18, (LPARAM)buffer);
+				bootID = _wtoi(buffer);
+
+				//Loop through each player
+				playerCounter = 1;
+				for (int ii = 0; ii < gnum_players; ii++)
+				{
+					//Stop if we updated 23 players
+					if (playerCounter >= 24) break;
+					if (gplayers[ii].id == team * 100 + playerCounter)
+					{
+						//Set boot ID
+						gplayers[ii].boot_id = bootID;
+						playerCounter++;
+						bootID++;
+					}
+				}
+			}
+
+			//If "Glove: set like boot IDs" is set
+			if (SendDlgItemMessage(hwnd, IDT_GLOVE_OPT2, BM_GETCHECK, 0, 0)) {
+				//Loop through each player
+				playerCounter = 1;
+				for (int ii = 0; ii < gnum_players; ii++)
+				{
+					if (playerCounter >= 24) break;
+					if (gplayers[ii].id == team * 100 + playerCounter)
+					{
+						//Set glove ID as boot ID
+						gplayers[ii].glove_id = gplayers[ii].boot_id;
+						playerCounter++;
+					}
+				}
+			}
+
+			//If "Glove: set all to the same ID" is set
+			if (SendDlgItemMessage(hwnd, IDT_GLOVE_OPT3, BM_GETCHECK, 0, 0)) {
+
+				//Get glove ID:
+				SendDlgItemMessage(hwnd, IDT_GLOVE_ID, WM_GETTEXT, 18, (LPARAM)buffer);
+				gloveID = _wtoi(buffer);
+
+				//Loop through each player
+				playerCounter = 1;
+				for (int ii = 0; ii < gnum_players; ii++)
+				{
+					if (playerCounter >= 24) break;
+					if (gplayers[ii].id == team * 100 + playerCounter)
+					{
+						//Set glove ID
+						gplayers[ii].glove_id = gloveID;
+						playerCounter++;
+					}
+				}
+			}
+
+			//Refresh display of currently selected player
+			show_player_info(gn_playind[gn_listsel]);
+
+			SendMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+		break;
+
+		case IDC_CANCEL: //If the "Close" button is pressed,
+		{
+			SendMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+		break;
+		}
+		break;
+
+	case WM_CLOSE:
+		DestroyIcon((HICON)GetClassLongPtr(hwnd, GCLP_HICONSM)); //Destroy the allocated icon to free the GDI resource
+		SetClassLongPtr(hwnd, GCLP_HICONSM, NULL); //Set icon pointer to NULL
+		ghw_stat = NULL;
+		DestroyWindow(hwnd);
+	default:
+		return FALSE;
+	}
+	return TRUE;
 }
 
 BOOL CALLBACK aatf_sing_dlg_proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
