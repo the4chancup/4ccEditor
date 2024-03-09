@@ -18,18 +18,20 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	msgOut+=gteams[teamSel].name;
 	msgOut+=_T("\r\n");
 
+	//============================
 	//Settings
 	int manletBonus = 5;
-	int silverManletBonus = 5;
-	int goldGiantPen = 4;
-	int silverGiantPen = 2;
+	int silverManletBonus = 3;
+	int goldManletBonus = 0;
+	int silverGiantPen = 0;
+	int goldGiantPen = 3;
 
 	int goldRate = 99;
 	int silverRate = 88;
 	int regRate = 77;
 	int gkRate = 77;
 	int reqNumGold = 2;
-	int reqNumSilver = 3;
+	int reqNumSilver = 2;
 
 	int goldForm = 8;
 	int silverForm = 8;
@@ -40,7 +42,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int regIR = 1;
 
 	int gkSkillCards = 2;
-	int regSkillCards = 4;
+	int regSkillCards = 6;
 	int silverSkillCards = 5;
 	int goldSkillCards = 6;
 
@@ -53,9 +55,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int silverCOM = 1;
 	int goldCOM = 2;
 
-	int greenGiant = 5;
+	int greenGiant = 6;
 	int greenTall = 5;
-	int greenMid = 7;
+	int greenMid = 6;
 	int greenManlet = 6;
 
 	int redGiant = 0;
@@ -63,11 +65,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int redMid = 7;
 	int redManlet = 6;
 
-	int heightGiant = 191;
+	int heightGiant = 194;
 	int heightTall = 185;
 	int heightTallGK = 189;
 	int heightMid = 180;
 	int heightManlet = 175;
+
+	//============================
 
 	int numGK = 0;
     //Count of player ratings
@@ -236,6 +240,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             if(player.play_skill[jj])
             {
                 cardCount++;
+		//SPECIAL Winter 24: Malicia (21) is a free card
+		if(jj==21) cardMod++;
                 //Captain gets free captaincy card
 				if(jj==25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
                     cardMod++;
@@ -256,18 +262,18 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 		}
 
-		if(player.height <= 175)
+		if(player.height <= heightManlet)
 		{
             numManlet++;
 			cardMod++; //Manlets get a bonus card
 		}
-        else if(player.height == 180)
+        else if(player.height == heightMid)
             numMid++;
-        else if(player.height == 185)
+        else if(player.height == heightTall)
             numTall++;
-        else if(player.height == 189 && player.reg_pos == 0) //GK
+        else if(player.height == heightTallGK && player.reg_pos == 0) //GK
             numTall++;
-        else if(player.height == 191)
+        else if(player.height == heightGiant)
             numGiant++;
         else
 		{
@@ -298,6 +304,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate = gkRate;
 				targetRate2 = gkRate;
 			}
+
+			/*if(countA > 3)
+			{
+				errorTot++;
+				errorMsg << _T("Regular player with > 3 A positions; ");
+			}*/
 
 			if(player.height > heightManlet)
 			{
@@ -349,7 +361,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             
             if(rating != targetRate)
             {
-                if(rating == targetRate+manletBonus && player.height <= heightManlet)
+                if(player.height <= heightManlet && rating > targetRate)
 				{
                     usingRed = true;
 					targetRate += manletBonus;
@@ -406,7 +418,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
 			}
-			else if(player.height <= heightManlet && rating == targetRate + silverManletBonus)
+			else if(player.height <= heightManlet && rating > targetRate)
             {
 				usingRed = true;
 				targetRate += silverManletBonus;
@@ -469,6 +481,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				targetRate -= goldGiantPen;
 				targetRate2 -= goldGiantPen;
+			}
+			else if(player.height <= heightManlet && rating > targetRate)
+            {
+				usingRed = true;
+				targetRate += goldManletBonus;
+				targetRate2 += goldManletBonus;
 			}
 			
             cardMod += min(goldTrickCards, numTrick); //4 free tricks
