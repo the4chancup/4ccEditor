@@ -297,7 +297,8 @@ void fill_appearance_entry16(player_entry &players, int &current_byte, void* ghd
 
 	players.glove_id = pDescriptorOld->data[current_byte] >> 2;
 	current_byte++;
-	players.glove_id += (pDescriptorOld->data[current_byte] & 15) << 6;
+	//players.glove_id += (pDescriptorOld->data[current_byte] & 15) << 6;
+	players.glove_id += (pDescriptorOld->data[current_byte]) << 6; //Extend to be 14 bits, using Unk B space
 
 	//Unknown B - 4/4
 	current_byte++;
@@ -774,7 +775,8 @@ void extract_player_entry16(player_entry player, int &current_byte, int &appear_
 	
 	pDescriptorOld->data[appear_byte] += (player.glove_id << 2) & 252; //6/10
 	appear_byte++;
-	pDescriptorOld->data[appear_byte] = (player.glove_id >> 6) & 15; //4/10
+	//pDescriptorOld->data[appear_byte] = (player.glove_id >> 6) & 15; //4/10
+	pDescriptorOld->data[appear_byte] = (player.glove_id >> 6); //8/14 - extended to be 14 bits, using Unk B space
 	
 	//Unknown B - 4/4
 	appear_byte++;
