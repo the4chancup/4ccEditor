@@ -402,7 +402,7 @@ void fill_team_ids16(team_entry &teams, int &current_byte, void* ghdescriptor)
 	current_byte++;
 
 	current_byte+=0xE;
-	teams.b_edit_name = (pDescriptorOld->data[current_byte] >> 7) & 1;
+	teams.b_edit_name = (pDescriptorOld->data[current_byte]) & 1;
 
 	current_byte+=0x82;
 
@@ -891,7 +891,7 @@ void extract_team_info16(team_entry team, int &current_byte, void* ghdescriptor)
 	current_byte++;
 	
 	current_byte+=0xE;
-	pDescriptorOld->data[current_byte] = pDescriptorOld->data[current_byte] | (team.b_edit_name << 7);
+	pDescriptorOld->data[current_byte] = pDescriptorOld->data[current_byte] | (team.b_edit_name & 1);
 
 	current_byte+=0x82;
 	

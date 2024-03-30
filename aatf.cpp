@@ -92,8 +92,21 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	//Run through all players once to determine height system
 	for (int ii = 0; ii < gteams[teamSel].num_on_team; ii++)
 	{
+		//Find each player on team
+		for (int jj = 0; jj < gnum_players; jj++)
+		{
+			if (gplayers[jj].id == gteams[teamSel].players[ii])
+			{
+				player = gplayers[jj];
+				break;
+			}
+		}
+		//If any player is in the green height brackets, team is on Green height system and we can halt
 		if (player.height >= heightGiant)
+		{
 			usingRed = false;
+			break;
+		}
 	}
     
 	//Now check each player for errors
@@ -471,7 +484,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		if ((player.height - heightMod) <= heightManlet)
 		{
 			numManlet++;
-			cardMod++; //Manlets get a bonus card
+			cardLimit++; //Manlets get a bonus card
 			weakFoot = 4; //Manlets get weak foot acc/use 4/4
 		}
 		else if ((player.height - heightMod) == heightMid)
