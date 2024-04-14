@@ -3911,7 +3911,7 @@ void team_fpc_on()
 		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
 		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
 			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
+		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); else Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
@@ -3970,6 +3970,16 @@ void team_fpc_on()
 							{
 								gplayers[jj].inners=0;
 								gplayers[jj].b_changed=true;
+							}
+							if (gplayers[jj].undershorts!=0)
+							{
+								gplayers[jj].undershorts = 0;
+								gplayers[jj].b_changed = true;
+							}
+							if (gplayers[jj].gloves)
+							{
+								gplayers[jj].gloves = false;
+								gplayers[jj].b_changed = true;
 							}
 							if(!gplayers[jj].gloves && giPesVersion==18) 
 							{
@@ -4057,6 +4067,11 @@ void team_fpc_off()
 							{
 								gplayers[jj].socks=0;
 								gplayers[jj].b_changed=true;
+							}
+							if (gplayers[jj].ankle_tape)
+							{
+								gplayers[jj].ankle_tape = false;
+								gplayers[jj].b_changed = true;
 							}
 							if(gplayers[jj].gloves && giPesVersion==18) 
 							{
