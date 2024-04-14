@@ -3874,8 +3874,10 @@ void team_created_set()
 void team_fpc_on()
 {
 	int iteam, ii, jj;
+	int curFpcBoot, curFpcGkGlove;
 	TCHAR fpcBoot[3], fpcGkGlove[3];
 	int i_fpcBoot, i_fpcGkGlove;
+	wchar_t buffer[21];
 
 	if(gn_listsel > -1)
 	{
@@ -3904,8 +3906,18 @@ void team_fpc_on()
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
 		if(giPesVersion<19)
 		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_GETTEXT, 18, (LPARAM)buffer);
+			curFpcBoot = _wtoi(buffer);
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_GETTEXT, 18, (LPARAM)buffer);
+			curFpcGkGlove = _wtoi(buffer);
+
+			if (curFpcBoot==0) {
+				SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
+			}
+
+			if (curFpcGkGlove==0) {
+				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
+			}					
 		}
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
 
