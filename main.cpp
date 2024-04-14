@@ -3874,10 +3874,9 @@ void team_created_set()
 void team_fpc_on()
 {
 	int iteam, ii, jj;
-	int curFpcBoot, curFpcGkGlove;
-	TCHAR fpcBoot[3], fpcGkGlove[3];
+	TCHAR fpcBoot[3], fpcGkGlove[3], fpcBootZero[3], fpcGkGloveZero[3];
 	int i_fpcBoot, i_fpcGkGlove;
-	wchar_t buffer[21];
+	TCHAR buffer[20];
 
 	if(gn_listsel > -1)
 	{
@@ -3896,6 +3895,8 @@ void team_fpc_on()
 			i_fpcGkGlove = 12;
 		}
 		
+		_tcscpy_s(fpcBootZero, 3, _T("0"));
+		_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
 		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
@@ -3904,21 +3905,12 @@ void team_fpc_on()
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		if(giPesVersion<19)
-		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_GETTEXT, 18, (LPARAM)buffer);
-			curFpcBoot = _wtoi(buffer);
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_GETTEXT, 18, (LPARAM)buffer);
-			curFpcGkGlove = _wtoi(buffer);
-
-			if (curFpcBoot==0) {
-				SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-			}
-
-			if (curFpcGkGlove==0) {
-				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
-			}					
-		}
+		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
+		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
@@ -4000,6 +3992,7 @@ void team_fpc_off()
 	TCHAR buffer[20];
 	TCHAR fpcBoot[3], fpcGkGlove[3];
 	int i_fpcBoot, i_fpcGkGlove;
+	
 
 	if(gn_listsel > -1)
 	{
