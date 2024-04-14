@@ -4090,7 +4090,7 @@ void team_fpc_off()
 void fpc_toggle()
 {
 	TCHAR buffer[20];
-	TCHAR fpcBoot[3], fpcGkGlove[3];
+	TCHAR fpcBoot[3], fpcGkGlove[3], fpcBootZero[3], fpcGkGloveZero[3];
 
 	if(giPesVersion==16)
 	{
@@ -4102,6 +4102,9 @@ void fpc_toggle()
 		_tcscpy_s(fpcBoot, 3, _T("38"));
 		_tcscpy_s(fpcGkGlove, 3, _T("12"));
 	}
+	
+	_tcscpy_s(fpcBootZero, 3, _T("0"));
+	_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
 
 	GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
 	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
@@ -4110,9 +4113,12 @@ void fpc_toggle()
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
+		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
 		if(giPesVersion<19)
 		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
+			GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+			if (!_tcscmp(buffer, fpcBoot) && giPesVersion < 19)
+				SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
 			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
 			if( !_tcscmp(buffer, fpcGkGlove) )
 				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
@@ -4120,24 +4126,24 @@ void fpc_toggle()
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED); 
 	}
 	else //Otherwise, set to FPC invis
-	{
-		if(giPesVersion<18) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)7, 0);
+	{		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		if( SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion<18 ) //GK sleeves are different in pre-Fox versions
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
-		else
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		if(giPesVersion<19)
-		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
-		}
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
+		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
+		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
+		if (giPesVersion == 18) 
+			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED);
+		else 
+			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
 	}
 }
 
