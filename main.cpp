@@ -3899,7 +3899,10 @@ void team_fpc_on()
 		_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
 				
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
+		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
+			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
+		else
+			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
@@ -3930,23 +3933,27 @@ void team_fpc_on()
 								gplayers[jj].b_changed=true;
 							}
 
-							if(gplayers[jj].sleeve!=2 && gplayers[jj].reg_pos!=0)
+							if (gplayers[jj].sleeve != 2 && (gplayers[jj].reg_pos != 0 || (giPesVersion >= 18 || giPesVersion==16)))
 							{
 								gplayers[jj].sleeve=2;
 								gplayers[jj].b_changed=true;
 							}
-							else if(gplayers[jj].sleeve!=1 && gplayers[jj].reg_pos==0)
+							else if(gplayers[jj].sleeve!=1 && (gplayers[jj].reg_pos==0 || (giPesVersion >= 18 || giPesVersion == 16)))
 							{
 								gplayers[jj].sleeve=1;
 								gplayers[jj].b_changed=true;
 							}
-
-							if(gplayers[jj].boot_id!=i_fpcBoot && giPesVersion<19 && gplayers[jj].boot_id==0)
+							if (gplayers[jj].skin_col != 7 && giPesVersion == 17)
+							{
+								gplayers[jj].skin_col = 7;
+								gplayers[jj].b_changed = true;
+							}
+							if(gplayers[jj].boot_id!=i_fpcBoot && giPesVersion<19 && gplayers[jj].boot_id==0 && giPesVersion != 17)
 							{
 								gplayers[jj].boot_id=i_fpcBoot;
 								gplayers[jj].b_changed=true;
 							}
-							if(gplayers[jj].glove_id!=i_fpcGkGlove && giPesVersion<19 && gplayers[jj].glove_id == 0)
+							if(gplayers[jj].glove_id!=i_fpcGkGlove && giPesVersion<19 && gplayers[jj].glove_id == 0 && giPesVersion != 17)
 							{
 								gplayers[jj].glove_id=i_fpcGkGlove;
 								gplayers[jj].b_changed=true;
@@ -4139,8 +4146,11 @@ void fpc_toggle()
 	}
 	else //Otherwise, set to FPC invis
 	{		
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
+		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
+			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
+		else
+			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
