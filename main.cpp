@@ -3897,7 +3897,7 @@ void team_fpc_on()
 		
 		_tcscpy_s(fpcBootZero, 3, _T("0"));
 		_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
-		
+				
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
@@ -4020,7 +4020,8 @@ void team_fpc_off()
 			i_fpcBoot = 38;
 			i_fpcGkGlove = 12;
 		}
-
+		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
+		if (giPesVersion < 18 && lstrcmp(buffer,L"Custom")==0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
@@ -4105,11 +4106,13 @@ void fpc_toggle()
 	
 	_tcscpy_s(fpcBootZero, 3, _T("0"));
 	_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
-
+	
 	GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
 	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
 	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, FPC is set
 	{
+		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
+		if (giPesVersion < 18 && lstrcmp(buffer, L"Custom") == 0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
