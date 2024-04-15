@@ -5383,6 +5383,7 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
 		SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
 		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		SetDlgItemText(hwnd, IDT_BOOT_ID, buffer);
 		SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
 		SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
 		SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
@@ -5432,6 +5433,27 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 						gplayers[ii].boot_id = bootID;
 						playerCounter++;
 						bootID++;
+					}
+				}
+			}
+
+			//If "Boot: set all to the same ID" is set
+			if (SendDlgItemMessage(hwnd, IDT_BOOT_OPT3, BM_GETCHECK, 0, 0)) {
+
+				//Get boot ID:
+				SendDlgItemMessage(hwnd, IDT_BOOT_ID, WM_GETTEXT, 18, (LPARAM)buffer);
+				bootID = _wtoi(buffer);
+
+				//Loop through each player
+				playerCounter = 1;
+				for (int ii = 0; ii < gnum_players; ii++)
+				{
+					if (playerCounter >= 24) break;
+					if (gplayers[ii].id == team * 100 + playerCounter)
+					{
+						//Set glove ID
+						gplayers[ii].boot_id = bootID;
+						playerCounter++;
 					}
 				}
 			}
