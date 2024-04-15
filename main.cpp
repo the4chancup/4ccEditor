@@ -4034,6 +4034,7 @@ void team_fpc_off()
 		if( !_tcscmp(buffer,fpcGkGlove) && giPesVersion<19 )
 			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED);
+		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
