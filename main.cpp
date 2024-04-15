@@ -4020,6 +4020,8 @@ void team_fpc_off()
 			i_fpcBoot = 38;
 			i_fpcGkGlove = 12;
 		}
+
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
 		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
 		if (giPesVersion < 18 && lstrcmp(buffer,L"Custom")==0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
@@ -4069,6 +4071,11 @@ void team_fpc_off()
 								gplayers[jj].socks=0;
 								gplayers[jj].b_changed=true;
 							}
+							if (gplayers[jj].wrist_tape != 0)
+							{
+								gplayers[jj].wrist_tape = 0;
+								gplayers[jj].b_changed = true;
+							}
 							if (gplayers[jj].ankle_tape)
 							{
 								gplayers[jj].ankle_tape = false;
@@ -4111,6 +4118,7 @@ void fpc_toggle()
 	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
 	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, FPC is set
 	{
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
 		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
 		if (giPesVersion < 18 && lstrcmp(buffer, L"Custom") == 0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
