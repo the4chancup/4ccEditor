@@ -162,7 +162,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Spring 24 Edition (Version F)"),
+		_T("4ccEditor Spring 24 Edition (Version G)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -3932,16 +3932,21 @@ void team_fpc_on()
 								gplayers[jj].tucked=false;
 								gplayers[jj].b_changed=true;
 							}
-
-							if (gplayers[jj].sleeve != 2 && (gplayers[jj].reg_pos != 0 || (giPesVersion >= 18 || giPesVersion==16)))
-							{
-								gplayers[jj].sleeve=2;
-								gplayers[jj].b_changed=true;
+							if (giPesVersion == 17) {
+								if (gplayers[jj].sleeve != 2 && gplayers[jj].reg_pos != 0) {
+									gplayers[jj].sleeve = 2;
+									gplayers[jj].b_changed = true;
+								}
+								else if (gplayers[jj].sleeve != 1 && gplayers[jj].reg_pos == 0){
+									gplayers[jj].sleeve = 1;
+									gplayers[jj].b_changed = true;
+								}
 							}
-							else if(gplayers[jj].sleeve!=1 && (gplayers[jj].reg_pos==0 || (giPesVersion >= 18 || giPesVersion == 16)))
-							{
-								gplayers[jj].sleeve=1;
-								gplayers[jj].b_changed=true;
+							else {
+								if (gplayers[jj].sleeve != 2) {
+									gplayers[jj].sleeve = 2;
+									gplayers[jj].b_changed = true;
+								}
 							}
 							if (gplayers[jj].skin_col != 7 && giPesVersion == 17)
 							{
@@ -5398,23 +5403,44 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 {
 	switch (Message)
 	{
-	case WM_INITDIALOG: //when box first opens
-	{
-		TCHAR buffer[20];
-				
-		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-		SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		SetDlgItemText(hwnd, IDT_BOOT_ID, buffer);
-		SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
-		SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
-		SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
+		case WM_INITDIALOG: //when box first opens
+		{
+			TCHAR buffer[20], bootIDChar[20];
+			INT bootID;
+			SendDlgItemMessage(hwnd, IDT_BOOT_END, EM_SETREADONLY, 1, 0);
+			GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+			SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
+			bootID = _tstoi(buffer)+22;
+			wsprintfW(buffer, L"%d", bootID);
+			SetDlgItemText(hwnd, IDT_BOOT_END, buffer);
+			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+			SetDlgItemText(hwnd, IDT_BOOT_ID, buffer);
+			SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
+			SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
+			SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
 
-		SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
-	}
-	break;
+			SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
+		}
+		break;
 
 	case WM_COMMAND:
+
+		switch (HIWORD(wParam))
+		{
+		case EN_CHANGE:
+			if (LOWORD(wParam) == IDT_BOOT_START)
+			{
+				TCHAR buffer[20];
+				INT bootID;
+				GetDlgItemText(hwnd, IDT_BOOT_START, buffer,20);
+				bootID = _tstoi(buffer) + 22;
+				wsprintfW(buffer, L"%d", bootID);
+				SetDlgItemText(hwnd, IDT_BOOT_END, buffer);
+			}
+			break;
+
+		}
+
 		switch (LOWORD(wParam))
 		{
 		case IDC_OK: //If the "OK" button is pressed,
