@@ -55,11 +55,11 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	int silverCOM = 1;
 	int goldCOM = 2;
 
-	int greenGiga = 3;
+	int greenGiga = 4;
 	int greenGiant = 6;
-	int greenTall = 4;
-	int greenMid = 5;
-	int greenManlet = 5;
+	int greenTall = 6;
+	int greenMid = 7;
+	int greenManlet = 0;
 
 	int redGiga = 0;
 	int redGiant = 0;
@@ -135,7 +135,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		int heightMod = 0;
 		int weakFoot = 2;
         bool hasTrick = false;
-		int targetRate = 0, targetRate2 = 0;
+		int targetRate = 0, targetRate2 = 0, targetRate3 = 0;
 		int rating = player.drib;
         rating = max(player.gk, rating);
         rating = max(player.finish, rating);
@@ -267,8 +267,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             if(player.play_skill[jj])
             {
                 cardCount++;
-		//SPECIAL Winter/Spring 24: Malicia (21) is a free card
-		if(jj==21) cardMod++;
+				//SPECIAL Winter/Spring 24: Malicia (21) is a free card
+				if(jj==21) cardMod++;
                 //Captain gets free captaincy card
 				if(jj==25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
                     cardMod++;
@@ -307,10 +307,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numReg++;
 			targetRate = regRate;
 			targetRate2 = regRate;
+			targetRate3 = regRate;
 			if(player.reg_pos == 0) //GK target rate is 77
             {
 				targetRate = gkRate;
 				targetRate2 = gkRate;
+				targetRate3 = gkRate;
 			}
 
 			/*if(countA > 3)
@@ -318,6 +320,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorTot++;
 				errorMsg << _T("Regular player with > 3 A positions; ");
 			}*/
+
+			//SPECIAL Summer 24: Malicia (21) is now mandatory on all non-medal players
+			if (!player.play_skill[21])
+			{
+				errorTot++;
+				errorMsg << _T("Malicia card is mandatory for all non-medal players; ");
+			}
 
             if(player.form+1 != regForm)
 			{
@@ -358,6 +367,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				targetRate += manletBonus;
 				targetRate2 += manletBonus;
+				targetRate3 += manletBonus;
 			}
 
 			//SPECIAL Spring 24: non-medals that are registered in a blue position (CB, LB, RB) get +5 defensive prowess
@@ -367,10 +377,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			
 			//SPECIAL Spring 24: red heights non-medals registered in a red position (CF/SS/LWF/RWF) receive a +5 boost to all stats and can stack with the boost from being 175cm however these players cannot be given a 2nd A position
+			//SPECIAL Summer 24: Red Position non-medal manlet players (CF/SS/LWF/RWF) have stamina stat = 77
 			if (player.reg_pos >= 9 && player.reg_pos <= 12 && usingRed)
 			{
 				targetRate += 5;
 				targetRate2 += 5;
+				targetRate3 = regRate;
 				if (countA > 1)
 				{
 					errorTot++;
@@ -378,8 +390,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				}
 			}
 
-			//SPECIAL Spring 24: green heights non-medals registered in a red position (CF/SS/LWF/RWF) get an additional 5cm of height except for 194cm players and 199cm players
-			if (player.reg_pos >= 9 && player.reg_pos <= 12 && !usingRed && player.height <= heightTall)
+			//SPECIAL Summer 24: green heights non-medals registered in a red position (CF/SS/LWF/RWF) get an additional 5cm of height except for 199cm players
+			if (player.reg_pos >= 9 && player.reg_pos <= 12 && !usingRed && player.height <= heightGiant)
 			{
 				heightMod = 5;
 			}
@@ -390,6 +402,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numSilver++;
 			targetRate = silverRate;
 			targetRate2 = silverRate;
+			targetRate3 = silverRate;
 
 			weakFoot = 4;
 
@@ -412,11 +425,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
+				targetRate3 -= silverGiantPen;
 			}
 			else if(player.height <= heightManlet && usingRed)
             {
 				targetRate += silverManletBonus;
 				targetRate2 += silverManletBonus;
+				targetRate3 += silverManletBonus;
 			}
             cardMod += min(silverTrickCards, numTrick); //3 free tricks
 			cardMod += min(silverCOM, numCom); //1 free COM
@@ -435,6 +450,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             numGold++;
 			targetRate = goldRate;
 			targetRate2 = goldRate;
+			targetRate3 = goldRate;
 
 			weakFoot = 4;
 
@@ -457,11 +473,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				targetRate -= goldGiantPen;
 				targetRate2 -= goldGiantPen;
+				targetRate3 -= goldGiantPen;
 			}
 			else if(player.height <= heightManlet && usingRed)
             {
 				targetRate += goldManletBonus;
 				targetRate2 += goldManletBonus;
+				targetRate3 += goldManletBonus;
 			}
 
 			if (player.height > heightGiant)
@@ -481,7 +499,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check player height
-		if ((player.height - heightMod) <= heightManlet)
+		//SPECIAL Summer24: Green bracket 180cm players will now receive 4/4 weak foot usage and accuracy with additional card
+		if ( ((player.height - heightMod) <= heightManlet) || (!usingRed && (player.height - heightMod) <= heightMid) )
 		{
 			numManlet++;
 			cardLimit++; //Manlets get a bonus card
@@ -632,10 +651,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             errorTot++;
 			errorMsg << _T("Place Kicking is ") << player.place_kick << _T(", should be ") << targetRate << _T("; ");
         }
-        if(player.stamina != targetRate)
+        if(player.stamina != targetRate3)
 		{
             errorTot++;
-			errorMsg << _T("Stamina is ") << player.stamina << _T(", should be ") << targetRate << _T("; ");
+			errorMsg << _T("Stamina is ") << player.stamina << _T(", should be ") << targetRate3 << _T("; ");
         }
         if(player.speed != targetRate)
 		{
