@@ -3874,8 +3874,9 @@ void team_created_set()
 void team_fpc_on()
 {
 	int iteam, ii, jj;
-	TCHAR fpcBoot[3], fpcGkGlove[3];
+	TCHAR fpcBoot[3], fpcGkGlove[3], fpcBootZero[3], fpcGkGloveZero[3];
 	int i_fpcBoot, i_fpcGkGlove;
+	TCHAR buffer[20];
 
 	if(gn_listsel > -1)
 	{
@@ -3893,10 +3894,12 @@ void team_fpc_on()
 			i_fpcBoot = 38;
 			i_fpcGkGlove = 12;
 		}
-
-		if(giPesVersion<18) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)7, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		if( SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion<18 ) //GK sleeves are different in pre-Fox versions
+		
+		_tcscpy_s(fpcBootZero, 3, _T("0"));
+		_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
+				
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
+		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		else
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
@@ -3905,12 +3908,13 @@ void team_fpc_on()
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		if(giPesVersion<19)
-		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
-		}
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
+		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
+		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
+		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); else Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
@@ -3928,29 +3932,33 @@ void team_fpc_on()
 								gplayers[jj].tucked=false;
 								gplayers[jj].b_changed=true;
 							}
-
-							if(gplayers[jj].sleeve!=2 && (gplayers[jj].reg_pos!=0 || giPesVersion>=18))
-							{
-								gplayers[jj].sleeve=2;
-								gplayers[jj].b_changed=true;
+							if (giPesVersion == 17) {
+								if (gplayers[jj].sleeve != 2 && gplayers[jj].reg_pos != 0) {
+									gplayers[jj].sleeve = 2;
+									gplayers[jj].b_changed = true;
+								}
+								else if (gplayers[jj].sleeve != 1 && gplayers[jj].reg_pos == 0){
+									gplayers[jj].sleeve = 1;
+									gplayers[jj].b_changed = true;
+								}
 							}
-							else if(gplayers[jj].sleeve!=1 && gplayers[jj].reg_pos==0 && giPesVersion<18)
-							{
-								gplayers[jj].sleeve=1;
-								gplayers[jj].b_changed=true;
+							else {
+								if (gplayers[jj].sleeve != 2) {
+									gplayers[jj].sleeve = 2;
+									gplayers[jj].b_changed = true;
+								}
 							}
-
-							if(gplayers[jj].skin_col!=7 && giPesVersion<18)
+							if (gplayers[jj].skin_col != 7 && giPesVersion == 17)
 							{
-								gplayers[jj].skin_col=7;
-								gplayers[jj].b_changed=true;
+								gplayers[jj].skin_col = 7;
+								gplayers[jj].b_changed = true;
 							}
-							if(gplayers[jj].boot_id!=i_fpcBoot && giPesVersion<19)
+							if(gplayers[jj].boot_id!=i_fpcBoot && giPesVersion<19 && gplayers[jj].boot_id==0 && giPesVersion != 17)
 							{
 								gplayers[jj].boot_id=i_fpcBoot;
 								gplayers[jj].b_changed=true;
 							}
-							if(gplayers[jj].glove_id!=i_fpcGkGlove && giPesVersion<19)
+							if(gplayers[jj].glove_id!=i_fpcGkGlove && giPesVersion<19 && gplayers[jj].glove_id == 0 && giPesVersion != 17)
 							{
 								gplayers[jj].glove_id=i_fpcGkGlove;
 								gplayers[jj].b_changed=true;
@@ -3975,6 +3983,16 @@ void team_fpc_on()
 								gplayers[jj].inners=0;
 								gplayers[jj].b_changed=true;
 							}
+							if (gplayers[jj].undershorts!=0)
+							{
+								gplayers[jj].undershorts = 0;
+								gplayers[jj].b_changed = true;
+							}
+							if (gplayers[jj].gloves)
+							{
+								gplayers[jj].gloves = false;
+								gplayers[jj].b_changed = true;
+							}
 							if(!gplayers[jj].gloves && giPesVersion==18) 
 							{
 								gplayers[jj].gloves=true;
@@ -3996,6 +4014,7 @@ void team_fpc_off()
 	TCHAR buffer[20];
 	TCHAR fpcBoot[3], fpcGkGlove[3];
 	int i_fpcBoot, i_fpcGkGlove;
+	
 
 	if(gn_listsel > -1)
 	{
@@ -4014,6 +4033,9 @@ void team_fpc_off()
 			i_fpcGkGlove = 12;
 		}
 
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
+		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
+		if (giPesVersion < 18 && lstrcmp(buffer,L"Custom")==0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
@@ -4024,6 +4046,7 @@ void team_fpc_off()
 		if( !_tcscmp(buffer,fpcGkGlove) && giPesVersion<19 )
 			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED);
+		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
@@ -4061,6 +4084,16 @@ void team_fpc_off()
 								gplayers[jj].socks=0;
 								gplayers[jj].b_changed=true;
 							}
+							if (gplayers[jj].wrist_tape != 0)
+							{
+								gplayers[jj].wrist_tape = 0;
+								gplayers[jj].b_changed = true;
+							}
+							if (gplayers[jj].ankle_tape)
+							{
+								gplayers[jj].ankle_tape = false;
+								gplayers[jj].b_changed = true;
+							}
 							if(gplayers[jj].gloves && giPesVersion==18) 
 							{
 								gplayers[jj].gloves=false;
@@ -4078,7 +4111,7 @@ void team_fpc_off()
 void fpc_toggle()
 {
 	TCHAR buffer[20];
-	TCHAR fpcBoot[3], fpcGkGlove[3];
+	TCHAR fpcBoot[3], fpcGkGlove[3], fpcBootZero[3], fpcGkGloveZero[3];
 
 	if(giPesVersion==16)
 	{
@@ -4090,17 +4123,26 @@ void fpc_toggle()
 		_tcscpy_s(fpcBoot, 3, _T("38"));
 		_tcscpy_s(fpcGkGlove, 3, _T("12"));
 	}
-
+	
+	_tcscpy_s(fpcBootZero, 3, _T("0"));
+	_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
+	
 	GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
 	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
 	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, FPC is set
 	{
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
+		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
+		if (giPesVersion < 18 && lstrcmp(buffer, L"Custom") == 0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
+		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
 		if(giPesVersion<19)
 		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
+			GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+			if (!_tcscmp(buffer, fpcBoot) && giPesVersion < 19)
+				SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
 			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
 			if( !_tcscmp(buffer, fpcGkGlove) )
 				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
@@ -4108,24 +4150,27 @@ void fpc_toggle()
 		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED); 
 	}
 	else //Otherwise, set to FPC invis
-	{
-		if(giPesVersion<18) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)7, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		if( SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion<18 ) //GK sleeves are different in pre-Fox versions
+	{		
+		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
 		else
 			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		if(giPesVersion<19)
-		{
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)fpcBoot);
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)fpcGkGlove);
-		}
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); 
+		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
+		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
+			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
+		if (giPesVersion == 18) 
+			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED);
+		else 
+			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
 	}
 }
 
@@ -5358,22 +5403,44 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 {
 	switch (Message)
 	{
-	case WM_INITDIALOG: //when box first opens
-	{
-		TCHAR buffer[20];
-				
-		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-		SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
-		SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
-		SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
+		case WM_INITDIALOG: //when box first opens
+		{
+			TCHAR buffer[20], bootIDChar[20];
+			INT bootID;
+			SendDlgItemMessage(hwnd, IDT_BOOT_END, EM_SETREADONLY, 1, 0);
+			GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
+			SetDlgItemText(hwnd, IDT_BOOT_START, buffer);
+			bootID = _tstoi(buffer)+22;
+			wsprintfW(buffer, L"%d", bootID);
+			SetDlgItemText(hwnd, IDT_BOOT_END, buffer);
+			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
+			SetDlgItemText(hwnd, IDT_BOOT_ID, buffer);
+			SetDlgItemText(hwnd, IDT_GLOVE_ID, buffer);
+			SendDlgItemMessage(hwnd, IDT_BOOT_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);
+			SendDlgItemMessage(hwnd, IDT_GLOVE_OPT1, BM_SETCHECK, (WPARAM)BST_CHECKED, 0);		
 
-		SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
-	}
-	break;
+			SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
+		}
+		break;
 
 	case WM_COMMAND:
+
+		switch (HIWORD(wParam))
+		{
+		case EN_CHANGE:
+			if (LOWORD(wParam) == IDT_BOOT_START)
+			{
+				TCHAR buffer[20];
+				INT bootID;
+				GetDlgItemText(hwnd, IDT_BOOT_START, buffer,20);
+				bootID = _tstoi(buffer) + 22;
+				wsprintfW(buffer, L"%d", bootID);
+				SetDlgItemText(hwnd, IDT_BOOT_END, buffer);
+			}
+			break;
+
+		}
+
 		switch (LOWORD(wParam))
 		{
 		case IDC_OK: //If the "OK" button is pressed,
@@ -5414,6 +5481,27 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 						gplayers[ii].boot_id = bootID;
 						playerCounter++;
 						bootID++;
+					}
+				}
+			}
+
+			//If "Boot: set all to the same ID" is set
+			if (SendDlgItemMessage(hwnd, IDT_BOOT_OPT3, BM_GETCHECK, 0, 0)) {
+
+				//Get boot ID:
+				SendDlgItemMessage(hwnd, IDT_BOOT_ID, WM_GETTEXT, 18, (LPARAM)buffer);
+				bootID = _wtoi(buffer);
+
+				//Loop through each player
+				playerCounter = 1;
+				for (int ii = 0; ii < gnum_players; ii++)
+				{
+					if (playerCounter >= 24) break;
+					if (gplayers[ii].id == team * 100 + playerCounter)
+					{
+						//Set glove ID
+						gplayers[ii].boot_id = bootID;
+						playerCounter++;
 					}
 				}
 			}
