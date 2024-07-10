@@ -377,12 +377,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}
 			
 			//SPECIAL Spring 24: red heights non-medals registered in a red position (CF/SS/LWF/RWF) receive a +5 boost to all stats and can stack with the boost from being 175cm however these players cannot be given a 2nd A position
-			//SPECIAL Summer 24: Red Position non-medal manlet players (CF/SS/LWF/RWF) have stamina stat = 77
 			if (player.reg_pos >= 9 && player.reg_pos <= 12 && usingRed)
 			{
 				targetRate += 5;
 				targetRate2 += 5;
-				targetRate3 = regRate;
+				//SPECIAL Summer 24: Red Position non-medal manlet players (CF/SS/LWF/RWF) have stamina stat = 77
+				if (player.height <= heightManlet && usingRed)
+					targetRate3 = regRate;
+				else
+					targetRate3 += 5;
 				if (countA > 1)
 				{
 					errorTot++;
@@ -499,15 +502,22 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check player height
-		//SPECIAL Summer24: Green bracket 180cm players will now receive 4/4 weak foot usage and accuracy with additional card
-		if ( ((player.height - heightMod) <= heightManlet) || (!usingRed && (player.height - heightMod) <= heightMid) )
+		//SPECIAL Summer 24: Green bracket 180cm players will now receive 4/4 weak foot usage and accuracy with additional card
+		if ( ((player.height - heightMod) <= heightManlet) && usingRed )
 		{
 			numManlet++;
 			cardLimit++; //Manlets get a bonus card
 			weakFoot = 4; //Manlets get weak foot acc/use 4/4
 		}
-		else if ((player.height - heightMod) == heightMid)
+		else if ((player.height - heightMod) <= heightMid)
+		{
 			numMid++;
+			if (!usingRed)
+			{
+				cardLimit++; //Manlets get a bonus card
+				weakFoot = 4; //Manlets get weak foot acc/use 4/4
+			}
+		}
 		else if ((player.height - heightMod) == heightTall)
 			numTall++;
 		else if ((player.height - heightMod) == heightTallGK && player.reg_pos == 0) //GK
