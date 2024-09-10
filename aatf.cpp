@@ -88,6 +88,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
     int numMid = 0;
     int numManlet = 0;
     bool usingRed = true;
+	bool eCheck = false;
 
 	//Run through all players once to determine height system
 	for (int ii = 0; ii < gteams[teamSel].num_on_team; ii++)
@@ -147,7 +148,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         rating = max(player.clearing, rating);
         rating = max(player.reflex, rating);
         rating = max(player.body_ctrl, rating);
-        if(pesVersion!=16) rating = max(player.phys_cont, rating); //Not in 16
+        if(pesVersion>16) rating = max(player.phys_cont, rating); //Not in 16
         rating = max(player.kick_pwr, rating);
         rating = max(player.exp_pwr, rating);
         rating = max(player.ball_ctrl, rating);
@@ -398,6 +399,21 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				heightMod = 5;
 			}
+
+			if (eCheck)
+			{
+				if (player.reg_pos == 0)
+				{
+					if (numTrick < gkTrickCards) errorMsg << _T("WARN: Has ") << numTrick << _T(" trick cards, allowed ") << gkTrickCards << _T("; ");
+					if (numCom < regCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << regCOM << _T("; ");
+				}
+				else
+				{
+					if (numTrick < regTrickCards) errorMsg << _T("WARN: Has ") << numTrick << _T(" trick cards, allowed ") << regTrickCards << _T("; ");
+					if (numCom < regCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << regCOM << _T("; ");
+				}
+				if (player.injury + 1 < regIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << regIR << _T("; ");
+			}
 		}
 		/* SILVER */
         else if(rating < goldRate-goldGiantPen) //Silver player
@@ -446,6 +462,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorTot++;
 				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be ") << silverIR << _T("; ");
 			}
+
+			if (eCheck)
+			{
+				if (numTrick < silverTrickCards) errorMsg << _T("WARN: Has ") << numTrick << _T(" trick cards, allowed ") << silverTrickCards << _T("; ");
+				if (numCom < silverCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << silverCOM << _T("; ");
+				if (player.injury + 1 < silverIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << silverIR << _T("; ");
+			}
         }
 		/* GOLD */
         else //rating == 99 //Gold player
@@ -493,11 +516,21 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             cardMod += min(goldTrickCards, numTrick); //4 free tricks
 			cardMod += min(goldCOM, numCom); //2 free COMs
 			cardLimit = goldSkillCards + cardMod; //5 skill cards
-            
+           
 			if(player.injury+1 > goldIR)
 			{
 				errorTot++;
 				errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", should be ") << goldIR << _T("; ");
+			}
+
+			if (eCheck)
+			{
+				if (cardCount < 10)
+				{
+					if (numTrick < goldTrickCards) errorMsg << _T("WARN: Has ") << numTrick << _T(" trick cards, allowed ") << goldTrickCards << _T("; ");
+					if (numCom < goldCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << goldCOM << _T("; ");
+				}
+				if (player.injury + 1 < goldIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << goldIR << _T("; ");
 			}
 		}
 
@@ -556,6 +589,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		{
             errorTot++;
 			errorMsg << _T("Has ") << cardCount-numCom << _T(" skill cards, PES limit is 10, please swap to COM cards or trade for additional A positions; ");
+		}
+
+		if (eCheck)
+		{
+			if (cardCount < min(cardLimit,10)) errorMsg << _T("WARN: Has ") << cardCount << _T(" cards, allowed ") << cardLimit << _T("; ");
+			if (player.weak_use + 1 < weakFoot) errorMsg << _T("WARN: Has weak usage") << player.weak_use + 1 << _T(", allowed ") << weakFoot << _T("; ");
+			if (player.weak_acc + 1 < weakFoot) errorMsg << _T("WARN: Has weak accuracy") << player.weak_acc + 1 << _T(", allowed ") << weakFoot << _T("; ");
 		}
 
 		//Check player overall rating
