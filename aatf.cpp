@@ -888,7 +888,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	SetWindowText(GetDlgItem(hAatfbox, IDT_AATFOUT), msgOut.c_str());
 	if(errorTot)
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("You are a sussy baka."));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Who the hell is Steve Jobs"));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Straight bussin fr fr"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("unf valid export plap plap"));
 }
