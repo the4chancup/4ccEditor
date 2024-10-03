@@ -676,3 +676,5 @@ void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, vo
 //data_util.cpp functions
 int read_data(int, int, int&, FileDescriptorNew*);
 void write_data(int, int, int, int&, FileDescriptorNew*);
+int read_dataOld(int, int, int&, FileDescriptorOld*);
+void write_dataOld(int, int, int, int&, FileDescriptorOld*);

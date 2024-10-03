@@ -101,6 +101,7 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aatf.h" />
     <ClInclude Include="crypt.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="pstdint.h" />

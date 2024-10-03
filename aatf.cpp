@@ -2,6 +2,7 @@
 #include <sstream>
 #include "editor.h"
 #include "resource.h"
+#include "aatf.h"
 #ifndef UNICODE  
   typedef std::string tstring; 
   typedef std::stringstream tstringstream;
@@ -9,6 +10,66 @@
   typedef std::wstring tstring; 
   typedef std::wstringstream tstringstream;
 #endif
+
+//============================
+//AATF Settings
+int manletBonus = 5;
+int silverManletBonus = 0;
+int goldManletBonus = 0;
+int silverGiantPen = 0;
+int goldGiantPen = 0;
+
+int goldRate = 99;
+int silverRate = 92;
+int regRate = 77;
+int gkRate = 77;
+int reqNumGold = 2;
+int reqNumSilver = 2;
+
+int goldForm = 8;
+int silverForm = 8;
+int regForm = 4;
+
+int goldIR = 3; //Injury resistence
+int silverIR = 3;
+int regIR = 1;
+
+int goldWeakFoot = 4;
+int silverWeakFoot = 4;
+int regWeakFoot = 2;
+
+int gkSkillCards = 2;
+int regSkillCards = 4;
+int silverSkillCards = 5;
+int goldSkillCards = 6;
+
+int gkTrickCards = 0;
+int regTrickCards = 2;
+int silverTrickCards = 3;
+int goldTrickCards = 3;
+
+int regCOM = 0;
+int silverCOM = 1;
+int goldCOM = 2;
+
+int greenGiga = 0;
+int greenGiant = 5;
+int greenTall = 5;
+int greenMid = 7;
+int greenManlet = 6;
+
+int redGiga = 0;
+int redGiant = 0;
+int redTall = 10;
+int redMid = 7;
+int redManlet = 6;
+
+int heightGiga = 199;
+int heightGiant = 191;
+int heightTall = 185;
+int heightTallGK = 189;
+int heightMid = 180;
+int heightManlet = 175;
 
 void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplayers, team_entry* gteams, int gnum_players)
 {
@@ -19,75 +80,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	msgOut+=_T("\r\n");
 
 	//============================
-	//Settings
-	int manletBonus = 5;
-	int silverManletBonus = 0;
-	int goldManletBonus = 0;
-	int silverGiantPen = 0;
-	int goldGiantPen = 0;
-
-	int goldRate = 99;
-	int silverRate = 88;
-	int regRate = 77;
-	int gkRate = 77;
-	int reqNumGold = 2;
-	int reqNumSilver = 2;
-
-	int goldForm = 8;
-	int silverForm = 8;
-	int regForm = 4;
-
-	int goldIR = 3; //Injury resistence
-	int silverIR = 3;
-	int regIR = 1;
-
-	int gkSkillCards = 2;
-	int regSkillCards = 4;
-	int silverSkillCards = 5;
-	int goldSkillCards = 6;
-
-	int gkTrickCards = 0;
-	int regTrickCards = 2;
-	int silverTrickCards = 3;
-	int goldTrickCards = 3;
-
-	int regCOM = 0;
-	int silverCOM = 1;
-	int goldCOM = 2;
-
-	int greenGiga = 4;
-	int greenGiant = 6;
-	int greenTall = 6;
-	int greenMid = 7;
-	int greenManlet = 0;
-
-	int redGiga = 0;
-	int redGiant = 0;
-	int redTall = 10;
-	int redMid = 7;
-	int redManlet = 6;
-
-	int heightGiga = 199;
-	int heightGiant = 194;
-	int heightTall = 185;
-	int heightTallGK = 189;
-	int heightMid = 180;
-	int heightManlet = 175;
-
-	//============================
 
 	int numGK = 0;
-    //Count of player ratings
-    int numReg = 0;
-    int numSilver = 0;
-    int numGold = 0;
-    //Count of height brackets
+	//Count of player ratings
+	int numReg = 0;
+	int numSilver = 0;
+	int numGold = 0;
+	//Count of height brackets
 	int numGiga = 0;
-    int numGiant = 0;
-    int numTall = 0;
-    int numMid = 0;
-    int numManlet = 0;
-    bool usingRed = true;
+	int numGiant = 0;
+	int numTall = 0;
+	int numMid = 0;
+	int numManlet = 0;
+	bool usingRed = true;
 	bool eCheck = false;
 
 	//Run through all players once to determine height system
@@ -134,7 +139,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         int cardMod = 0;
 		int cardLimit = 0;
 		int heightMod = 0;
-		int weakFoot = 2;
+		int weakFoot = 0;
         bool hasTrick = false;
 		int targetRate = 0, targetRate2 = 0, targetRate3 = 0;
 		int rating = player.drib;
@@ -316,18 +321,20 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate3 = gkRate;
 			}
 
+			weakFoot = regWeakFoot;
+
 			/*if(countA > 3)
 			{
 				errorTot++;
 				errorMsg << _T("Regular player with > 3 A positions; ");
 			}*/
 
-			//SPECIAL Summer 24: Malicia (21) is now mandatory on all non-medal players
+			/*//SPECIAL Summer 24: Malicia (21) is now mandatory on all non-medal players
 			if (!player.play_skill[21])
 			{
 				errorTot++;
 				errorMsg << _T("Malicia card is mandatory for all non-medal players; ");
-			}
+			}*/
 
             if(player.form+1 != regForm)
 			{
@@ -371,13 +378,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate3 += manletBonus;
 			}
 
-			//SPECIAL Spring 24: non-medals that are registered in a blue position (CB, LB, RB) get +5 defensive prowess
+			/*//SPECIAL Spring 24: non-medals that are registered in a blue position (CB, LB, RB) get +5 defensive prowess
 			if (player.reg_pos >= 1 && player.reg_pos <= 3)
 			{
 				targetRate2 += 5;
-			}
+			}*/
 			
-			//SPECIAL Spring 24: red heights non-medals registered in a red position (CF/SS/LWF/RWF) receive a +5 boost to all stats and can stack with the boost from being 175cm however these players cannot be given a 2nd A position
+			/*//SPECIAL Spring 24: red heights non-medals registered in a red position (CF/SS/LWF/RWF) receive a +5 boost to all stats and can stack with the boost from being 175cm however these players cannot be given a 2nd A position
 			if (player.reg_pos >= 9 && player.reg_pos <= 12 && usingRed)
 			{
 				targetRate += 5;
@@ -392,9 +399,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					errorTot++;
 					errorMsg << _T("Illegal 2nd A position on red heights non-medal forward; ");
 				}
-			}
+			}*/
 
-			//SPECIAL Summer 24: green heights non-medals registered in a red position (CF/SS/LWF/RWF) get an additional 5cm of height except for 199cm players
+			/*//SPECIAL Summer 24: green heights non-medals registered in a red position (CF/SS/LWF/RWF) get an additional 5cm of height except for 199cm players
 			if (player.reg_pos >= 9 && player.reg_pos <= 12 && !usingRed && player.height <= heightGiant)
 			{
 				heightMod = 5;
@@ -413,7 +420,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					if (numCom < regCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << regCOM << _T("; ");
 				}
 				if (player.injury + 1 < regIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << regIR << _T("; ");
-			}
+			}*/
 		}
 		/* SILVER */
         else if(rating < goldRate-goldGiantPen) //Silver player
@@ -423,7 +430,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			targetRate2 = silverRate;
 			targetRate3 = silverRate;
 
-			weakFoot = 4;
+			weakFoot = silverWeakFoot;
 
             if(numSilver > reqNumSilver)
 			{
@@ -478,7 +485,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			targetRate2 = goldRate;
 			targetRate3 = goldRate;
 
-			weakFoot = 4;
+			weakFoot = goldWeakFoot;
 
             if(numGold > reqNumGold)
 			{
@@ -535,8 +542,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check player height
-		//SPECIAL Summer 24: Green bracket 180cm players will now receive 4/4 weak foot usage and accuracy with additional card
-		if ( ((player.height - heightMod) <= heightManlet) && usingRed )
+		if ( ((player.height - heightMod) <= heightManlet) )
 		{
 			numManlet++;
 			cardLimit++; //Manlets get a bonus card
@@ -545,11 +551,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		else if ((player.height - heightMod) <= heightMid)
 		{
 			numMid++;
-			if (!usingRed)
-			{
-				cardLimit++; //Manlets get a bonus card
-				weakFoot = 4; //Manlets get weak foot acc/use 4/4
-			}
 		}
 		else if ((player.height - heightMod) == heightTall)
 			numTall++;
