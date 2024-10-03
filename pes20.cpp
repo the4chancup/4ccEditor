@@ -458,8 +458,11 @@ void extract_player_entry20(player_entry player, int &current_byte, void* ghdesc
 	write_data(player.play_skill[27],	6, 1, current_byte, pDescriptorNew); //Fighting spirit
 	current_byte++; //Unknown D 1/1
 	
-	WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 61, NULL, NULL);
-	current_byte+=61;
+	uint8_t nameBuffer[61];
+	memset(nameBuffer, 0, sizeof(nameBuffer));
+	int len = WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)nameBuffer, 60, NULL, NULL); //set byte limit to 60 to ensure null termination of truncated strings
+	memcpy(&(pDescriptorNew->data[current_byte]), nameBuffer, 61);
+	current_byte += 61;
 	
 	//strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 21, player.shirt_name);
 	strncpy_s((char *)&(pDescriptorNew->data[current_byte]), 21, player.shirt_name, 21-1);

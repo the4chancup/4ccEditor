@@ -552,9 +552,11 @@ void extract_player_entry17(player_entry player, int &current_byte, void* ghdesc
 	//Unknown F - 8/8
 	current_byte++;
 	
-	WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 46, NULL, NULL);
-	//(LPSTR)&(pDescriptorOld->data[current_byte])
-	current_byte+=46;
+	uint8_t nameBuffer[46];
+	memset(nameBuffer, 0, sizeof(nameBuffer));
+	int len = WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)nameBuffer, 45, NULL, NULL); //set byte limit to 45 to ensure null termination of truncated strings
+	memcpy(&(pDescriptorOld->data[current_byte]), nameBuffer, 46);
+	current_byte += 46;
 	
 	strncpy_s((char *)&(pDescriptorOld->data[current_byte]), 18, player.shirt_name, 18-1);
 	current_byte+=18;

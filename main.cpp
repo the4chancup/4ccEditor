@@ -163,7 +163,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 24 Edition (Version A)"),
+		_T("4ccEditor Autumn 24 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -5502,6 +5502,7 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 							{
 								//Set boot ID
 								gplayers[ii].boot_id = bootID;
+								gplayers[ii].b_changed = true;
 								playerCounter++;
 								bootID++;
 							}
@@ -5524,6 +5525,7 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 							{
 								//Set glove ID
 								gplayers[ii].boot_id = bootID;
+								gplayers[ii].b_changed = true;
 								playerCounter++;
 							}
 						}
@@ -5540,6 +5542,7 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 							{
 								//Set glove ID as boot ID
 								gplayers[ii].glove_id = gplayers[ii].boot_id;
+								gplayers[ii].b_changed = true;
 								playerCounter++;
 							}
 						}
@@ -5561,6 +5564,7 @@ BOOL CALLBACK bogloDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
 							{
 								//Set glove ID
 								gplayers[ii].glove_id = gloveID;
+								gplayers[ii].b_changed = true;
 								playerCounter++;
 							}
 						}

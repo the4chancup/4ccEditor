@@ -546,10 +546,10 @@ void extract_player_entry16(player_entry player, int &current_byte, int &appear_
 	write_dataOld(player.play_skill[26], 6, 1, current_byte, pDescriptorOld);
 	write_dataOld(player.play_skill[27], 7, 1, current_byte, pDescriptorOld);
 	
-	//char tbuffer[46];
-	//memset(tbuffer, 0, 46);
-	WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 46, NULL, NULL);
-	//(LPSTR)&(pDescriptorOld->data[current_byte])
+	uint8_t nameBuffer[46];
+	memset(nameBuffer, 0, sizeof(nameBuffer));
+	int len = WideCharToMultiByte(CP_UTF8, 0, player.name, -1, (LPSTR)nameBuffer, 45, NULL, NULL); //set byte limit to 45 to ensure null termination of truncated strings
+	memcpy(&(pDescriptorOld->data[current_byte]), nameBuffer, 46);
 	current_byte+=46;
 	
 	char tbuffer[16];

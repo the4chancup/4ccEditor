@@ -405,7 +405,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			if (player.reg_pos >= 9 && player.reg_pos <= 12 && !usingRed && player.height <= heightGiant)
 			{
 				heightMod = 5;
-			}
+			}*/
 
 			if (eCheck)
 			{
@@ -420,7 +420,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					if (numCom < regCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << regCOM << _T("; ");
 				}
 				if (player.injury + 1 < regIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << regIR << _T("; ");
-			}*/
+			}
 		}
 		/* SILVER */
         else if(rating < goldRate-goldGiantPen) //Silver player
