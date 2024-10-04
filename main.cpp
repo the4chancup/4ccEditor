@@ -36,7 +36,7 @@ BOOL CALLBACK scale_children(HWND,LPARAM);
 BOOL CALLBACK draw_children(HWND,LPARAM);
 */
 int loadDLL();
-void DoFileOpen(HWND, TCHAR* = NULL);
+int DoFileOpen(HWND, int, TCHAR* = NULL);
 void DoFileSave(HWND);
 void data_handler(const TCHAR *);
 void save_handler(const TCHAR *);
@@ -163,7 +163,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 24 Edition (Version B)"),
+		_T("4ccEditor Autumn 24 Edition (Version C)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -673,6 +673,8 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 		break;
 		case WM_COMMAND:
 			wchar_t buffer[4];
+			int ret;
+			int prevPesVersion;
 			memset(buffer, 0, sizeof(buffer));
 			switch(LOWORD(W))
 			{
@@ -680,29 +682,35 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 					PostMessage(H, WM_CLOSE, 0, 0);
 				break;
 				case ID_FILE_OPEN_16_EN:
-					giPesVersion = 16;
-					DoFileOpen(H, _T("Open PES16 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 16, _T("Open PES16 EDIT file"));
+					if(ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_17_EN:
-					giPesVersion = 17;
-					DoFileOpen(H, _T("Open PES17 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 17, _T("Open PES17 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_18_EN:
-					giPesVersion = 18;
-					DoFileOpen(H, _T("Open PES18 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 18, _T("Open PES18 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_19_EN:
-					giPesVersion = 19;
-					DoFileOpen(H, _T("Open PES19 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 19, _T("Open PES19 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_20_EN:
-					giPesVersion = 20;
-					DoFileOpen(H, _T("Open PES20 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 20, _T("Open PES20 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_EN:
 				case ID_FILE_OPEN_21_EN:
-					giPesVersion = 21;
-					DoFileOpen(H, _T("Open PES21 EDIT file"));
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 21, _T("Open PES21 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_SAVE_EN:
 					if(ghdescriptor)
@@ -1080,7 +1088,7 @@ int loadDLL()
 }
 
 //Launch an Open File dialog box and attempt to open the selected file
-void DoFileOpen(HWND hwnd, TCHAR* pcs_title)
+int DoFileOpen(HWND hwnd, int pesVersion, TCHAR* pcs_title)
 {
 	OPENFILENAME ofn;
 	TCHAR cs_file_name[MAX_PATH] = _T("");
@@ -1101,6 +1109,7 @@ void DoFileOpen(HWND hwnd, TCHAR* pcs_title)
 	if(GetOpenFileName(&ofn))
 	{
 		gb_firstsave = true;
+		giPesVersion = pesVersion;
 		__try
 		{
 			data_handler(cs_file_name);
@@ -1126,9 +1135,11 @@ void DoFileOpen(HWND hwnd, TCHAR* pcs_title)
 			}
 			SendDlgItemMessage(ghw_main, IDC_NAME_LIST, LVM_DELETEALLITEMS, 0, 0);
 			SendDlgItemMessage(ghw_main, IDC_TEAM_LIST, CB_RESETCONTENT, 0, 0);
-			return;
+			return 1;
 		}
+		return 0;
 	}
+	return 2;
 }
 
 //Launch a Save File dialog box and save the PES EDIT data to the chosen location

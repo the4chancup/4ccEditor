@@ -71,6 +71,7 @@ int heightTallGK = 189;
 int heightMid = 180;
 int heightManlet = 175;
 
+
 void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplayers, team_entry* gteams, int gnum_players)
 {
 	player_entry player;
@@ -890,5 +891,5 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	if(errorTot)
 		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Who the hell is Steve Jobs"));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("unf valid export plap plap"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("unf exportie plap plap"));
 }
