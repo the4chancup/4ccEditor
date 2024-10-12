@@ -671,7 +671,54 @@ void extract_team_info17(team_entry team, int &current_byte, void* ghdescriptor)
 	current_byte+=0x2; //19:0
 	write_dataOld(team.b_edit_name, 4, 1, current_byte, pDescriptorOld);
 
-	current_byte+=0x7F;
+	current_byte++; //1A
+	write_dataOld(0, 5, 1, current_byte, pDescriptorOld); //1A:5 (Team Strip Edited Flag)
+
+	current_byte++; //1B
+	current_byte++; //1C
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 1
+	current_byte++;
+	current_byte++;
+	current_byte++;
+	write_dataOld(0x1, 0, 8, current_byte, pDescriptorOld); //Team Strip 2
+	current_byte++;
+	current_byte++;
+	current_byte++;
+	write_dataOld(0x80, 0, 8, current_byte, pDescriptorOld); //Team Strip 3 (GK)
+	current_byte++;
+	current_byte++;
+	current_byte++;
+
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 4
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 5
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 6
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 7
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 8
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 9
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0x0, 0, 8, current_byte, pDescriptorOld); //Team Strip 10
+	write_dataOld(0xC0, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+	write_dataOld(0xFF, 0, 8, current_byte, pDescriptorOld);
+
+	current_byte += 0x54;
 	
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;

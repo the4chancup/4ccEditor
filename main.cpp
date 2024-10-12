@@ -5113,6 +5113,11 @@ void fix_database()
 	}
 	if(gn_listsel > -1)
 		show_player_info(gn_playind[gn_listsel]);
+
+	for (ii = 0; ii < gnum_teams; ii++)
+	{
+		gteams[ii].b_changed = true;
+	}
 }
 
 
