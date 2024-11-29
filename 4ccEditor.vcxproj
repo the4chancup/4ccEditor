@@ -99,6 +99,7 @@
     <ClCompile Include="pes18.cpp" />
     <ClCompile Include="pes19.cpp" />
     <ClCompile Include="pes20.cpp" />
+    <ClCompile Include="fpc.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>

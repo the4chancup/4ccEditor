@@ -1,5 +1,8 @@
 #include "editor.h"
 
+// Read the data stored in 'FileDescriptorNew* pDescriptorNew', starting at 'start_bit' of 'current_byte' 
+// and continuing for 'bits_to_write'.  If end of current byte is reached, advance 'current_byte' to next
+// byte.
 int read_data(int start_bit, int bits_to_read, int& current_byte, FileDescriptorNew* pDescriptorNew)
 {
 	int shift;
@@ -28,7 +31,8 @@ int read_data(int start_bit, int bits_to_read, int& current_byte, FileDescriptor
 	return output;
 }
 
-
+// Write the data stored in 'input' to 'FileDescriptorNew* pDescriptorNew', starting at 'start_bit' of 'current_byte' 
+// and continuing for 'bits_to_write'. If end of current byte is reached, advance 'current_byte' to next byte.
 void write_data(int input, int start_bit, int bits_to_write, int& current_byte, FileDescriptorNew* pDescriptorNew)
 {
 	int shift;
@@ -90,7 +94,8 @@ int read_dataOld(int start_bit, int bits_to_read, int& current_byte, FileDescrip
 	return output;
 }
 
-
+// Write the data stored in 'input' to 'FileDescriptorOld* pDescriptor', starting at 'start_bit' of 'current_byte' 
+// and continuing for 'bits_to_write'
 void write_dataOld(int input, int start_bit, int bits_to_write, int& current_byte, FileDescriptorOld* pDescriptor)
 {
 	int shift;

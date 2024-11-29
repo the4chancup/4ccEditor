@@ -163,7 +163,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 24 Edition (Version C)"),
+		_T("4ccEditor Autumn 24 Edition (Version E)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -2258,7 +2258,7 @@ void show_player_info(int p_ind)
 
 		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)gplayers[p_ind].undershorts, 0);
 
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)gplayers[p_ind].tucked, 0);
+		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)gplayers[p_ind].untucked, 0);
 
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),gplayers[p_ind].ankle_tape);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),gplayers[p_ind].gloves);
@@ -2909,7 +2909,7 @@ player_entry get_form_player_info(int index)
 
 	output.undershorts = SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_GETCURSEL, 0, 0);
 
-	output.tucked = SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_GETCURSEL, 0, 0);
+	output.untucked = SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_GETCURSEL, 0, 0);
 
 	if(Button_GetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA))==BST_CHECKED) output.ankle_tape=true;
 	else output.ankle_tape=false;
@@ -3914,42 +3914,19 @@ void team_fpc_on()
 
 	if(gn_listsel > -1)
 	{
-		if(giPesVersion==16)
-		{
-			_tcscpy_s(fpcBoot, 3, _T("55"));
-			_tcscpy_s(fpcGkGlove, 3, _T("11"));
-			i_fpcBoot = 55;
-			i_fpcGkGlove = 11;
-		}
-		else
-		{
-			_tcscpy_s(fpcBoot, 3, _T("38"));
-			_tcscpy_s(fpcGkGlove, 3, _T("12"));
-			i_fpcBoot = 38;
-			i_fpcGkGlove = 12;
-		}
-		
-		_tcscpy_s(fpcBootZero, 3, _T("0"));
-		_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
-				
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
-		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
-		else
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
-		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED); else Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
+		//Hide currently selected player
+		enable_fpc_invis_for_displayed_player(ghw_tab2, giPesVersion);
 
+		//Update current player entry
+		player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+		if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+		{
+			if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
+				pe_current.b_edit_player = true;
+			gplayers[gn_playind[gn_listsel]] = pe_current;
+		}
+
+		//Loop through team and turn on FPC invis for each
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
 			iteam = gplayers[gn_playind[gn_listsel]].team_ind;
@@ -3961,77 +3938,7 @@ void team_fpc_on()
 					{
 						if( gteams[iteam].players[ii]==gplayers[jj].id )
 						{
-							if(gplayers[jj].tucked) 
-							{
-								gplayers[jj].tucked=false;
-								gplayers[jj].b_changed=true;
-							}
-							if (giPesVersion == 17) {
-								if (gplayers[jj].sleeve != 2 && gplayers[jj].reg_pos != 0) {
-									gplayers[jj].sleeve = 2;
-									gplayers[jj].b_changed = true;
-								}
-								else if (gplayers[jj].sleeve != 1 && gplayers[jj].reg_pos == 0){
-									gplayers[jj].sleeve = 1;
-									gplayers[jj].b_changed = true;
-								}
-							}
-							else {
-								if (gplayers[jj].sleeve != 2) {
-									gplayers[jj].sleeve = 2;
-									gplayers[jj].b_changed = true;
-								}
-							}
-							if (gplayers[jj].skin_col != 7 && giPesVersion == 17)
-							{
-								gplayers[jj].skin_col = 7;
-								gplayers[jj].b_changed = true;
-							}
-							if(gplayers[jj].boot_id!=i_fpcBoot && giPesVersion<19 && gplayers[jj].boot_id==0 && giPesVersion != 17)
-							{
-								gplayers[jj].boot_id=i_fpcBoot;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].glove_id!=i_fpcGkGlove && giPesVersion<19 && gplayers[jj].glove_id == 0 && giPesVersion != 17)
-							{
-								gplayers[jj].glove_id=i_fpcGkGlove;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].socks!=2)
-							{
-								gplayers[jj].socks=2;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].wrist_tape!=0)
-							{
-								gplayers[jj].wrist_tape=0;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].ankle_tape) 
-							{
-								gplayers[jj].ankle_tape=false;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].inners) 
-							{
-								gplayers[jj].inners=0;
-								gplayers[jj].b_changed=true;
-							}
-							if (gplayers[jj].undershorts!=0)
-							{
-								gplayers[jj].undershorts = 0;
-								gplayers[jj].b_changed = true;
-							}
-							if (gplayers[jj].gloves)
-							{
-								gplayers[jj].gloves = false;
-								gplayers[jj].b_changed = true;
-							}
-							if(!gplayers[jj].gloves && giPesVersion==18) 
-							{
-								gplayers[jj].gloves=true;
-								gplayers[jj].b_changed=true;
-							}
+							enable_fpc_invis_for_player(gplayers[jj], giPesVersion);
 							break;
 						}
 					}
@@ -4052,35 +3959,17 @@ void team_fpc_off()
 
 	if(gn_listsel > -1)
 	{
-		if(giPesVersion==16)
-		{
-			_tcscpy_s(fpcBoot, 3, _T("55"));
-			_tcscpy_s(fpcGkGlove, 3, _T("11"));
-			i_fpcBoot = 55;
-			i_fpcGkGlove = 11;
-		}
-		else
-		{
-			_tcscpy_s(fpcBoot, 3, _T("38"));
-			_tcscpy_s(fpcGkGlove, 3, _T("12"));
-			i_fpcBoot = 38;
-			i_fpcGkGlove = 12;
-		}
+		//Show currently selected player
+		disable_fpc_invis_for_displayed_player(ghw_tab2, giPesVersion);
 
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
-		if (giPesVersion < 18 && lstrcmp(buffer,L"Custom")==0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
-		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-		if( !_tcscmp(buffer,fpcBoot) && giPesVersion<19 )
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		if( !_tcscmp(buffer,fpcGkGlove) && giPesVersion<19 )
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED);
-		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
+		//Update current player entry
+		player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+		if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+		{
+			if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
+				pe_current.b_edit_player = true;
+			gplayers[gn_playind[gn_listsel]] = pe_current;
+		}
 
 		if(gplayers[gn_playind[gn_listsel]].team_ind >= 0)
 		{
@@ -4093,46 +3982,7 @@ void team_fpc_off()
 					{
 						if( gteams[iteam].players[ii]==gplayers[jj].id )
 						{
-							if(!gplayers[jj].tucked) 
-							{
-								gplayers[jj].tucked=true;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].sleeve==2)
-							{
-								gplayers[jj].sleeve=1;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].boot_id==i_fpcBoot && giPesVersion<19)
-							{
-								gplayers[jj].boot_id=0;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].glove_id==i_fpcGkGlove && giPesVersion<19)
-							{
-								gplayers[jj].glove_id=0;
-								gplayers[jj].b_changed=true;
-							}
-							if(gplayers[jj].socks==2)
-							{
-								gplayers[jj].socks=0;
-								gplayers[jj].b_changed=true;
-							}
-							if (gplayers[jj].wrist_tape != 0)
-							{
-								gplayers[jj].wrist_tape = 0;
-								gplayers[jj].b_changed = true;
-							}
-							if (gplayers[jj].ankle_tape)
-							{
-								gplayers[jj].ankle_tape = false;
-								gplayers[jj].b_changed = true;
-							}
-							if(gplayers[jj].gloves && giPesVersion==18) 
-							{
-								gplayers[jj].gloves=false;
-								gplayers[jj].b_changed=true;
-							}
+							disable_fpc_invis_for_player(gplayers[jj], giPesVersion);
 							break;
 						}
 					}
@@ -4144,67 +3994,13 @@ void team_fpc_off()
 
 void fpc_toggle()
 {
-	TCHAR buffer[20];
-	TCHAR fpcBoot[3], fpcGkGlove[3], fpcBootZero[3], fpcGkGloveZero[3];
-
-	if(giPesVersion==16)
+	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, assume FPC is set and remove FPC invisibility settings
 	{
-		_tcscpy_s(fpcBoot, 3, _T("55"));
-		_tcscpy_s(fpcGkGlove, 3, _T("11"));
+		disable_fpc_invis_for_displayed_player(ghw_tab2, giPesVersion);
 	}
-	else
+	else //Otherwise, assume FPC isn't set and turn on FPC invisibility settings
 	{
-		_tcscpy_s(fpcBoot, 3, _T("38"));
-		_tcscpy_s(fpcGkGlove, 3, _T("12"));
-	}
-	
-	_tcscpy_s(fpcBootZero, 3, _T("0"));
-	_tcscpy_s(fpcGkGloveZero, 3, _T("0"));
-	
-	GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-	//if( !_tcscmp(buffer, fpcBoot) ) //If it's 38, FPC is set
-	if(SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_GETCURSEL, 0, 0) == 2) //If short socks, FPC is set
-	{
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);
-		GetDlgItemText(ghw_tab2, IDC_PHYS_SKIN, buffer, 20);
-		if (giPesVersion < 18 && lstrcmp(buffer, L"Custom") == 0) SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_SETCURSEL, (WPARAM)1, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)1, 0);
-		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA), BST_UNCHECKED);
-		if(giPesVersion<19)
-		{
-			GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-			if (!_tcscmp(buffer, fpcBoot) && giPesVersion < 19)
-				SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-			GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-			if( !_tcscmp(buffer, fpcGkGlove) )
-				SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)_T("0"));
-		}
-		if(giPesVersion==18) Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_UNCHECKED); 
-	}
-	else //Otherwise, set to FPC invis
-	{		
-		if (SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0) && giPesVersion == 17) //GK sleeves are different in pre-Fox versions
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)1, 0);
-		else
-			SendDlgItemMessage(ghw_tab2, IDC_STRP_SLEE, CB_SETCURSEL, (WPARAM)2, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_WRTA, CB_SETCURSEL, (WPARAM)0, 0);		
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SOCK, CB_SETCURSEL, (WPARAM)2, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_TAIL, CB_SETCURSEL, (WPARAM)0, 0);
-		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_ANTA),BST_UNCHECKED);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_SLIN, CB_SETCURSEL, (WPARAM)0, 0);
-		SendDlgItemMessage(ghw_tab2, IDC_STRP_UNDR, CB_SETCURSEL, (WPARAM)0, 0);
-		GetDlgItemText(ghw_tab2, IDT_STRP_BOID, buffer, 20);
-		if (!_tcscmp(buffer, fpcBootZero) && giPesVersion < 19)
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_BOID, WM_SETTEXT, 0, (LPARAM)(fpcBoot));
-		GetDlgItemText(ghw_tab2, IDT_STRP_GLID, buffer, 20);
-		if (!_tcscmp(buffer, fpcGkGloveZero) && giPesVersion < 19)
-			SendDlgItemMessage(ghw_tab2, IDT_STRP_GLID, WM_SETTEXT, 0, (LPARAM)(fpcGkGlove));
-		if (giPesVersion == 18) 
-			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV),BST_CHECKED);
-		else 
-			Button_SetCheck(GetDlgItem(ghw_tab2, IDB_STRP_GLOV), BST_UNCHECKED);
+		enable_fpc_invis_for_displayed_player(ghw_tab2, giPesVersion);
 	}
 }
 
@@ -5074,15 +4870,15 @@ void fix_database()
 
 	for(ii=0;ii<gnum_players;ii++)
 	{
-		if(!gplayers[ii].b_base_copy && gplayers[ii].copy_id != gplayers[ii].id)
+		if(!gplayers[ii].b_base_copy && gplayers[ii].copy_id != gplayers[ii].id && gplayers[ii].copy_id != 0)
 		{
-			gplayers[ii].copy_id = gplayers[ii].id;
+			gplayers[ii].copy_id = 0;
 			gplayers[ii].b_changed=true;
 		}
 		else if(gplayers[ii].b_base_copy && 
-			    (gplayers[ii].copy_id == gplayers[ii].id || gplayers[ii].copy_id == 0))
+			    (gplayers[ii].copy_id == gplayers[ii].id || gplayers[ii].copy_id == 0)) //If it's not a base copy of another player but the base copy flag is set, unset it
 		{
-			gplayers[ii].copy_id = gplayers[ii].id;
+			//gplayers[ii].copy_id = gplayers[ii].id;
 			gplayers[ii].b_base_copy=false;
 			gplayers[ii].b_changed=true;
 		}
@@ -5113,6 +4909,51 @@ void fix_database()
 	}
 	if(gn_listsel > -1)
 		show_player_info(gn_playind[gn_listsel]);
+
+	//Clear the Team Strip Edited flag and reset strip values
+	for (ii=0; ii < gnum_teams; ii++)
+	{
+		//Set Edited Strip flag to false
+		if (gteams[ii].b_edit_strip)
+		{
+			gteams[ii].b_edit_strip = false;
+			gteams[ii].b_changed = true;
+		}
+		//Return strip settings to default configuration:
+		//Set first 3 strip entries to Kit 1 (0), Kit 2 (1), and GK kit (0x80), and IDs to Team Id * 0x40
+		//Set all subsequent strip entries to a non-existent team ID (0xFFFFC0)
+		if (gteams[ii].stripBlock[0].stripNumber != 0x0 || 
+			gteams[ii].stripBlock[0].stripTeamId != gteams[ii].id * 0x40)
+		{
+			gteams[ii].stripBlock[0].stripNumber = 0x0;
+			gteams[ii].stripBlock[0].stripTeamId = gteams[ii].id * 0x40;
+			gteams[ii].b_changed = true;
+		}
+		if (gteams[ii].stripBlock[1].stripNumber != 0x1 ||
+			gteams[ii].stripBlock[1].stripTeamId != gteams[ii].id * 0x40)
+		{
+			gteams[ii].stripBlock[1].stripNumber = 0x1;
+			gteams[ii].stripBlock[1].stripTeamId = gteams[ii].id * 0x40;
+			gteams[ii].b_changed = true;
+		}
+		if (gteams[ii].stripBlock[2].stripNumber != 0x80 ||
+			gteams[ii].stripBlock[2].stripTeamId != gteams[ii].id * 0x40)
+		{
+			gteams[ii].stripBlock[2].stripNumber = 0x80; //GK strip
+			gteams[ii].stripBlock[2].stripTeamId = gteams[ii].id * 0x40;
+			gteams[ii].b_changed = true;
+		}
+		for (int jj = 3; jj < 10; jj++)
+		{
+			if (gteams[ii].stripBlock[jj].stripNumber != 0x0 ||
+				gteams[ii].stripBlock[jj].stripTeamId != 0xFFFFC0)
+			{
+				gteams[ii].stripBlock[jj].stripNumber = 0x0;
+				gteams[ii].stripBlock[jj].stripTeamId = 0xFFFFC0; //Non-existent team ID
+				gteams[ii].b_changed = true;
+			}
+		}
+	}
 }
 
 
@@ -5322,7 +5163,7 @@ void import_squad(HWND hwnd)
 			pesVer = atoi(c_pesVer);
 			
 			//Find number of players on this team
-			for(num_on_team=0;num_on_team< gteams->team_max;num_on_team++)
+			for(num_on_team=0; num_on_team < gteams->team_max; num_on_team++)
 			{
 				if(!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
 			}

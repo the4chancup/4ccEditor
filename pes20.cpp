@@ -177,7 +177,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	players.inners		= read_data(0, 2, current_byte, pDescriptorNew);
 	players.socks		= read_data(2, 2, current_byte, pDescriptorNew);
 	players.undershorts = read_data(4, 2, current_byte, pDescriptorNew);
-	players.tucked		= read_data(6, 1, current_byte, pDescriptorNew);
+	players.untucked		= read_data(6, 1, current_byte, pDescriptorNew);
 	players.ankle_tape	= read_data(7, 1, current_byte, pDescriptorNew);
 	//0x16:0
 	players.gloves		= read_data(0, 1, current_byte, pDescriptorNew);
@@ -504,7 +504,7 @@ void extract_player_entry20(player_entry player, int &current_byte, void* ghdesc
 	write_data(player.inners,		0, 2, current_byte, pDescriptorNew);
 	write_data(player.socks,		2, 2, current_byte, pDescriptorNew);
 	write_data(player.undershorts,	4, 2, current_byte, pDescriptorNew);
-	write_data(player.tucked,		6, 1, current_byte, pDescriptorNew);
+	write_data(player.untucked,		6, 1, current_byte, pDescriptorNew);
 	write_data(player.ankle_tape,	7, 1, current_byte, pDescriptorNew);
 	//0x16:0
 	write_data(player.gloves,		0, 1, current_byte, pDescriptorNew);

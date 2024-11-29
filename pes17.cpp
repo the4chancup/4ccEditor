@@ -238,7 +238,7 @@ void fill_player_entry17(player_entry &players, int &current_byte, void* ghdescr
 	players.inners = read_dataOld(0, 2, current_byte, pDescriptorOld);
 	players.socks = read_dataOld(2, 2, current_byte, pDescriptorOld);
 	players.undershorts = read_dataOld(4, 2, current_byte, pDescriptorOld);
-	players.tucked = read_dataOld(6, 1, current_byte, pDescriptorOld);
+	players.untucked = read_dataOld(6, 1, current_byte, pDescriptorOld);
 	players.ankle_tape = read_dataOld(7, 1, current_byte, pDescriptorOld);
 
 	players.gloves = read_dataOld(0, 1, current_byte, pDescriptorOld);
@@ -271,29 +271,39 @@ void fill_team_ids17(team_entry &teams, int &current_byte, void* ghdescriptor)
 
 	teams.id = read_dataOld(0, 4 * 8, current_byte, pDescriptorOld);
 
-	current_byte+=0xE; //12:0 - 12:5
-	teams.color1_red = read_dataOld(0, 6, current_byte, pDescriptorOld);
+	current_byte+=0xE; //0x12
+	teams.color1_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x12:0 - 0x12:5
 
-	teams.color1_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //12:6 - 13:3
+	teams.color1_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x12:6 - 0x13:3
 	
-	current_byte++; //14
-	teams.color2_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //14:0 - 14:5
+	current_byte++; //0x14
+	teams.color2_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x14:0 - 0x14:5
 	
-	teams.color2_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //14:6 - 15:3
+	teams.color2_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x14:6 - 0x15:3
 	
-	teams.color2_blue = read_dataOld(4, 6, current_byte, pDescriptorOld); //15:4 - 16:1
+	teams.color2_blue = read_dataOld(4, 6, current_byte, pDescriptorOld); //0x15:4 - 0x16:1
 
-	teams.color1_blue = read_dataOld(2, 6, current_byte, pDescriptorOld); //16:2 - 16:7
+	teams.color1_blue = read_dataOld(2, 6, current_byte, pDescriptorOld); //0x16:2 - 0x16:7
 	
-	current_byte+=0x2; //19:0
-	teams.b_edit_name = read_dataOld(4, 1, current_byte, pDescriptorOld);
+	current_byte+=0x2; //0x19
+	teams.b_edit_name = read_dataOld(4, 1, current_byte, pDescriptorOld); //0x19:4
 
-	current_byte+=0x7F;
+	current_byte++; //0x1A
+	teams.b_edit_strip = read_dataOld(5, 1, current_byte, pDescriptorOld); //0x1A:5
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, teams.name, 0x46);
+	current_byte += 2; //0x1C
+	for (int ii = 0; ii < 10; ii++)
+	{
+		teams.stripBlock[ii].stripNumber = read_dataOld(0, 1 * 8, current_byte, pDescriptorOld); //Loop from 0x1C to 0x40
+		teams.stripBlock[ii].stripTeamId = read_dataOld(0, 3 * 8, current_byte, pDescriptorOld);
+	}
+
+	current_byte += 0x54;
+
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, teams.name, 0x46); //0x98
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte]));
+	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte])); //0xDE
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
@@ -615,7 +625,7 @@ void extract_player_entry17(player_entry player, int &current_byte, void* ghdesc
 	write_dataOld(player.inners, 0, 2, current_byte, pDescriptorOld);
 	write_dataOld(player.socks, 2, 2, current_byte, pDescriptorOld);
 	write_dataOld(player.undershorts, 4, 2, current_byte, pDescriptorOld);
-	write_dataOld(player.tucked, 6, 1, current_byte, pDescriptorOld);
+	write_dataOld(player.untucked, 6, 1, current_byte, pDescriptorOld);
 	write_dataOld(player.ankle_tape, 7, 1, current_byte, pDescriptorOld);
 
 	write_dataOld(player.gloves, 0, 1, current_byte, pDescriptorOld);
@@ -652,31 +662,41 @@ void extract_team_info17(team_entry team, int &current_byte, void* ghdescriptor)
 		return;
 	}
 	
-	write_dataOld(team.id, 0, 4 * 8, current_byte, pDescriptorOld);
+	write_dataOld(team.id, 0, 4 * 8, current_byte, pDescriptorOld); //0 - 4
 	
-	current_byte += 0xE; //12:0 - 12:5
-	write_dataOld(team.color1_red, 0, 6, current_byte, pDescriptorOld);
+	current_byte += 0xE; //0x12
+	write_dataOld(team.color1_red, 0, 6, current_byte, pDescriptorOld); //0x12:0 - 0x12:5
 
-	write_dataOld(team.color1_green, 6, 6, current_byte, pDescriptorOld); //12:6 - 13:3
+	write_dataOld(team.color1_green, 6, 6, current_byte, pDescriptorOld); //0x12:6 - 0x13:3
 
-	current_byte++; //14
-	write_dataOld(team.color2_red, 0, 6, current_byte, pDescriptorOld); //14:0 - 14:5
+	current_byte++; //0x14
+	write_dataOld(team.color2_red, 0, 6, current_byte, pDescriptorOld); //0x14:0 - 0x14:5
 
-	write_dataOld(team.color2_green, 6, 6, current_byte, pDescriptorOld); //14:6 - 15:3
+	write_dataOld(team.color2_green, 6, 6, current_byte, pDescriptorOld); //0x14:6 - 0x15:3
 
-	write_dataOld(team.color2_blue, 4, 6, current_byte, pDescriptorOld); //15:4 - 16:1
+	write_dataOld(team.color2_blue, 4, 6, current_byte, pDescriptorOld); //0x15:4 - 0x16:1
 
-	write_dataOld(team.color1_blue, 2, 6, current_byte, pDescriptorOld); //16:2 - 16:7
+	write_dataOld(team.color1_blue, 2, 6, current_byte, pDescriptorOld); //0x16:2 - 0x16:7
 	
-	current_byte+=0x2; //19:0
-	write_dataOld(team.b_edit_name, 4, 1, current_byte, pDescriptorOld);
+	current_byte+=0x2; //0x19:0
+	write_dataOld(team.b_edit_name, 4, 1, current_byte, pDescriptorOld); //0x19:4
 
-	current_byte+=0x7F;
+	current_byte++; //0x1A
+	write_dataOld(team.b_edit_strip, 5, 1, current_byte, pDescriptorOld); //0x1A:5
+	current_byte += 2; //0x1C
+
+	for (int ii = 0; ii < 10; ii++)
+	{
+		write_dataOld(team.stripBlock[ii].stripNumber, 0, 1 * 8, current_byte, pDescriptorOld); //Loop from 0x1C to 0x40
+		write_dataOld(team.stripBlock[ii].stripTeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	}
 	
-	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL);
+	current_byte += 0x54;
+	
+	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL); //0x98
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name);
+	strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name); //0xDE
 	current_byte+=0x4;
 	
 	current_byte+=0xFE;

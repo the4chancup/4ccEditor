@@ -252,7 +252,7 @@ void fill_appearance_entry16(player_entry &players, int &current_byte, void* ghd
 	players.inners = read_dataOld(0, 2, current_byte, pDescriptorOld);
 	players.socks = read_dataOld(2, 2, current_byte, pDescriptorOld);
 	players.undershorts = read_dataOld(4, 2, current_byte, pDescriptorOld);
-	players.tucked = read_dataOld(6, 1, current_byte, pDescriptorOld);
+	players.untucked = read_dataOld(6, 1, current_byte, pDescriptorOld);
 	players.ankle_tape = read_dataOld(7, 1, current_byte, pDescriptorOld);
 
 	players.gloves = read_dataOld(0, 1, current_byte, pDescriptorOld);
@@ -614,7 +614,7 @@ void extract_player_entry16(player_entry player, int &current_byte, int &appear_
 	write_dataOld(player.inners, 0, 2, appear_byte, pDescriptorOld);
 	write_dataOld(player.socks, 2, 2, appear_byte, pDescriptorOld);
 	write_dataOld(player.undershorts, 4, 2, appear_byte, pDescriptorOld);
-	write_dataOld(player.tucked, 6, 1, appear_byte, pDescriptorOld);
+	write_dataOld(player.untucked, 6, 1, appear_byte, pDescriptorOld);
 	write_dataOld(player.ankle_tape, 7, 1, appear_byte, pDescriptorOld);
 
 	write_dataOld(player.gloves, 0, 1, appear_byte, pDescriptorOld);
@@ -651,13 +651,33 @@ void extract_team_info16(team_entry team, int &current_byte, void* ghdescriptor)
 		return;
 	}
 	
-	write_dataOld(team.id, 0, 4 * 8, current_byte, pDescriptorOld);
+	write_dataOld(team.id, 0, 4 * 8, current_byte, pDescriptorOld); //0x0-0x4
 	
 	current_byte+=0xE;
-	write_dataOld(team.b_edit_name, 0, 1, current_byte, pDescriptorOld);
+	write_dataOld(team.b_edit_name, 0, 1, current_byte, pDescriptorOld); //0x12:0
 
 	current_byte+=0x82;
-	
+	/*Check these before enabling:
+	current_byte+=0x6; //0x18
+	write_dataOld(teams.strip1Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x18
+	write_dataOld(teams.strip1TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip2Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x1C
+	write_dataOld(teams.strip2TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip3Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x20
+	write_dataOld(teams.strip3TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip4Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x24
+	write_dataOld(teams.strip4TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip5Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x2C
+	write_dataOld(teams.strip5TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip6Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x30
+	write_dataOld(teams.strip6TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip7Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x34
+	write_dataOld(teams.strip7TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+	write_dataOld(teams.strip8Number, 0, 1 * 8, current_byte, pDescriptorOld); //0x3C
+	write_dataOld(teams.strip8TeamId, 0, 3 * 8, current_byte, pDescriptorOld);
+
+	current_byte+=0x54; //0x94
+	*/
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	

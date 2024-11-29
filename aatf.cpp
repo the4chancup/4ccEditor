@@ -353,9 +353,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                     errorTot++;
 					errorMsg << _T("GKs in this bracket must be ") << heightTallGK << _T("cm; ");
 				}
-				if (player.height > heightGiant)
+				//SPECIAL Autumn 24 - GK and medals can'ts be in giant height bracket
+				if (player.height >= heightGiant)
 				{
-					errorMsg << _T("GK heights cannot exceed ") << heightGiant << _T("cm; ");
+					errorMsg << _T("GK heights cannot be ") << heightGiant << _T("cm; ");
 				}
             }
             else
@@ -477,6 +478,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (numCom < silverCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << silverCOM << _T("; ");
 				if (player.injury + 1 < silverIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << silverIR << _T("; ");
 			}
+
+			//SPECIAL Autumn 24 - GK and medals can't be in giant height bracket
+			if (player.height >= heightGiant)
+			{
+				errorMsg << _T("Medal heights cannot be ") << heightGiant << _T("cm; ");
+			}
         }
 		/* GOLD */
         else //rating == 99 //Gold player
@@ -539,6 +546,12 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 					if (numCom < goldCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << goldCOM << _T("; ");
 				}
 				if (player.injury + 1 < goldIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << goldIR << _T("; ");
+			}
+
+			//SPECIAL Autumn 24 - GK and medals can't be in giant height bracket
+			if (player.height >= heightGiant)
+			{
+				errorMsg << _T("Medal heights cannot be ") << heightGiant << _T("cm; ");
 			}
 		}
 
