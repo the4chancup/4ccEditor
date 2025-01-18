@@ -26,12 +26,12 @@ int gkRate = 77;
 int reqNumGold = 2;
 int reqNumSilver = 2;
 
-int goldForm = 8;
+int goldForm = 8; //possible range 1-8
 int silverForm = 8;
 int regForm = 4;
 
-int goldIR = 3; //Injury resistence
-int silverIR = 3;
+int goldIR = 4; //Injury resistence (possible range 1-4)
+int silverIR = 4;
 int regIR = 1;
 
 int goldWeakFoot = 4;
