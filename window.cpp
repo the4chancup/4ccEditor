@@ -1210,7 +1210,7 @@ void setup_tab1(HWND H)
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)_T("1"));
 	SendDlgItemMessage(ghw_tab1, IDC_ABIL_FORM, UDM_SETRANGE, 0, MAKELPARAM(8, 1));
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)_T("1"));
-	SendDlgItemMessage(ghw_tab1, IDC_ABIL_INJU, UDM_SETRANGE, 0, MAKELPARAM(4, 1));
+	SendDlgItemMessage(ghw_tab1, IDC_ABIL_INJU, UDM_SETRANGE, 0, MAKELPARAM(3, 1));
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)_T("1"));
 }
 

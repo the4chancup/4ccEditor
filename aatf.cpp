@@ -30,8 +30,8 @@ int goldForm = 8; //possible range 1-8
 int silverForm = 8;
 int regForm = 4;
 
-int goldIR = 4; //Injury resistence (possible range 1-4)
-int silverIR = 4;
+int goldIR = 3; //Injury resistence (possible range 1-3)
+int silverIR = 3;
 int regIR = 1;
 
 int goldWeakFoot = 4;
