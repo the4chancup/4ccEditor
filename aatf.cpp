@@ -16,7 +16,7 @@
 int manletBonus = 5;
 int silverManletBonus = 0;
 int goldManletBonus = 0;
-int silverGiantPen = 0;
+int silverGiantPen = 4;
 int goldGiantPen = 0;
 
 int goldRate = 99;
@@ -34,14 +34,18 @@ int goldIR = 3; //Injury resistence (possible range 1-3)
 int silverIR = 3;
 int regIR = 1;
 
-int goldWeakFoot = 4;
-int silverWeakFoot = 4;
+int goldWeakFoot = 2;
+int silverWeakFoot = 2;
 int regWeakFoot = 2;
 
+int manletCardBonus = 1; //Manlets get 1 extra card
+int manletWeakFoot = 4; //Manlets get 4/4 weak foot usage/accuracy
+int manletPosBonus = 1; //Manlets get 1 extra double A position
+
 int gkSkillCards = 2;
-int regSkillCards = 4;
-int silverSkillCards = 5;
-int goldSkillCards = 6;
+int regSkillCards = 3;
+int silverSkillCards = 4;
+int goldSkillCards = 5;
 
 int gkTrickCards = 0;
 int regTrickCards = 2;
@@ -53,10 +57,10 @@ int silverCOM = 1;
 int goldCOM = 2;
 
 int greenGiga = 0;
-int greenGiant = 5;
-int greenTall = 5;
-int greenMid = 7;
-int greenManlet = 6;
+int greenGiant = 6;
+int greenTall = 6;
+int greenMid = 6;
+int greenManlet = 5;
 
 int redGiga = 0;
 int redGiant = 0;
@@ -65,7 +69,7 @@ int redMid = 7;
 int redManlet = 6;
 
 int heightGiga = 199;
-int heightGiant = 191;
+int heightGiant = 194;
 int heightTall = 185;
 int heightTallGK = 189;
 int heightMid = 180;
@@ -478,12 +482,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (numCom < silverCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << silverCOM << _T("; ");
 				if (player.injury + 1 < silverIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << silverIR << _T("; ");
 			}
-
-			//SPECIAL Autumn 24 - GK and medals can't be in giant height bracket
-			if (player.height >= heightGiant)
-			{
-				errorMsg << _T("Medal heights cannot be ") << heightGiant << _T("cm; ");
-			}
         }
 		/* GOLD */
         else //rating == 99 //Gold player
@@ -548,10 +546,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (player.injury + 1 < goldIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << goldIR << _T("; ");
 			}
 
-			//SPECIAL Autumn 24 - GK and medals can't be in giant height bracket
+			//SPECIAL Spring 25 - GK and gold medals can't be in giant height bracket
 			if (player.height >= heightGiant)
 			{
-				errorMsg << _T("Medal heights cannot be ") << heightGiant << _T("cm; ");
+				errorMsg << _T("Gold medal heights cannot be ") << heightGiant << _T("cm; ");
 			}
 		}
 
@@ -559,8 +557,9 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		if ( ((player.height - heightMod) <= heightManlet) )
 		{
 			numManlet++;
-			cardLimit++; //Manlets get a bonus card
-			weakFoot = 4; //Manlets get weak foot acc/use 4/4
+			cardLimit += manletCardBonus; //Manlets get a bonus card
+			if (countA > 1) cardLimit += manletPosBonus; //Manlets get a bonus double A position
+			weakFoot = manletWeakFoot; //Manlets get weak foot acc/use 4/4
 		}
 		else if ((player.height - heightMod) <= heightMid)
 		{
