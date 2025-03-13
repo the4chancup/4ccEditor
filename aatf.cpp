@@ -11,6 +11,34 @@
   typedef std::wstringstream tstringstream;
 #endif
 
+//Struct to hold the necessary data to check if each player skill matches its target rating and, if not, print an error message
+struct skillCheck
+{
+	unsigned char c_skillRate; //The player's rating in a skill
+	tstring s_skillName; //The skill name
+	int n_minPesVersion; //The PES version in which skill was introduced (0 if in all versions)
+	int n_targetRate; //What the player's rating in this skill should be under the rules
+};
+
+//This array encodes the mapping between the registered position IDs (0-12) used in the player_export struct's reg_pos field
+// and the corresponding index in the playable position array (player_export play_pos).  It is used to check that a player has 
+// playable position set to A in the same position in which they are registered.
+/* position	reg_pos	play_pos
+	GK		0		12
+	CB		1		9
+	LB		2		10
+	RB		3		11
+	DMF		4		5
+	CMF		5		6
+	LMF		6		7
+	RMF		7		8
+	AMF		8		4
+	LWF		9		2
+	RWF		10		3
+	SS		11		1
+	CF		12		0 */
+int regPosToPlayPosMap[13] = { 12, 9, 10, 11, 5, 6, 7, 8, 4, 2, 3, 1, 0 };
+
 //============================
 //AATF Settings
 int manletBonus = 5;
@@ -19,11 +47,12 @@ int goldManletBonus = 0;
 int silverGiantPen = 4;
 int goldGiantPen = 0;
 
-int goldRate = 99;
+int goldRate = 99; //Player skill ratings
 int silverRate = 92;
 int regRate = 77;
 int gkRate = 77;
-int reqNumGold = 2;
+
+int reqNumGold = 2; //Numbers of medals
 int reqNumSilver = 2;
 
 int goldForm = 8; //possible range 1-8
@@ -34,41 +63,46 @@ int goldIR = 3; //Injury resistence (possible range 1-3)
 int silverIR = 3;
 int regIR = 1;
 
-int goldWeakFoot = 2;
-int silverWeakFoot = 2;
-int regWeakFoot = 2;
+int goldWeakFootUse = 4; //Gold medal weak foot usage limit
+int silverWeakFootUse = 4;
+int regWeakFootUse = 2;
+
+int goldWeakFootAcc = 2; //Gold medal weak foot accuracy limit
+int silverWeakFootAcc = 2;
+int regWeakFootAcc = 2;
 
 int manletCardBonus = 1; //Manlets get 1 extra card
-int manletWeakFoot = 4; //Manlets get 4/4 weak foot usage/accuracy
+int manletWeakFootUse = 4; //Manlets get 4/4 weak foot usage/accuracy
+int manletWeakFootAcc = 4;
 int manletPosBonus = 1; //Manlets get 1 extra double A position
 
-int gkSkillCards = 2;
+int gkSkillCards = 2; //Skill cards
 int regSkillCards = 3;
 int silverSkillCards = 4;
 int goldSkillCards = 5;
 
-int gkTrickCards = 0;
+int gkTrickCards = 0; //Trick cards
 int regTrickCards = 2;
 int silverTrickCards = 3;
 int goldTrickCards = 3;
 
-int regCOM = 0;
+int regCOM = 0; //COM playing styles
 int silverCOM = 1;
 int goldCOM = 2;
 
-int greenGiga = 0;
+int greenGiga = 0; //Green height bracket
 int greenGiant = 6;
 int greenTall = 6;
 int greenMid = 6;
 int greenManlet = 5;
 
-int redGiga = 0;
+int redGiga = 0; //Red height bracket
 int redGiant = 0;
 int redTall = 10;
 int redMid = 7;
 int redManlet = 6;
 
-int heightGiga = 199;
+int heightGiga = 199; //Player heights in each category
 int heightGiant = 194;
 int heightTall = 185;
 int heightTallGK = 189;
@@ -86,6 +120,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	//============================
 
+	bool hasCaptain = false;
 	int numGK = 0;
 	//Count of player ratings
 	int numReg = 0;
@@ -144,7 +179,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         int cardMod = 0;
 		int cardLimit = 0;
 		int heightMod = 0;
-		int weakFoot = 0;
+		int weakFootUse = 0;
+		int weakFootAcc = 0;
         bool hasTrick = false;
 		int targetRate = 0, targetRate2 = 0, targetRate3 = 0;
 		int rating = player.drib;
@@ -176,76 +212,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             errorMsg << _T("Injury resist is ") << player.injury+1 << _T(", cannot exceed 3; ");
 		}*/
 
+		//Check if this player is the captain
+		if (player.id == gteams[teamSel].players[gteams[teamSel].captain_ind]) hasCaptain = true;
+
 		//Check if registered pos has playable set to A
-        if(player.reg_pos == 12 && player.play_pos[0] != 2)
+		int requiredAPos = regPosToPlayPosMap[player.reg_pos];
+		if(player.play_pos[requiredAPos] != 2)
 		{
-            errorTot++;
+			errorTot++;
 			errorMsg << _T("Doesn't have A in registered position; ");
 		}
-        else if(player.reg_pos == 11 && player.play_pos[1] != 2)
-		{
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 10 && player.play_pos[3] != 2)
-		{
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 9 && player.play_pos[2] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 8 && player.play_pos[4] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 7 && player.play_pos[8] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 6 && player.play_pos[7] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 5 && player.play_pos[6] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 4 && player.play_pos[5] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 3 && player.play_pos[11] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 2 && player.play_pos[10] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 1 && player.play_pos[9] != 2)
-        {
-            errorTot++;
-			errorMsg << _T("Doesn't have A in registered position; ");
-		}
-        else if(player.reg_pos == 0)
-        {
-            numGK++;
-            if(player.play_pos[12] != 2)
-			{
-                errorTot++;
-				errorMsg << _T("Doesn't have A in registered position; ");
-			}
-        }
+		
+		//Count number of registered GKs
+		if(player.reg_pos == 0) numGK++;
 
 		//Count A positions
         int countA = 0;
@@ -326,7 +305,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				targetRate3 = gkRate;
 			}
 
-			weakFoot = regWeakFoot;
+			weakFootUse = regWeakFootUse;
+			weakFootAcc = regWeakFootAcc;
 
 			/*if(countA > 3)
 			{
@@ -436,7 +416,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			targetRate2 = silverRate;
 			targetRate3 = silverRate;
 
-			weakFoot = silverWeakFoot;
+			weakFootUse = silverWeakFootUse;
+			weakFootAcc = silverWeakFootAcc;
 
             if(numSilver > reqNumSilver)
 			{
@@ -491,7 +472,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			targetRate2 = goldRate;
 			targetRate3 = goldRate;
 
-			weakFoot = goldWeakFoot;
+			weakFootUse = goldWeakFootUse;
+			weakFootAcc = goldWeakFootAcc;
 
             if(numGold > reqNumGold)
 			{
@@ -559,7 +541,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			numManlet++;
 			cardLimit += manletCardBonus; //Manlets get a bonus card
 			if (countA > 1) cardLimit += manletPosBonus; //Manlets get a bonus double A position
-			weakFoot = manletWeakFoot; //Manlets get weak foot acc/use 4/4
+			weakFootUse = manletWeakFootUse; //Manlets get weak foot acc/use 4/4
+			weakFootAcc = manletWeakFootAcc;
 		}
 		else if ((player.height - heightMod) <= heightMid)
 		{
@@ -580,15 +563,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check weak foot ratings
-		if (player.weak_use + 1 > weakFoot)
+		if (player.weak_use + 1 > weakFootUse)
 		{
 			errorTot++;
-			errorMsg << _T("Weak foot usage > ") << weakFoot << _T("; ");
+			errorMsg << _T("Weak foot usage > ") << weakFootUse << _T("; ");
 		}
-		if (player.weak_acc + 1 > weakFoot)
+		if (player.weak_acc + 1 > weakFootAcc)
 		{
 			errorTot++;
-			errorMsg << _T("Weak foot accuracy > ") << weakFoot << _T("; ");
+			errorMsg << _T("Weak foot accuracy > ") << weakFootAcc << _T("; ");
 		}
 
 		//Check player card count
@@ -608,8 +591,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		if (eCheck)
 		{
 			if (cardCount < min(cardLimit,10)) errorMsg << _T("WARN: Has ") << cardCount << _T(" cards, allowed ") << cardLimit << _T("; ");
-			if (player.weak_use + 1 < weakFoot) errorMsg << _T("WARN: Has weak usage") << player.weak_use + 1 << _T(", allowed ") << weakFoot << _T("; ");
-			if (player.weak_acc + 1 < weakFoot) errorMsg << _T("WARN: Has weak accuracy") << player.weak_acc + 1 << _T(", allowed ") << weakFoot << _T("; ");
+			if (player.weak_use + 1 < weakFootUse) errorMsg << _T("WARN: Has weak usage") << player.weak_use + 1 << _T(", allowed ") << weakFootUse << _T("; ");
+			if (player.weak_acc + 1 < weakFootAcc) errorMsg << _T("WARN: Has weak accuracy") << player.weak_acc + 1 << _T(", allowed ") << weakFootAcc << _T("; ");
 		}
 
 		//Check player overall rating
@@ -620,131 +603,42 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check individual skill ratings
-		if(player.drib != targetRate)
-        {
-            errorTot++;
-			errorMsg << _T("Dribbling is ") << player.drib << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.gk != targetRate)
-        {
-            errorTot++;
-			errorMsg << _T("Goalkeeping is ") << player.gk << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.finish != targetRate)
+		//								c_skillRate			s_skillName		n_minPesVersion	n_targetRate
+		skillCheck skillChecks[25] = {	{player.drib,		_T("Dribbling"),		0,		targetRate	},
+										{player.gk,			_T("Goalkeeping"),		0,		targetRate	},
+										{player.finish,		_T("Finishing"),		0,		targetRate	},
+										{player.lowpass,	_T("Low Pass"),			0,		targetRate	},
+										{player.loftpass,	_T("Lofted Pass"),		0,		targetRate	},
+										{player.header,		_T("Header"),			0,		targetRate	},
+										{player.swerve,		_T("Swerve"),			0,		targetRate	},
+										{player.catching,	_T("Catching"),			0,		targetRate	},
+										{player.clearing,	_T("Clearing"),			0,		targetRate	},
+										{player.reflex,		_T("Reflexes"),			0,		targetRate	},
+										{player.body_ctrl,	_T("Body Control"),		0,		targetRate	},
+										{player.phys_cont,	_T("Physical Contact"), 17,		targetRate	},
+										{player.kick_pwr,	_T("Kicking Power"),	0,		targetRate	},
+										{player.exp_pwr,	_T("Explosive Power"),	0,		targetRate	},
+										{player.ball_ctrl,	_T("Ball Control"),		0,		targetRate	},
+										{player.ball_win,	_T("Ball Winning"),		0,		targetRate	},
+										{player.jump,		_T("Jump"),				0,		targetRate	},
+										{player.cover,		_T("Coverage"),			0,		targetRate	},
+										{player.place_kick, _T("Place Kicking"),	0,		targetRate	},
+										{player.stamina,	_T("Stamina"),			0,		targetRate3	},
+										{player.speed,		_T("Speed"),			0,		targetRate	},
+										{player.atk,		_T("Attacking Prowess"), 0,		targetRate	},
+										{player.def,		_T("Defensive Prowess"), 0,		targetRate2	},
+										{player.tight_pos,	_T("Tight Possession"), 20,		targetRate	},
+										{player.aggres,		_T("Aggression"),		20,		targetRate	} };
+
+		for (int ii = 0; ii < 25; ii++)
 		{
-            errorTot++;
-			errorMsg << _T("Finishing is ") << player.finish << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.lowpass != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Low Pass is ") << player.lowpass << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.loftpass != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Lofted Pass is ") << player.loftpass << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.header != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Header is ") << player.header << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.swerve != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Swerve is ") << player.swerve << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.catching != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Catching is ") << player.catching << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.clearing != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Clearing is ") << player.clearing << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.reflex != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Reflexes is ") << player.reflex << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.body_ctrl != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Body Control is ") << player.body_ctrl << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.phys_cont != targetRate && pesVersion!=16) //Not in 16
-		{
-            errorTot++;
-			errorMsg << _T("Physical Contact is ") << player.phys_cont << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.kick_pwr != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Kicking Power is ") << player.kick_pwr << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.exp_pwr != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Explosive Power is ") << player.exp_pwr << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.ball_ctrl != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Ball Control is ") << player.ball_ctrl << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.ball_win != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Ball winning is ") << player.ball_win << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.jump != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Jump is ") << player.jump << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.cover != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Coverage is ") << player.cover << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.place_kick != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Place Kicking is ") << player.place_kick << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.stamina != targetRate3)
-		{
-            errorTot++;
-			errorMsg << _T("Stamina is ") << player.stamina << _T(", should be ") << targetRate3 << _T("; ");
-        }
-        if(player.speed != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Speed is ") << player.speed << _T(", should be ") << targetRate << _T("; ");
-        }
-        if(player.atk > targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Attacking Prowess is ") << player.atk << _T(", should be ") << targetRate << _T(" or less; ");
-        }
-        if(player.def > targetRate2)
-		{
-            errorTot++;
-			errorMsg << _T("Defensive Prowess is ") << player.def << _T(", should be ") << targetRate2 << _T(" or less; ");
-        }
-		if(pesVersion>19 && player.tight_pos != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Tight Possession is ") << player.tight_pos << _T(", should be ") << targetRate << _T("; ");
-        }
-		if(pesVersion>19 && player.aggres != targetRate)
-		{
-            errorTot++;
-			errorMsg << _T("Aggression is ") << player.aggres << _T(", should be ") << targetRate << _T("; ");
-        }
+			if (skillChecks[ii].n_minPesVersion <= pesVersion && skillChecks[ii].c_skillRate != skillChecks[ii].n_targetRate)
+			{
+				errorTot++;
+				errorMsg << skillChecks[ii].s_skillName << _T(" is ") << skillChecks[ii].c_skillRate << _T(", should be ") << skillChecks[ii].n_targetRate << _T("; ");
+			}
+		}
+
 		if(errorMsg.rdbuf()->in_avail())
 		{
 			errorMsg << _T("\r\n");
@@ -755,6 +649,20 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 	//Team level errors
 	int diff;
 	tstringstream errorMsg;
+
+	if (!hasCaptain)
+	{
+		errorTot++;
+		errorMsg << _T("Team must have an assigned Captain; ");
+	}
+
+	//Must have at least 1 GK
+	if (numGK < 1)
+	{
+		errorTot++;
+		errorMsg << _T("Team must have a registered GK; ");
+	}
+
     //Check heights
     if(!usingRed) //Using Green height system
     {

@@ -163,7 +163,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Spring 25 Edition (Version A)"),
+		_T("4ccEditor Spring 25 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -872,8 +872,10 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 						_itow_s(goldIR, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
 						
-						_itow_s(goldWeakFoot, buffer, 3, 10);
+						_itow_s(goldWeakFootUse, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(goldWeakFootAcc, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
 					}
 				}
@@ -892,8 +894,10 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 						_itow_s(silverIR, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						_itow_s(silverWeakFoot, buffer, 3, 10);
+						_itow_s(silverWeakFootUse, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(silverWeakFootAcc, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
 					}
 				}
@@ -915,8 +919,10 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 						_itow_s(regIR, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
 
-						_itow_s(regWeakFoot, buffer, 3, 10);
+						_itow_s(regWeakFootUse, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(regWeakFootAcc, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
 					}
 				}

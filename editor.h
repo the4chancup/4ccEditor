@@ -63,22 +63,20 @@ struct player_export
 	unsigned char cover; //Coverage 
 	unsigned char weak_use; //Weak Foot Usage
 	unsigned char play_pos[13]; //Playable Position 
-	/*
-position	reg_pos	play_pos
-GK	0	12
-CB	1	9
-LB	2	10
-RB	3	11
-DMF	4	5
-CMF	5	6
-LMF	6	7
-RMF	7	8
-AMF	8	4
-LWF	9	8
-RWF	10	3
-SS	11	1
-CF	12	0
-	*/
+	/* position	reg_pos	play_pos
+		GK		0		12
+		CB		1		9
+		LB		2		10
+		RB		3		11
+		DMF		4		5
+		CMF		5		6
+		LMF		6		7
+		RMF		7		8
+		AMF		8		4
+		LWF		9		2
+		RWF		10		3
+		SS		11		1
+		CF		12		0 */
 	unsigned char mo_hunchd; //Motion: Hunching (dribbling) 
 	unsigned char mo_hunchr; //Motion: Hunching (running) 
 	unsigned char mo_pk; //Motion: Penalty Kick 

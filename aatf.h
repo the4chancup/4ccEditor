@@ -22,9 +22,13 @@ extern int goldIR; //Injury resistence
 extern int silverIR;
 extern int regIR;
 
-extern int goldWeakFoot;
-extern int silverWeakFoot;
-extern int regWeakFoot;
+extern int goldWeakFootUse;
+extern int silverWeakFootUse;
+extern int regWeakFootUse;
+
+extern int goldWeakFootAcc;
+extern int silverWeakFootAcc;
+extern int regWeakFootAcc;
 
 extern int gkSkillCards;
 extern int regSkillCards;
