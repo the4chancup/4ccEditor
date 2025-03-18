@@ -137,6 +137,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	WNDCLASSEX wc;
 	MSG msg;
 
+	//Create brush for painting main window background so it will match the bg color of the tabs and dialog boxes on all systems
 	COLORREF bkColor = (COLORREF)GetSysColor(COLOR_3DFACE);
 	g_hbr = (HBRUSH)CreateSolidBrush(bkColor);
 
