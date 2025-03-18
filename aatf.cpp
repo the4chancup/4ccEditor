@@ -603,32 +603,32 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//Check individual skill ratings
-		//								c_skillRate			s_skillName		n_minPesVersion	n_targetRate
-		skillCheck skillChecks[25] = {	{player.drib,		_T("Dribbling"),		0,		targetRate	},
-										{player.gk,			_T("Goalkeeping"),		0,		targetRate	},
-										{player.finish,		_T("Finishing"),		0,		targetRate	},
-										{player.lowpass,	_T("Low Pass"),			0,		targetRate	},
-										{player.loftpass,	_T("Lofted Pass"),		0,		targetRate	},
-										{player.header,		_T("Header"),			0,		targetRate	},
-										{player.swerve,		_T("Swerve"),			0,		targetRate	},
-										{player.catching,	_T("Catching"),			0,		targetRate	},
-										{player.clearing,	_T("Clearing"),			0,		targetRate	},
-										{player.reflex,		_T("Reflexes"),			0,		targetRate	},
-										{player.body_ctrl,	_T("Body Control"),		0,		targetRate	},
-										{player.phys_cont,	_T("Physical Contact"), 17,		targetRate	},
-										{player.kick_pwr,	_T("Kicking Power"),	0,		targetRate	},
-										{player.exp_pwr,	_T("Explosive Power"),	0,		targetRate	},
-										{player.ball_ctrl,	_T("Ball Control"),		0,		targetRate	},
-										{player.ball_win,	_T("Ball Winning"),		0,		targetRate	},
-										{player.jump,		_T("Jump"),				0,		targetRate	},
-										{player.cover,		_T("Coverage"),			0,		targetRate	},
-										{player.place_kick, _T("Place Kicking"),	0,		targetRate	},
-										{player.stamina,	_T("Stamina"),			0,		targetRate3	},
-										{player.speed,		_T("Speed"),			0,		targetRate	},
-										{player.atk,		_T("Attacking Prowess"), 0,		targetRate	},
-										{player.def,		_T("Defensive Prowess"), 0,		targetRate2	},
-										{player.tight_pos,	_T("Tight Possession"), 20,		targetRate	},
-										{player.aggres,		_T("Aggression"),		20,		targetRate	} };
+		//								c_skillRate			s_skillName			n_minPesVersion	n_targetRate
+		skillCheck skillChecks[25] = {	{player.drib,		_T("Dribbling"),			0,		targetRate	},
+										{player.gk,			_T("Goalkeeping"),			0,		targetRate	},
+										{player.finish,		_T("Finishing"),			0,		targetRate	},
+										{player.lowpass,	_T("Low Pass"),				0,		targetRate	},
+										{player.loftpass,	_T("Lofted Pass"),			0,		targetRate	},
+										{player.header,		_T("Header"),				0,		targetRate	},
+										{player.swerve,		_T("Swerve"),				0,		targetRate	},
+										{player.catching,	_T("Catching"),				0,		targetRate	},
+										{player.clearing,	_T("Clearing"),				0,		targetRate	},
+										{player.reflex,		_T("Reflexes"),				0,		targetRate	},
+										{player.body_ctrl,	_T("Body Control"),			0,		targetRate	},
+										{player.phys_cont,	_T("Physical Contact"),		17,		targetRate	},
+										{player.kick_pwr,	_T("Kicking Power"),		0,		targetRate	},
+										{player.exp_pwr,	_T("Explosive Power"),		0,		targetRate	},
+										{player.ball_ctrl,	_T("Ball Control"),			0,		targetRate	},
+										{player.ball_win,	_T("Ball Winning"),			0,		targetRate	},
+										{player.jump,		_T("Jump"),					0,		targetRate	},
+										{player.cover,		_T("Coverage"),				0,		targetRate	},
+										{player.place_kick, _T("Place Kicking"),		0,		targetRate	},
+										{player.stamina,	_T("Stamina"),				0,		targetRate3	},
+										{player.speed,		_T("Speed"),				0,		targetRate	},
+										{player.atk,		_T("Attacking Prowess"),	0,		targetRate	},
+										{player.def,		_T("Defensive Prowess"),	0,		targetRate2	},
+										{player.tight_pos,	_T("Tight Possession"),		20,		targetRate	},
+										{player.aggres,		_T("Aggression"),			20,		targetRate	} };
 
 		for (int ii = 0; ii < 25; ii++)
 		{
@@ -809,7 +809,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	SetWindowText(GetDlgItem(hAatfbox, IDT_AATFOUT), msgOut.c_str());
 	if(errorTot)
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Who the hell is Steve Jobs"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("KWABanger melty in the 'tor"));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("unf exportie plap plap"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Well, Seymour, this export made it... despite your directions"));
 }

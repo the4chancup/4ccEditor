@@ -111,6 +111,7 @@ int gi_lastAbility = IDC_ABIL_AGGR; //Final control ID in list of Player Ability
 //Brushes
 HBRUSH gTeamColor1 = NULL;
 HBRUSH gTeamColor2 = NULL;
+HBRUSH g_hbr = NULL;
 
 pf_createFileDescriptorOld createFileDescriptorOld;
 pf_createFileDescriptorNew createFileDescriptorNew;
@@ -136,6 +137,9 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	WNDCLASSEX wc;
 	MSG msg;
 
+	COLORREF bkColor = (COLORREF)GetSysColor(COLOR_3DFACE);
+	g_hbr = (HBRUSH)CreateSolidBrush(bkColor);
+
 	wc.cbSize		 = sizeof(WNDCLASSEX);
 	wc.style		 = 0;
 	wc.lpfnWndProc	 = wnd_proc;
@@ -144,7 +148,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	wc.hInstance	 = I;
 	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_MENU+1);
+	wc.hbrBackground = g_hbr;
 	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MAINMENU);
 	wc.lpszClassName = _T("4cc_app");
 	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION);
@@ -664,6 +668,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			//Delete icons, fonts and bitmaps
 			DeleteObject((HGDIOBJ)ghFont);
 			FreeLibrary(hPesDecryptDLL);
+			DeleteObject(g_hbr); 
 
 			DestroyWindow(H);
 		break;
