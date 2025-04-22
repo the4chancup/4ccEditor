@@ -4720,7 +4720,7 @@ void roster_data_output()
 						  _T("The Destroyer"),
 						  _T("Extra Frontman"),
 						  _T("Offensive Fullback"),
-						  _T("Defensive Fullback")
+						  _T("Defensive Fullback"),
 						  _T("Target Man"),
 						  _T("Creative Playmaker"),
 						  _T("Build Up"),
