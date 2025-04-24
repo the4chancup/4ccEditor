@@ -637,6 +637,17 @@ struct resize_info
 	HDWP hdefer;
 };
 
+
+//Combobox item definitions
+
+extern TCHAR* gpc_playstyle18[];
+extern TCHAR* gpc_playstyle19[];
+extern TCHAR* gpc_playstyle20[];
+extern TCHAR* gpc_positions[];
+extern TCHAR* gpc_pos_short[];
+
+//Function prototypes
+
 void fill_player_entry16(player_entry &, int &, void*);
 void fill_appearance_entry16(player_entry &, int &, void*);
 void fill_team_ids16(team_entry &, int &, void*);

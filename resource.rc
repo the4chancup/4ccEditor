@@ -50,6 +50,7 @@ BEGIN
         MENUITEM "Set &FPC invisibility",					IDM_TEAM_FPCON
 		MENUITEM "&Remove FPC invisibility",				IDM_TEAM_FPOFF
 		MENUITEM "&Set boot/glove IDs for everyone",		IDM_TEAM_BOGLO
+		MENUITEM "Set &player names to positions",			IDM_TEAM_NAMEPOS
 		MENUITEM "&Save squad",								IDM_TEAM_SAVES
 		MENUITEM "&Load squad",								IDM_TEAM_LOADS
     END

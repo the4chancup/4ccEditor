@@ -225,19 +225,12 @@ void setup_main(HWND H)
 	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""), 
 		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP, 
 		x3, 378, 134, 120, H, (HMENU)IDC_PLAY_RPOS, GetModuleHandle(NULL), NULL);
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Goalkeeper"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Center Back"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Left Back"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Right Back"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Midfielder"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Center Midfielder"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Left Midfielder"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Right Midfielder"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Attacking Midfielder"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Left Wing Forward"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Right Wing Forward"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Second Striker"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Centre Forward"));
+	//Fill combobox
+	int numPositions = 13;
+	for (int ii = 0; ii < numPositions; ii++)
+	{
+		SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)gpc_positions[ii]);
+	}
 	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
 	setup_combo(hw_new, ghFont, cb2_cntl_proc);
 
@@ -249,24 +242,12 @@ void setup_main(HWND H)
 	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""), 
 		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP, 
 		x3, 408, 134, 120, H, (HMENU)IDC_PLAY_STYL, GetModuleHandle(NULL), NULL);
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("None"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Goal Poacher"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Dummy Runner"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Fox in the Box"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Prolific Winger"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Classic No. 10"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Hole Player"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Box to Box"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Anchor Man"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("The Destroyer"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Extra Frontman"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Fullback"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Fullback"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Target Man"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Creative Playmaker"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Build Up"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Offensive Goalkeeper"));
-	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Defensive Goalkeeper"));
+	//Fill combobox
+	int numPlayStyles = 18;
+	for (int ii = 0; ii < numPlayStyles; ii++)
+	{
+		SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)gpc_playstyle18[ii]);
+	}
 	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
 	setup_combo(hw_new, ghFont, onto_tab_proc);
 	
