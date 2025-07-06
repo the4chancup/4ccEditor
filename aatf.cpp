@@ -63,12 +63,12 @@ int goldIR = 3; //Injury resistence (possible range 1-3)
 int silverIR = 3;
 int regIR = 1;
 
-int goldWeakFootUse = 4; //Gold medal weak foot usage limit
-int silverWeakFootUse = 4;
+int goldWeakFootUse = 2; //Gold medal weak foot usage limit
+int silverWeakFootUse = 2;
 int regWeakFootUse = 2;
 
-int goldWeakFootAcc = 2; //Gold medal weak foot accuracy limit
-int silverWeakFootAcc = 2;
+int goldWeakFootAcc = 4; //Gold medal weak foot accuracy limit
+int silverWeakFootAcc = 4;
 int regWeakFootAcc = 2;
 
 int manletCardBonus = 1; //Manlets get 1 extra card
@@ -93,8 +93,8 @@ int goldCOM = 2;
 int greenGiga = 0; //Green height bracket
 int greenGiant = 6;
 int greenTall = 6;
-int greenMid = 6;
-int greenManlet = 5;
+int greenMid = 5;
+int greenManlet = 6;
 
 int redGiga = 0; //Red height bracket
 int redGiant = 0;
@@ -228,11 +228,22 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 		//Count A positions
         int countA = 0;
+		int countB = 0;
         for(int jj=0;jj<13;jj++)
         {
-            if(player.play_pos[jj] > 0)
+            if(player.play_pos[jj] == 2)
 				countA++;
+			else if (player.play_pos[jj] == 1)
+				countB++;
         }
+
+		//No B positions allowed:
+		if(countB > 0)
+		{
+			errorTot++;
+			errorMsg << _T("Has B position; ");
+		}
+
 
         //If more than 1 A, 1 card less for each
         if(countA > 1)
@@ -289,6 +300,38 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		{
 			errorTot++;
 			errorMsg << _T("Weight out of range (") << max(30,player.height-129) << _T(",") << player.height-81 << _T("); ");
+		}
+
+		//Check playing style and registered position are in valid range per PES version
+		if (player.reg_pos > 12) 
+		{
+			errorTot++;
+			errorMsg << _T("Registered position out of range (0-12); ");
+		}
+
+		if (pesVersion <= 16)
+		{
+			if (player.play_style > 18 || player.play_style == 16)
+			{
+				errorTot++;
+				errorMsg << _T("Playing style out of range (0-18, excluding 16); ");
+			}
+		}
+		else if (pesVersion > 16 && pesVersion < 19)
+		{
+			if (player.play_style > 17) 
+			{
+				errorTot++;
+				errorMsg << _T("Playing style out of range (0-17); ");
+			}
+		}
+		else
+		{
+			if (player.play_style > 21) 
+			{
+				errorTot++;
+				errorMsg << _T("Playing style out of range (0-21); ");
+			}
 		}
 
 		/* REGULAR */
@@ -463,6 +506,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (numCom < silverCOM) errorMsg << _T("WARN: Has ") << numCom << _T(" COM cards, allowed ") << silverCOM << _T("; ");
 				if (player.injury + 1 < silverIR) errorMsg << _T("WARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << silverIR << _T("; ");
 			}
+
+			//SPECIAL FAG13: Medals can trade a card for 4/4 footedness
+			/*if (player.weak_use + 1 > weakFootUse)
+			{
+				weakFootUse = 4;
+				cardLimit--;
+			}*/
         }
 		/* GOLD */
         else //rating == 99 //Gold player
@@ -533,6 +583,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			{
 				errorMsg << _T("Gold medal heights cannot be ") << heightGiant << _T("cm; ");
 			}
+
+			//SPECIAL FAG13: Medals can trade a card for 4/4 footedness
+			/*if (player.weak_use + 1 > weakFootUse)
+			{
+				weakFootUse = 4;
+				cardLimit--;
+			}*/
 		}
 
 		//Check player height
@@ -591,8 +648,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		if (eCheck)
 		{
 			if (cardCount < min(cardLimit,10)) errorMsg << _T("WARN: Has ") << cardCount << _T(" cards, allowed ") << cardLimit << _T("; ");
-			if (player.weak_use + 1 < weakFootUse) errorMsg << _T("WARN: Has weak usage") << player.weak_use + 1 << _T(", allowed ") << weakFootUse << _T("; ");
-			if (player.weak_acc + 1 < weakFootAcc) errorMsg << _T("WARN: Has weak accuracy") << player.weak_acc + 1 << _T(", allowed ") << weakFootAcc << _T("; ");
+			if (player.weak_use + 1 < weakFootUse) errorMsg << _T("WARN: Has weak usage ") << player.weak_use + 1 << _T(", allowed ") << weakFootUse << _T("; ");
+			if (player.weak_acc + 1 < weakFootAcc) errorMsg << _T("WARN: Has weak accuracy ") << player.weak_acc + 1 << _T(", allowed ") << weakFootAcc << _T("; ");
 		}
 
 		//Check player overall rating
@@ -809,7 +866,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	SetWindowText(GetDlgItem(hAatfbox, IDT_AATFOUT), msgOut.c_str());
 	if(errorTot)
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("KWABxport melty in the 'tor"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Back to Magic Kindergarten"));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Well, Seymour, this export made it... despite your directions"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Turns out you were prepared for this!"));
 }

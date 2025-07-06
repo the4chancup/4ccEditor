@@ -586,6 +586,11 @@ struct team_entry
 		b_edit_strip = false;
 		memset(name,0,sizeof(name));
 		memset(short_name,0,sizeof(short_name));
+		for (int ii = 0; ii < team_max; ii++)
+		{
+			players[ii] = 0;
+			numbers[ii] = 0;
+		}
 		for(int ii=0; ii<11; ii++) starting11[ii]=0;
 		num_on_team = 0;
 		color1_red = 0;
@@ -645,6 +650,19 @@ extern TCHAR* gpc_playstyle19[];
 extern TCHAR* gpc_playstyle20[];
 extern TCHAR* gpc_positions[];
 extern TCHAR* gpc_pos_short[];
+
+extern unsigned char n_playstyle16to1718[];
+extern unsigned char n_playstyle1718to16[];
+extern unsigned char n_playstyle16to19[];
+extern unsigned char n_playstyle19to16[];
+extern unsigned char n_playstyle16to2021[];
+extern unsigned char n_playstyle2021to16[];
+extern unsigned char n_playstyle1718to19[];
+extern unsigned char n_playstyle19to1718[];
+extern unsigned char n_playstyle1718to2021[];
+extern unsigned char n_playstyle2021to1718[];
+extern unsigned char n_playstyle19to2021[];
+extern unsigned char n_playstyle2021to19[];
 
 //Function prototypes
 
