@@ -10,6 +10,7 @@
 #include <commctrl.h>	//Provides common control types 
 						//  (e.g. HTREEITEM, TVITEM, LVITEM)
 #include <fstream>
+#include <unordered_map> //Unordered map for Player Appearance start byte lookup
 #include "atlstr.h"
 #include "crypt.h"
 
@@ -40,9 +41,9 @@ struct player_export
 	unsigned char form; //Form 
 	bool b_edit_player; //Edited/Created player 
 	unsigned char swerve; //Swerve 
-	unsigned char catching; //Catching 
-	unsigned char clearing; //Clearing 
-	unsigned char reflex; //Reflexes 
+	unsigned char catching; //Catching 						(Saving in 15)
+	unsigned char clearing; //Clearing 						(16+)
+	unsigned char reflex; //Reflexes 						(16+)
 	unsigned char injury; //Injury Resistance 
 	bool b_edit_basicset; //Whether the player's basic settings are changed
 	unsigned char body_ctrl; //Body Control 
@@ -60,7 +61,7 @@ struct player_export
 	unsigned char jump; //Jump 
 	unsigned char mo_armr; //Motion: Arm Movement (running) 
 	unsigned char mo_ck; //Motion: Corner Kick 
-	unsigned char cover; //Coverage 
+	unsigned char cover; //Coverage							(16+)
 	unsigned char weak_use; //Weak Foot Usage
 	unsigned char play_pos[13]; //Playable Position 
 	/* position	reg_pos	play_pos
@@ -99,6 +100,14 @@ struct player_export
 	unsigned char strong_foot; //Stronger Foot 
 	unsigned char strong_hand; //Stronger hand				(20+)
 	bool com_style[7]; //COM Playing Styles
+	/*	Bit 0 - Trickster
+		Bit 1 - Mazing Run
+		Bit 2 - Speeding Bullet
+		Bit 3 - Incisive Run
+		Bit 4 - Long Ball Expert
+		Bit 5 - Early Cross
+		Bit 6 - Long Ranger
+	*/
 	bool play_skill[41]; //Player Skills 
 	/*
 	0 Scissors Feint
@@ -665,6 +674,18 @@ extern unsigned char n_playstyle19to2021[];
 extern unsigned char n_playstyle2021to19[];
 
 //Function prototypes
+typedef std::unordered_map<int, int> appearance_map;
+
+void build_appearance_map15(appearance_map&, int&, void*);
+void read_player_entry15(player_entry&, int&, void*);
+void read_appearance_entry15(player_entry&, appearance_map&, void*);
+void read_team_ids15(team_entry&, int&, void*);
+void read_team_rosters15(int&, void*, team_entry*, int);
+void read_team_tactics15(int&, void*, team_entry*, int);
+void write_player_entry15(player_entry, int&, appearance_map&, void*);
+void write_team_info15(team_entry, int&, void*);
+void write_teamplayer_info15(team_entry, int&, void*);
+void write_team_tactics15(team_entry, int&, void*);
 
 void fill_player_entry16(player_entry &, int &, void*);
 void fill_appearance_entry16(player_entry &, int &, void*);
@@ -721,6 +742,8 @@ int read_data(int, int, int&, FileDescriptorNew*);
 void write_data(int, int, int, int&, FileDescriptorNew*);
 int read_dataOld(int, int, int&, FileDescriptorOld*);
 void write_dataOld(int, int, int, int&, FileDescriptorOld*);
+int read_data15(int, int, int&, FileDescriptor15*);
+void write_data15(int, int, int, int&, FileDescriptor15*);
 
 //fpc.cpp functions
 void enable_fpc_invis_for_displayed_player(HWND, int);

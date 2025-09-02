@@ -95,6 +95,7 @@
     <ClCompile Include="data_util.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="menu_lists.cpp" />
+    <ClCompile Include="pes15.cpp" />
     <ClCompile Include="pes16.cpp" />
     <ClCompile Include="pes17.cpp" />
     <ClCompile Include="pes18.cpp" />

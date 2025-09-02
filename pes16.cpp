@@ -187,7 +187,7 @@ void fill_player_entry16(player_entry &players, int &current_byte, void* ghdescr
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, players.name, 46);
 	current_byte+=46;
 
-	strcpy_s(players.shirt_name, 16, (const char*)&(pDescriptorOld->data[current_byte]));
+	strncpy_s(players.shirt_name, 16, (const char*)&(pDescriptorOld->data[current_byte]), 16 - 1);
 	current_byte+=16;
 }
 

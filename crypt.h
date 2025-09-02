@@ -49,21 +49,40 @@ struct FileDescriptorOld
     uint8_t *serial;
 };
 
+struct FileDescriptor15
+{
+    uint32_t dataSize;
+    char startByte;
+    uint32_t chunk0Size; //384
+    uint32_t chunk1Size;
+    uint32_t chunk2Size;
+
+    uint8_t* chunk0; //Fixed length "Edit file" string
+    uint8_t* chunk1lenBytes; //4 bytes that encode length of chunk 1
+    uint8_t* chunk1; //PNG
+    uint8_t* chunk2lenBytes; //4 bytes that encode length of chunk 2
+    uint8_t* data; //Main edit data (chunk 2)
+};
+
 //struct FileDescriptor CRYPTER_EXPORT *createFileDescriptor();
 typedef struct FileDescriptorOld* (__cdecl *pf_createFileDescriptorOld)();
 typedef struct FileDescriptorNew* (__cdecl *pf_createFileDescriptorNew)();
+typedef struct FileDescriptor15* (__cdecl* pf_createFileDescriptor15)();
 
 //void CRYPTER_EXPORT destroyFileDescriptor(struct FileDescriptor *desc);
 typedef void (__cdecl *pf_destroyFileDescriptorOld)(struct FileDescriptorOld*);
 typedef void (__cdecl *pf_destroyFileDescriptorNew)(struct FileDescriptorNew*);
+typedef void (__cdecl *pf_destroyFileDescriptor15)(struct FileDescriptor15*);
 
 //void CRYPTER_EXPORT decryptWithKey(struct FileDescriptor *descriptor, const uint8_t *input, const char *masterKey);
 typedef void (__cdecl *pf_decryptWithKeyOld)(struct FileDescriptorOld*, const uint8_t*, const char*);
 typedef void (__cdecl *pf_decryptWithKeyNew)(struct FileDescriptorNew*, const uint8_t*, const char*);
+typedef void (__cdecl *pf_decryptFile15)(struct FileDescriptor15*, const uint8_t*);
 
 //uint8_t CRYPTER_EXPORT *encryptWithKey(const struct FileDescriptor *descriptor, int *size, const char *masterKey);
 typedef uint8_t* (__cdecl *pf_encryptWithKeyOld)(const struct FileDescriptorOld*, int*, const char*);
 typedef uint8_t* (__cdecl *pf_encryptWithKeyNew)(const struct FileDescriptorNew*, int*, const char*);
+typedef uint8_t* (__cdecl *pf_encryptFile15)(const struct FileDescriptor15*, int*);
 
 uint8_t *readFile(const TCHAR *path, uint32_t *sizePtr);
 

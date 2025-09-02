@@ -24,12 +24,15 @@ int c_num_players, c_num_teams;
 extern HINSTANCE hPesDecryptDLL; //Handle to libpesXdecrypter.dll
 extern pf_createFileDescriptorOld createFileDescriptorOld;
 extern pf_createFileDescriptorNew createFileDescriptorNew;
+extern pf_createFileDescriptor15 createFileDescriptor15;
 extern pf_destroyFileDescriptorOld destroyFileDescriptorOld;
 extern pf_destroyFileDescriptorNew destroyFileDescriptorNew;
+extern pf_destroyFileDescriptor15 destroyFileDescriptor15;
 extern pf_decryptWithKeyOld decryptWithKeyOld;
 extern pf_decryptWithKeyNew decryptWithKeyNew;
+extern pf_decryptFile15 decryptFile15;
 extern pf_encryptWithKeyOld encryptWithKeyOld;
-extern pf_encryptWithKeyNew encryptWithKeyNew;
+extern pf_encryptFile15 encryptFile15;
 
 void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, int gnum_players, team_entry* gteams, int gnum_teams, TCHAR *cs_file_name, void *hc_descriptor)
 {
@@ -64,10 +67,12 @@ void save_comparator(HWND hCompareBox, int nPesVersion, player_entry* gplayers, 
 		//Cleanup should go here...
 		if(hc_descriptor) 
 		{
-			if(nPesVersion>=18)
+			if (nPesVersion >= 18)
 				destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
-			else
+			else if (nPesVersion >= 16)
 				destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
+			else 
+				destroyFileDescriptor15((FileDescriptor15*)hc_descriptor);
 			hc_descriptor = NULL;
 		}
 		if(c_players) 
@@ -90,10 +95,12 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion, void* hc_
 
 	if(hc_descriptor) 
 	{
-		if(nPesVersion>=18)
+		if (nPesVersion >= 18)
 			destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
-		else
+		else if (nPesVersion >= 16)
 			destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
+		else
+			destroyFileDescriptor15((FileDescriptor15*)hc_descriptor);
 		hc_descriptor = NULL;
 	}
 	if(c_players) 
@@ -107,7 +114,61 @@ void compare_data_handler(const TCHAR *pcs_file_name, int nPesVersion, void* hc_
 		c_teams = NULL;
 	}
 
-	if(nPesVersion==16)
+	if (nPesVersion == 15)
+	{
+		hc_descriptor = (void*)createFileDescriptor15();
+		uint32_t inputLen = 0;
+		uint8_t* pfin = readFile(pcs_file_name, &inputLen);
+		((FileDescriptor15*)hc_descriptor)->dataSize = inputLen;
+		decryptFile15((FileDescriptor15*)hc_descriptor, pfin);
+
+		//get number of player, team entries
+		c_num_players = ((FileDescriptor15*)hc_descriptor)->data[0x34];
+		c_num_players += (((FileDescriptor15*)hc_descriptor)->data[0x35]) * 256;
+
+		c_num_teams = ((FileDescriptor15*)hc_descriptor)->data[0x38];
+		c_num_teams += (((FileDescriptor15*)hc_descriptor)->data[0x39]) * 256;
+
+		//First, generate map b/w player ID and Appearance Entry start byte so we can access the correct start byte position
+		// for each player ID when we loop over the Player Entry, even if they're in different orders
+		appearance_byte = 0x2AB9CC;
+		int pid = 0;
+		appearance_map umap_pid_to_startByte;
+		for (int ii = 0; ii < c_num_players; ii++)
+		{
+			build_appearance_map15(umap_pid_to_startByte, appearance_byte, hc_descriptor);
+		}
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x4C;
+		c_players = new player_entry[c_num_players];
+		for (int ii = 0; ii < c_num_players; ii++)
+		{
+			read_player_entry15(c_players[ii], current_byte, hc_descriptor);
+			read_appearance_entry15(c_players[ii], umap_pid_to_startByte, hc_descriptor);
+		}
+
+		//Place team entries into array of structs
+		current_byte = 0x44AA6C;
+		c_teams = new team_entry[c_num_teams];
+		for (ii = 0; ii < c_num_teams; ii++)
+		{
+			read_team_ids15(c_teams[ii], current_byte, hc_descriptor);
+		}
+
+		current_byte = 0x4E45CC;
+		for (ii = 0; ii < c_num_teams; ii++)
+		{
+			read_team_rosters15(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+
+		current_byte = 0x507194;
+		for (ii = 0; ii < c_num_teams; ii++)
+		{
+			read_team_tactics15(current_byte, hc_descriptor, c_teams, c_num_teams);
+		}
+	}
+	else if(nPesVersion==16)
 	{
 		hc_descriptor = (void*)createFileDescriptorOld();
 		pMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes16");
@@ -466,11 +527,16 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 			errorMsg << _T("\tbody_ctrl: ") << (int)playerA.body_ctrl <<_T(" / ") << (int)playerB.body_ctrl <<_T("\r\n");
 		if(playerA.catching!=playerB.catching)
 			errorMsg << _T("\tcatching: ") << (int)playerA.catching <<_T(" / ") << (int)playerB.catching <<_T("\r\n");
-		if(playerA.clearing!=playerB.clearing)
-			errorMsg << _T("\tclearing: ") << (int)playerA.clearing <<_T(" / ") << (int)playerB.clearing <<_T("\r\n");
+		if (pesVersion > 15)
+		{
+			if (playerA.clearing != playerB.clearing)
+				errorMsg << _T("\tclearing: ") << (int)playerA.clearing << _T(" / ") << (int)playerB.clearing << _T("\r\n");
+			if (playerA.reflex != playerB.reflex)
+				errorMsg << _T("\treflex: ") << (int)playerA.reflex << _T(" / ") << (int)playerB.reflex << _T("\r\n");
+			if (playerA.cover != playerB.cover)
+				errorMsg << _T("\tcover: ") << (int)playerA.cover << _T(" / ") << (int)playerB.cover << _T("\r\n");
+		}
 //		(playerA.copy_id!=playerB.copy_id);
-		if(playerA.cover!=playerB.cover)
-			errorMsg << _T("\tcover: ") << (int)playerA.cover <<_T(" / ") << (int)playerB.cover <<_T("\r\n");
 		if(playerA.def!=playerB.def)
 			errorMsg << _T("\tdef: ") << (int)playerA.def <<_T(" / ") << (int)playerB.def <<_T("\r\n");
 		if(playerA.drib!=playerB.drib)
@@ -493,14 +559,12 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 			errorMsg << _T("\tlowpass: ") << (int)playerA.lowpass <<_T(" / ") << (int)playerB.lowpass <<_T("\r\n");
 		//if(playerA.nation!=playerB.nation)
 		//	errorMsg << _T("\tName: ") << (int)playerA.name <<_T(" / ") << (int)playerB.name <<_T("\r\n");
-		if(pesVersion!=16 && playerA.phys_cont!=playerB.phys_cont)
+		if(pesVersion > 16 && playerA.phys_cont!=playerB.phys_cont)
 			errorMsg << _T("\tphys_cont: ") << (int)playerA.phys_cont <<_T(" / ") << (int)playerB.phys_cont <<_T("\r\n");
 		if(playerA.place_kick!=playerB.place_kick)
 			errorMsg << _T("\tplace_kick: ") << (int)playerA.place_kick <<_T(" / ") << (int)playerB.place_kick <<_T("\r\n");
 		if(playerA.play_style!=playerB.play_style)
 			errorMsg << _T("\tplay_style: ") << (int)playerA.play_style <<_T(" / ") << (int)playerB.play_style <<_T("\r\n");
-		if(playerA.reflex!=playerB.reflex)
-			errorMsg << _T("\treflex: ") << (int)playerA.reflex <<_T(" / ") << (int)playerB.reflex <<_T("\r\n");
 		if(playerA.reg_pos!=playerB.reg_pos)
 			errorMsg << _T("\treg_pos: ") << (int)playerA.reg_pos <<_T(" / ") << (int)playerB.reg_pos <<_T("\r\n");
 		if(playerA.speed!=playerB.speed)
@@ -511,7 +575,7 @@ tstring compare_single_team(int pesVersion, int teamSel, player_entry* gplayers,
 			errorMsg << _T("\tstrong_foot: ") << (int)playerA.strong_foot <<_T(" / ") << (int)playerB.strong_foot <<_T("\r\n");
 		if(playerA.swerve!=playerB.swerve)
 			errorMsg << _T("\tswerve: ") << (int)playerA.swerve <<_T(" / ") << (int)playerB.swerve <<_T("\r\n");
-		if(pesVersion>19 && playerA.aggres!=playerB.aggres)
+		if(pesVersion > 19 && playerA.aggres!=playerB.aggres)
 			errorMsg << _T("\taggression: ") << (int)playerA.aggres <<_T(" / ") << (int)playerB.aggres <<_T("\r\n");
 
 		if(playerA.form!=playerB.form)

@@ -138,7 +138,7 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, players.name, 61);
 	current_byte+=61;
 
-	strcpy_s(players.shirt_name, 21, (const char*)&(pDescriptorNew->data[current_byte]));
+	strncpy_s(players.shirt_name, 21, (const char*)&(pDescriptorNew->data[current_byte]), 21 - 1);
 	current_byte+=61;
 
 	current_byte+=64; //Print Name (National Team) 

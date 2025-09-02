@@ -86,13 +86,14 @@ int SD_GetScrollPos(HWND hwnd, int bar, UINT code);
 char gc_ver4ccs[] = "20a";
 HINSTANCE ghinst;			//Main window instance
 HINSTANCE hPesDecryptDLL;	//Handle to libpesXcrypter.dll 
+HINSTANCE hPes15DecryptDLL;	//Handle to libpes15crypter.dll 
 HWND ghw_main;				//Handle to main window
 HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3;
 HFONT ghFont;
 HWND ghw_stat=NULL, ghw_bump=NULL, ghw_copy=NULL, ghw_import=NULL, ghw_swap = NULL, ghw_boglo=NULL;
 HWND ghw_DlgCurrent = NULL;
 HWND ghAatfbox=NULL;
-void* ghdescriptor = NULL; //void, cast as FileDescriptorOld or FileDescriptorNew depending on version
+void* ghdescriptor = NULL; //void, cast as FileDescriptorOld, FileDescriptorNew, or FileDescriptor15 depending on version
 player_entry* gplayers = NULL;
 int* gn_playind = NULL; //positions in gplayers array of each item in player listbox
 team_entry* gteams = NULL;
@@ -107,6 +108,8 @@ int g_prevx=0;
 int giPesVersion = 0;
 int g_bumpAmount = 0;
 const uint8_t* gpMasterKey;
+
+appearance_map g_umap_pid_to_startByte; //Map from player ID to start byte of appearance entry
 
 int gi_lastAbility = IDC_ABIL_AGGR; //Final control ID in list of Player Ability, for looping over them
 
@@ -124,6 +127,10 @@ pf_decryptWithKeyNew decryptWithKeyNew;
 pf_encryptWithKeyOld encryptWithKeyOld;
 pf_encryptWithKeyNew encryptWithKeyNew;
 
+pf_createFileDescriptor15 createFileDescriptor15;
+pf_destroyFileDescriptor15 destroyFileDescriptor15;
+pf_decryptFile15 decryptFile15;
+pf_encryptFile15 encryptFile15;
 
 //The TCHAR-version of a user-provided entry point for a graphical 
 //  Windows-based application.
@@ -170,7 +177,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Summer 25 Edition (Version A)"),
+		_T("4ccEditor Summer 25 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -646,10 +653,12 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 		case WM_CLOSE:
 			if(ghdescriptor) 
 			{
-				if(giPesVersion>=18)
+				if(giPesVersion >= 18)
 					destroyFileDescriptorNew((FileDescriptorNew*)ghdescriptor);
-				else
+				else if(giPesVersion >= 16)
 					destroyFileDescriptorOld((FileDescriptorOld*)ghdescriptor);
+				else
+					destroyFileDescriptor15((FileDescriptor15*)ghdescriptor);
 				ghdescriptor = NULL;
 			}
 			if(gplayers) 
@@ -671,6 +680,7 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			//Delete icons, fonts and bitmaps
 			DeleteObject((HGDIOBJ)ghFont);
 			FreeLibrary(hPesDecryptDLL);
+			FreeLibrary(hPes15DecryptDLL);
 			DeleteObject(g_hbr); 
 
 			DestroyWindow(H);
@@ -688,6 +698,11 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 			{
 				case ID_FILE_EXIT:
 					PostMessage(H, WM_CLOSE, 0, 0);
+				break;
+				case ID_FILE_OPEN_15_EN:
+					prevPesVersion = giPesVersion;
+					ret = DoFileOpen(H, 15, _T("Open PES15 EDIT file"));
+					if (ret) giPesVersion = prevPesVersion;
 				break;
 				case ID_FILE_OPEN_16_EN:
 					prevPesVersion = giPesVersion;
@@ -1042,6 +1057,22 @@ int loadDLL()
 	hPesDecryptDLL = LoadLibrary(L"lib\\libpesXcrypter.dll");
 	if(!hPesDecryptDLL)
 	{
+		DWORD dw = GetLastError();
+		LPVOID lpMsgBuf;
+		if (FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&lpMsgBuf,
+			0, NULL) == 0) {
+			MessageBox(NULL, TEXT("FormatMessage failed"), TEXT("Error"), MB_OK);
+			ExitProcess(dw);
+		}
+		MessageBox(NULL, (LPCTSTR)lpMsgBuf, TEXT("Error"), MB_OK);
+		LocalFree(lpMsgBuf);
 		MessageBox(NULL, _T("Failed to load libpesXcrypter.dll"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
 		return EXIT_FAILURE;
 	}
@@ -1102,6 +1133,60 @@ int loadDLL()
 		FreeLibrary(hPesDecryptDLL);
 		return EXIT_FAILURE;
 	}
+
+	//Load PES15 DLL
+	hPes15DecryptDLL = LoadLibrary(L"lib\\libpes15crypter.dll");
+	if (!hPes15DecryptDLL)
+	{
+		DWORD dw = GetLastError();
+		LPVOID lpMsgBuf;
+		if (FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&lpMsgBuf,
+			0, NULL) == 0) {
+			MessageBox(NULL, TEXT("FormatMessage failed"), TEXT("Error"), MB_OK);
+			ExitProcess(dw);
+		}
+		MessageBox(NULL, (LPCTSTR)lpMsgBuf, TEXT("Error"), MB_OK);
+		LocalFree(lpMsgBuf);
+		MessageBox(NULL, _T("Failed to load hPes15DecryptDLL"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		return EXIT_FAILURE;
+	}
+	//Load functions from DLL
+	createFileDescriptor15 = (pf_createFileDescriptor15)GetProcAddress(hPes15DecryptDLL, "createFileDescriptor15");
+	if (!createFileDescriptor15)
+	{
+		MessageBox(NULL, _T("Failed to load createFileDescriptor15"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		FreeLibrary(hPes15DecryptDLL);
+		return EXIT_FAILURE;
+	}
+	destroyFileDescriptor15 = (pf_destroyFileDescriptor15)GetProcAddress(hPes15DecryptDLL, "destroyFileDescriptor15");
+	if (!destroyFileDescriptor15)
+	{
+		MessageBox(NULL, _T("Failed to load destroyFileDescriptor15"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		FreeLibrary(hPes15DecryptDLL);
+		return EXIT_FAILURE;
+	}
+	decryptFile15 = (pf_decryptFile15)GetProcAddress(hPes15DecryptDLL, "decryptFile15");
+	if (!decryptFile15)
+	{
+		MessageBox(NULL, _T("Failed to load decryptFile15"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		FreeLibrary(hPes15DecryptDLL);
+		return EXIT_FAILURE;
+	}
+	encryptFile15 = (pf_encryptFile15)GetProcAddress(hPes15DecryptDLL, "encryptFile15");
+	if (!encryptFile15)
+	{
+		MessageBox(NULL, _T("Failed to load encryptFile15"), _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
+		FreeLibrary(hPes15DecryptDLL);
+		return EXIT_FAILURE;
+	}
+
 	return 0;
 }
 
@@ -1147,8 +1232,10 @@ int DoFileOpen(HWND hwnd, int pesVersion, TCHAR* pcs_title)
 			{
 				if(giPesVersion>=18)
 					destroyFileDescriptorNew((FileDescriptorNew*)ghdescriptor);
-				else
+				else if(giPesVersion >= 16)
 					destroyFileDescriptorOld((FileDescriptorOld*)ghdescriptor);
+				else
+					destroyFileDescriptor15((FileDescriptor15*)ghdescriptor);
 				ghdescriptor = NULL;
 			}
 			SendDlgItemMessage(ghw_main, IDC_NAME_LIST, LVM_DELETEALLITEMS, 0, 0);
@@ -1202,8 +1289,10 @@ void data_handler(const TCHAR *pcs_file_name)
 	{
 		if(giPesVersion>=18)
 			destroyFileDescriptorNew((FileDescriptorNew*)ghdescriptor);
-		else
+		else if(giPesVersion >= 16)
 			destroyFileDescriptorOld((FileDescriptorOld*)ghdescriptor);
+		else
+			destroyFileDescriptor15((FileDescriptor15*)ghdescriptor);
 		ghdescriptor = NULL;
 	}
 	if(gplayers) 
@@ -1241,6 +1330,15 @@ void data_handler(const TCHAR *pcs_file_name)
 		Button_SetCheck(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii),BST_UNCHECKED);
 		Button_Enable(GetDlgItem(ghw_tab1, IDB_SKIL_SCIS+ii), FALSE); 
 	}
+
+	//Enable 16+ skill checkboxes
+	int post16skills[6] = { IDB_SKIL_HEAD, IDB_SKIL_HEEL, IDB_SKIL_RABO, IDB_SKIL_LLPA, IDB_SKIL_MALI, IDB_SKIL_ACRC };
+	for (int ii = 0; ii < 6; ii++)
+	{
+		Button_SetCheck(GetDlgItem(ghw_tab1, post16skills[ii]), BST_UNCHECKED);
+		Button_Enable(GetDlgItem(ghw_tab1, post16skills[ii]), TRUE);
+	}
+
 	//Disable extra ability editboxes
 	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO), FALSE);
 	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_TIPO));
@@ -1256,6 +1354,24 @@ void data_handler(const TCHAR *pcs_file_name)
 	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO));
 	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36), TRUE);
 	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36));
+
+	//Enable Clearing skill
+	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_CLEA), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_CLEA));
+	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T41), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T41));
+
+	//Enable Reflexes skill
+	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_REFL), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_REFL));
+	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T42), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T42));
+
+	//Enable Coverage skill
+	EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_COVE), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_COVE));
+	EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43), TRUE);
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43));
 
 	//Remove Custom Skin option
 	if(SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_GETCOUNT, 0, 0) == 8)
@@ -1285,6 +1401,10 @@ void data_handler(const TCHAR *pcs_file_name)
 	SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T39), _T("Goalkeeping:"));
 	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T39));
 
+	//Change Catching label to default
+	SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T40), _T("Catching:"));
+	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T40));
+
 	//Change Coverage label to default
 	SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T43), _T("Coverage:"));
 	UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43));
@@ -1300,7 +1420,114 @@ void data_handler(const TCHAR *pcs_file_name)
 	SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC1, UDM_SETRANGE, 0, MAKELPARAM(0, 122));
 	SendDlgItemMessage(ghw_tab2, IDC_MOTI_GC2, UDM_SETRANGE, 0, MAKELPARAM(0, 122));
 
-	if(giPesVersion==16)
+	if (giPesVersion == 15)
+	{
+		ghdescriptor = (void*)createFileDescriptor15();
+		uint32_t inputLen = 0;
+		uint8_t* pfin = readFile(pcs_file_name, &inputLen);
+		((FileDescriptor15*)ghdescriptor)->dataSize = inputLen; //IMPORTANT: need to set the dataSize here
+		decryptFile15((FileDescriptor15*)ghdescriptor, pfin);
+
+		//Ensure Custom Skin option is available
+		if (SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_GETCOUNT, 0, 0) < 8)
+			SendDlgItemMessage(ghw_tab2, IDC_PHYS_SKIN, CB_ADDSTRING, 0, (LPARAM)_T("Custom"));
+
+		//Disable Physical Contact skill box in 15, as this stat doesn't exist
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_PHCO));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T36));
+
+		//Disable Clearing skill box in 15, as this stat doesn't exist
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_CLEA), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_CLEA));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T41), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T41));
+
+		//Disable Reflexes skill box in 15, as this stat doesn't exist
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_REFL), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_REFL));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T42), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T42));
+
+		//Disable Coverage skill box in 15, as this stat doesn't exist
+		EnableWindow(GetDlgItem(ghw_tab1, IDT_ABIL_COVE), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDT_ABIL_COVE));
+		EnableWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43), FALSE);
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T43));
+
+		//Change Body Control label to "Body Balance"
+		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T35), _T("Body Balance:"));
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T35));
+
+		//Change Catching label to "Saving"
+		SetWindowText(GetDlgItem(ghw_tab1, IDC_STATIC_T40), _T("Saving:"));
+		UpdateWindow(GetDlgItem(ghw_tab1, IDC_STATIC_T40));
+
+		//Disable 16+ skill checkboxes
+		int post16skills[6] = { IDB_SKIL_HEAD, IDB_SKIL_HEEL, IDB_SKIL_RABO, IDB_SKIL_LLPA, IDB_SKIL_MALI, IDB_SKIL_ACRC };
+		for (int ii = 0; ii < 6; ii++)
+		{
+			Button_SetCheck(GetDlgItem(ghw_tab1, post16skills[ii]), BST_UNCHECKED);
+			Button_Enable(GetDlgItem(ghw_tab1, post16skills[ii]), FALSE);
+		}
+
+		//Fill Play Style combobox:	
+		int numPlayStyles = 18;
+		SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_RESETCONTENT, 0, 0);
+		for (int ii = 0; ii < numPlayStyles; ii++)
+		{
+			SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_ADDSTRING, 0, (LPARAM)gpc_playstyle18[ii]);
+		}
+
+		//get number of player, team entries
+		gnum_players = ((FileDescriptor15*)ghdescriptor)->data[0x34];
+		gnum_players += (((FileDescriptor15*)ghdescriptor)->data[0x35]) * 256;
+
+		gnum_teams = ((FileDescriptor15*)ghdescriptor)->data[0x38];
+		gnum_teams += (((FileDescriptor15*)ghdescriptor)->data[0x39]) * 256;
+
+		//First, generate map b/w player ID and Appearance Entry start byte so we can access the correct start byte position
+		// for each player ID when we loop over the Player Entry, even if they're in different orders
+		appearance_byte = 0x2AB9CC;
+		int pid = 0;
+		for (int ii = 0; ii < gnum_players; ii++)
+		{
+			build_appearance_map15(g_umap_pid_to_startByte, appearance_byte, ghdescriptor);
+		}
+
+		//place player info+appearance entries into array of structs
+		current_byte = 0x4C;
+		if (gplayers != NULL) delete[] gplayers;
+		gplayers = new player_entry[gnum_players];
+		for (int ii = 0; ii < gnum_players; ii++)
+		{
+			read_player_entry15(gplayers[ii], current_byte, ghdescriptor);
+			read_appearance_entry15(gplayers[ii], g_umap_pid_to_startByte, ghdescriptor);
+		}
+
+		//Place team entries into array of structs
+		current_byte = 0x44AA6C;
+		if (gteams != NULL) delete[] gteams;
+		gteams = new team_entry[gnum_teams];
+		for (ii = 0; ii < gnum_teams; ii++)
+		{
+			read_team_ids15(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		current_byte = 0x4E45CC;
+		for (ii = 0; ii < gnum_teams; ii++)
+		{
+			read_team_rosters15(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+
+		current_byte = 0x507194;
+		for (ii = 0; ii < gnum_teams; ii++)
+		{
+			read_team_tactics15(current_byte, ghdescriptor, gteams, gnum_teams);
+		}
+	}
+	else if(giPesVersion==16)
 	{
 		ghdescriptor = (void*)createFileDescriptorOld();
 		gpMasterKey = (const uint8_t*)GetProcAddress(hPesDecryptDLL, "MasterKeyPes16");
@@ -1755,7 +1982,40 @@ void save_handler(const TCHAR *pcs_file_name)
 	}
 
 	//Now write any changed player and team entries back into the ghdescriptor
-	if(giPesVersion==16)
+	if (giPesVersion == 15)
+	{
+		//Extract player info & appearance from array of structs
+		int current_byte = 0x4C;
+
+		for (int ii = 0; ii < gnum_players; ii++)
+		{
+			write_player_entry15(gplayers[ii], current_byte, g_umap_pid_to_startByte, ghdescriptor);
+		}
+
+		//Extract team info from array of structs
+		current_byte = 0x44AA6C;
+		for (int ii = 0; ii < gnum_teams; ii++)
+		{
+			write_team_info15(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0x4E45CC;
+		for (int ii = 0; ii < gnum_teams; ii++)
+		{
+			write_teamplayer_info15(gteams[ii], current_byte, ghdescriptor);
+		}
+		current_byte = 0x507194;
+		for (int ii = 0; ii < gnum_teams; ii++)
+		{
+			write_team_tactics15(gteams[ii], current_byte, ghdescriptor);
+		}
+
+		//Write out data to file
+		int outputSize = 0;
+		uint8_t* output;
+		output = encryptFile15((FileDescriptor15*)ghdescriptor, &outputSize);
+		writeFile(pcs_file_name, output, outputSize);
+	}
+	else if(giPesVersion==16)
 	{
 		//Extract player info & appearance from array of structs
 		int ii, current_byte = 0x4C, appearance_byte = 0x2AB9CC;
@@ -1994,7 +2254,7 @@ void show_player_info(int p_ind)
 		SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_SETCURSEL, (WPARAM)gplayers[p_ind].reg_pos, 0);
 
 		ii = gplayers[p_ind].play_style;
-		if(giPesVersion==16 && ii>16) ii--;
+		if((giPesVersion == 15 || giPesVersion == 16) && ii>16) ii--; //Unused index at 16 (left over from PES14)
 		SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_SETCURSEL, (WPARAM)ii, 0);
 
 		for(ii=0;ii<13;ii++)
@@ -2061,7 +2321,7 @@ void show_player_info(int p_ind)
 		_itow_s(gplayers[p_ind].body_ctrl, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_BODB, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		if(giPesVersion!=16)
+		if(giPesVersion>16)
 		{
 			_itow_s(gplayers[p_ind].phys_cont, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab1, IDT_ABIL_PHCO, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -2079,14 +2339,17 @@ void show_player_info(int p_ind)
 		_itow_s(gplayers[p_ind].catching, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_CATC, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		_itow_s(gplayers[p_ind].clearing, buffer, 3, 10);
-		SendDlgItemMessage(ghw_tab1, IDT_ABIL_CLEA, WM_SETTEXT, 0, (LPARAM)buffer);
+		if (giPesVersion > 15)
+		{
+			_itow_s(gplayers[p_ind].clearing, buffer, 3, 10);
+			SendDlgItemMessage(ghw_tab1, IDT_ABIL_CLEA, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		_itow_s(gplayers[p_ind].reflex, buffer, 3, 10);
-		SendDlgItemMessage(ghw_tab1, IDT_ABIL_REFL, WM_SETTEXT, 0, (LPARAM)buffer);
+			_itow_s(gplayers[p_ind].reflex, buffer, 3, 10);
+			SendDlgItemMessage(ghw_tab1, IDT_ABIL_REFL, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		_itow_s(gplayers[p_ind].cover, buffer, 3, 10); //ERROR HERE
-		SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_SETTEXT, 0, (LPARAM)buffer);
+			_itow_s(gplayers[p_ind].cover, buffer, 3, 10);
+			SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_SETTEXT, 0, (LPARAM)buffer);
+		}
 
 		if(giPesVersion>=20)
 		{
@@ -2376,11 +2639,11 @@ void show_player_info(int p_ind)
 		_itow_s(blank_val, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_BODB, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		if(giPesVersion!=16)
-		{
+		//if(giPesVersion > 16)
+		//{
 			_itow_s(blank_val, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab1, IDT_ABIL_PHCO, WM_SETTEXT, 0, (LPARAM)buffer);
-		}
+		//}
 
 		_itow_s(blank_val, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_JUMP, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -2400,17 +2663,17 @@ void show_player_info(int p_ind)
 		_itow_s(blank_val, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_REFL, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		_itow_s(blank_val, buffer, 3, 10); //ERROR HERE
+		_itow_s(blank_val, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		if(giPesVersion>=20)
-		{
+		//if(giPesVersion>=20)
+		//{
 			_itow_s(blank_val, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab1, IDT_ABIL_TIPO, WM_SETTEXT, 0, (LPARAM)buffer);
 
 			_itow_s(blank_val, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab1, IDT_ABIL_AGGR, WM_SETTEXT, 0, (LPARAM)buffer);
-		}
+		//}
 
 		_itow_s(1, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -2424,16 +2687,16 @@ void show_player_info(int p_ind)
 		_itow_s(1, buffer, 3, 10);
 		SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
 
-		if(giPesVersion>=19)
-		{
+		//if(giPesVersion>=19)
+		//{
 			_itow_s(0, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab2, IDT_STAR, WM_SETTEXT, 0, (LPARAM)buffer);
-		}
-		if(giPesVersion>=20)
-		{
+		//}
+		//if(giPesVersion>=20)
+		//{
 			_itow_s(0, buffer, 3, 10);
 			SendDlgItemMessage(ghw_tab2, IDT_PLAY_ATT, WM_SETTEXT, 0, (LPARAM)buffer);
-		}
+		//}
 
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_FACE),0);
 		Button_SetCheck(GetDlgItem(ghw_tab2, IDB_EDIT_HAIR),0);
@@ -2597,7 +2860,7 @@ player_entry get_form_player_info(int index)
 	SendDlgItemMessage(ghw_main, IDT_PLAY_ID, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.id = _wtoi(buffer);
 
-	if(giPesVersion==16) shirtNameLen=16;
+	if(giPesVersion==16) shirtNameLen=16; //This is correct, 15 has 18 len shirt names
 	else if(giPesVersion<20) shirtNameLen=18;
 	else shirtNameLen=20;
 	SendDlgItemMessage(ghw_main, IDT_PLAY_SHIRT, WM_GETTEXT, shirtNameLen+1, (LPARAM)buffer);
@@ -2631,7 +2894,7 @@ player_entry get_form_player_info(int index)
 	output.reg_pos = SendDlgItemMessage(ghw_main, IDC_PLAY_RPOS, CB_GETCURSEL, 0, 0);
 
 	ii = SendDlgItemMessage(ghw_main, IDC_PLAY_STYL, CB_GETCURSEL, 0, 0);
-	if(giPesVersion==16 && ii>15) ii++;
+	if((giPesVersion == 15 || giPesVersion==16) && ii>15) ii++; //15 and 16 have unused index 16, left over from 14
 	output.play_style = ii;
 
 	for(ii=0;ii<13;ii++)
@@ -2702,8 +2965,11 @@ player_entry get_form_player_info(int index)
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_BODB, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.body_ctrl = _wtoi(buffer);
 
-	SendDlgItemMessage(ghw_tab1, IDT_ABIL_PHCO, WM_GETTEXT, 18, (LPARAM)buffer);
-	output.phys_cont = _wtoi(buffer);
+	if (giPesVersion > 16)
+	{
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_PHCO, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.phys_cont = _wtoi(buffer);
+	}
 
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_JUMP, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.jump = _wtoi(buffer);
@@ -2717,14 +2983,17 @@ player_entry get_form_player_info(int index)
 	SendDlgItemMessage(ghw_tab1, IDT_ABIL_CATC, WM_GETTEXT, 18, (LPARAM)buffer);
 	output.catching = _wtoi(buffer);
 
-	SendDlgItemMessage(ghw_tab1, IDT_ABIL_CLEA, WM_GETTEXT, 18, (LPARAM)buffer);
-	output.clearing = _wtoi(buffer);
+	if (giPesVersion > 15)
+	{
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_CLEA, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.clearing = _wtoi(buffer);
 
-	SendDlgItemMessage(ghw_tab1, IDT_ABIL_REFL, WM_GETTEXT, 18, (LPARAM)buffer);
-	output.reflex = _wtoi(buffer);
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_REFL, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.reflex = _wtoi(buffer);
 
-	SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_GETTEXT, 18, (LPARAM)buffer);
-	output.cover = _wtoi(buffer);
+		SendDlgItemMessage(ghw_tab1, IDT_ABIL_COVE, WM_GETTEXT, 18, (LPARAM)buffer);
+		output.cover = _wtoi(buffer);
+	}
 
 	if(giPesVersion>=20)
 	{
@@ -4163,6 +4432,11 @@ void common_shortcuts(WPARAM W)
 	{
 		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_EN), 0);
 	}
+	//ctrl+5 for Open 15 dialog
+	else if (W == 0x35 && (GetKeyState(VK_CONTROL) & 0x8000))
+	{
+		SendMessage(ghw_main, WM_COMMAND, LOWORD(ID_FILE_OPEN_15_EN), 0);
+	}
 	//ctrl+6 for Open 16 dialog
 	else if( W == 0x36 && (GetKeyState(VK_CONTROL) & 0x8000) )
 	{
@@ -4695,7 +4969,7 @@ void roster_data_output()
 
 						//Print play style
 						int ind = gplayers[jj].play_style;
-						if(giPesVersion==16 && ind>16) ind--;
+						if((giPesVersion == 15 || giPesVersion==16) && ind>16) ind--;
 						outstr += playstyle[ind];
 
 						//Print player skill(s)
@@ -5009,7 +5283,13 @@ void export_squad(HWND hwnd)
 				if(gplayers[ii].id == gteams[gn_teamCbIndToArray[csel]].players[jj])
 				{
 					player_export pOut = gplayers[ii].PlayerExport();
-					if(giPesVersion==16) pOut.phys_cont = pOut.body_ctrl;
+					if (giPesVersion <= 16) pOut.phys_cont = pOut.body_ctrl;
+					if (giPesVersion <= 15)
+					{
+						pOut.clearing = pOut.body_ctrl;
+						pOut.reflex = pOut.body_ctrl;
+						pOut.cover = pOut.body_ctrl;
+					}
 					output_file.write((char*)&pOut, sizeof(pOut));
 					kk++;
 					break;
@@ -5114,16 +5394,16 @@ void import_squad(HWND hwnd)
 						if(gb_importStats)
 						{
 							//Convert playstyle numbers between PES versions
-							if (pesVer == 16 && (giPesVersion == 17 || giPesVersion == 18)) gplayers[ii].play_style = n_playstyle16to1718[gplayers[ii].play_style];
-							else if (pesVer == 16 && giPesVersion == 19) gplayers[ii].play_style = n_playstyle16to19[gplayers[ii].play_style];
-							else if (pesVer == 16 && giPesVersion >= 20) gplayers[ii].play_style = n_playstyle16to2021[gplayers[ii].play_style];
-							else if ((pesVer == 17 || pesVer == 18) && giPesVersion == 16) gplayers[ii].play_style = n_playstyle1718to16[gplayers[ii].play_style];
+							if (pesVer <= 16 && (giPesVersion == 17 || giPesVersion == 18)) gplayers[ii].play_style = n_playstyle16to1718[gplayers[ii].play_style];
+							else if (pesVer <= 16 && giPesVersion == 19) gplayers[ii].play_style = n_playstyle16to19[gplayers[ii].play_style];
+							else if (pesVer <= 16 && giPesVersion >= 20) gplayers[ii].play_style = n_playstyle16to2021[gplayers[ii].play_style];
+							else if ((pesVer == 17 || pesVer == 18) && giPesVersion <= 16) gplayers[ii].play_style = n_playstyle1718to16[gplayers[ii].play_style];
 							else if ((pesVer == 17 || pesVer == 18) && giPesVersion == 19) gplayers[ii].play_style = n_playstyle1718to19[gplayers[ii].play_style];
 							else if ((pesVer == 17 || pesVer == 18) && giPesVersion >= 20) gplayers[ii].play_style = n_playstyle1718to2021[gplayers[ii].play_style];
-							else if (pesVer == 19 && giPesVersion == 16) gplayers[ii].play_style = n_playstyle19to16[gplayers[ii].play_style];
+							else if (pesVer == 19 && giPesVersion <= 16) gplayers[ii].play_style = n_playstyle19to16[gplayers[ii].play_style];
 							else if (pesVer == 19 && (giPesVersion == 17 || giPesVersion == 18)) gplayers[ii].play_style = n_playstyle19to1718[gplayers[ii].play_style];
 							else if (pesVer == 19 && giPesVersion >= 20) gplayers[ii].play_style = n_playstyle19to2021[gplayers[ii].play_style];
-							else if (pesVer >= 20 && giPesVersion == 16) gplayers[ii].play_style = n_playstyle2021to16[gplayers[ii].play_style];
+							else if (pesVer >= 20 && giPesVersion <= 16) gplayers[ii].play_style = n_playstyle2021to16[gplayers[ii].play_style];
 							else if (pesVer >= 20 && (giPesVersion == 17 || giPesVersion == 18)) gplayers[ii].play_style = n_playstyle2021to1718[gplayers[ii].play_style];
 							else if (pesVer >= 20 && giPesVersion == 19) gplayers[ii].play_style = n_playstyle2021to19[gplayers[ii].play_style];
 						}
@@ -5456,10 +5736,12 @@ BOOL CALLBACK aatf_comp_dlg_proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM 
 				MessageBox(ghw_main, errBuffer, _T("Error!"), MB_ICONEXCLAMATION | MB_OK);
 				if(hc_descriptor) 
 				{
-					if(giPesVersion>=18)
+					if (giPesVersion >= 18)
 						destroyFileDescriptorNew((FileDescriptorNew*)hc_descriptor);
-					else
+					else if (giPesVersion >= 16)
 						destroyFileDescriptorOld((FileDescriptorOld*)hc_descriptor);
+					else
+						destroyFileDescriptor15((FileDescriptor15*)hc_descriptor);
 					hc_descriptor = NULL;
 				}
 				EndDialog(hwnd, IDB_AATFOK);

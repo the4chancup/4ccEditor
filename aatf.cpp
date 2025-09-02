@@ -191,20 +191,23 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
         rating = max(player.header, rating);
         rating = max(player.swerve, rating);
         rating = max(player.catching, rating);
-        rating = max(player.clearing, rating);
-        rating = max(player.reflex, rating);
+		if (pesVersion > 15)
+		{
+			rating = max(player.clearing, rating);
+			rating = max(player.reflex, rating);
+			rating = max(player.cover, rating);
+		}
         rating = max(player.body_ctrl, rating);
-        if(pesVersion>16) rating = max(player.phys_cont, rating); //Not in 16
+        if (pesVersion > 16) rating = max(player.phys_cont, rating); //Not in 16
         rating = max(player.kick_pwr, rating);
         rating = max(player.exp_pwr, rating);
         rating = max(player.ball_ctrl, rating);
         rating = max(player.ball_win, rating);
         rating = max(player.jump, rating);
-        rating = max(player.cover, rating);
         rating = max(player.place_kick, rating);
         rating = max(player.stamina, rating);
         rating = max(player.speed, rating);
-		if(pesVersion>19) rating = max(player.aggres, rating);
+		if (pesVersion > 19) rating = max(player.aggres, rating);
 
 		/*if(player.injury+1 > 3)
 		{
@@ -669,8 +672,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 										{player.header,		_T("Header"),				0,		targetRate	},
 										{player.swerve,		_T("Swerve"),				0,		targetRate	},
 										{player.catching,	_T("Catching"),				0,		targetRate	},
-										{player.clearing,	_T("Clearing"),				0,		targetRate	},
-										{player.reflex,		_T("Reflexes"),				0,		targetRate	},
+										{player.clearing,	_T("Clearing"),				16,		targetRate	},
+										{player.reflex,		_T("Reflexes"),				16,		targetRate	},
 										{player.body_ctrl,	_T("Body Control"),			0,		targetRate	},
 										{player.phys_cont,	_T("Physical Contact"),		17,		targetRate	},
 										{player.kick_pwr,	_T("Kicking Power"),		0,		targetRate	},
@@ -678,7 +681,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 										{player.ball_ctrl,	_T("Ball Control"),			0,		targetRate	},
 										{player.ball_win,	_T("Ball Winning"),			0,		targetRate	},
 										{player.jump,		_T("Jump"),					0,		targetRate	},
-										{player.cover,		_T("Coverage"),				0,		targetRate	},
+										{player.cover,		_T("Coverage"),				16,		targetRate	},
 										{player.place_kick, _T("Place Kicking"),		0,		targetRate	},
 										{player.stamina,	_T("Stamina"),				0,		targetRate3	},
 										{player.speed,		_T("Speed"),				0,		targetRate	},
@@ -689,7 +692,17 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 		for (int ii = 0; ii < 25; ii++)
 		{
-			if (skillChecks[ii].n_minPesVersion <= pesVersion && skillChecks[ii].c_skillRate != skillChecks[ii].n_targetRate)
+			//atk and def can be lower than the target rate
+			if (skillChecks[ii].s_skillName == _T("Attacking Prowess") || skillChecks[ii].s_skillName == _T("Defensive Prowess"))
+			{
+				if (skillChecks[ii].n_minPesVersion <= pesVersion && skillChecks[ii].c_skillRate > skillChecks[ii].n_targetRate)
+				{
+					errorTot++;
+					errorMsg << skillChecks[ii].s_skillName << _T(" is ") << skillChecks[ii].c_skillRate << _T(", should be <= ") << skillChecks[ii].n_targetRate << _T("; ");
+				}
+			}
+			else if (skillChecks[ii].n_minPesVersion <= pesVersion && 
+				     skillChecks[ii].c_skillRate != skillChecks[ii].n_targetRate)
 			{
 				errorTot++;
 				errorMsg << skillChecks[ii].s_skillName << _T(" is ") << skillChecks[ii].c_skillRate << _T(", should be ") << skillChecks[ii].n_targetRate << _T("; ");

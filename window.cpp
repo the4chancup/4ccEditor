@@ -774,77 +774,77 @@ void setup_tab1(HWND H)
 	x1=329+22+144, x2=448+33+144, xc=114+11, y1=24, y2=22, ydiff=22;//y1=24
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Attacking Prowess:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*0, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T21, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Ball Control:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*1, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T22, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Dribbling:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*2, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T23, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Low Pass:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*3, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T24, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Lofted Pass:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*4, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T25, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Finishing:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*5, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T26, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Place Kicking:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*6, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T27, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Swerve:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*7, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T28, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Header:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*8, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T29, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Defensive Prowess:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*9, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T30, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Ball Winning:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*10, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T31, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Kicking Power:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*11, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T32, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Speed:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*12, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T33, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Explosive Power:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*13, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T34, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Body Control:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*14, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T35, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
@@ -854,47 +854,47 @@ void setup_tab1(HWND H)
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Jump:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*16, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T37, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Stamina:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*17, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T38, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Goalkeeping:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*18, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T39, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Catching:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*19, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T40, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Clearing:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*20, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T41, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Reflexes:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*21, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T42, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Coverage:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*22, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T43, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Tight Possession:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*23, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T44, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 
 	hw_new = CreateWindowEx(0, _T("Static"), _T("Aggression:"), 
-		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y1+ydiff*24, xc, 17, ghw_tab1, (HMENU)IDC_STATIC_T45, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
 

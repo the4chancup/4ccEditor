@@ -25,6 +25,7 @@ IDR_MAINMENU MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
+		MENUITEM "&Load 15 Edit file (encrypted)\tCtrl+5",  ID_FILE_OPEN_15_EN
         MENUITEM "&Load 16 Edit file (encrypted)\tCtrl+6",	ID_FILE_OPEN_16_EN
 		MENUITEM "&Load 17 Edit file (encrypted)\tCtrl+7",	ID_FILE_OPEN_17_EN
 		MENUITEM "&Load 18 Edit file (encrypted)\tCtrl+8",	ID_FILE_OPEN_18_EN
