@@ -378,55 +378,55 @@ void fill_player_entry18(player_entry &players, int &current_byte, void* ghdescr
 }
 
 
-void fill_team_ids18(team_entry &teams, int &current_byte, void* ghdescriptor)
+void fill_team_ids18(team_entry &team, int &current_byte, void* ghdescriptor)
 {
 	FileDescriptorNew* pDescriptorNew = (FileDescriptorNew*)ghdescriptor;
 
-	teams.id = pDescriptorNew->data[current_byte];
+	team.id = pDescriptorNew->data[current_byte];
 	current_byte++; //1
-	teams.id += pDescriptorNew->data[current_byte] << 8;
+	team.id += pDescriptorNew->data[current_byte] << 8;
 	current_byte++; //2
-	teams.id += pDescriptorNew->data[current_byte] << 16;
+	team.id += pDescriptorNew->data[current_byte] << 16;
 	current_byte++; //3
-	teams.id += pDescriptorNew->data[current_byte] << 24;
+	team.id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++; //4
 
 	current_byte+=0xE; //12
-	teams.color1_red = (pDescriptorNew->data[current_byte]) & 63;
+	team.color1_red = (pDescriptorNew->data[current_byte]) & 63;
 
-	teams.color1_green = (pDescriptorNew->data[current_byte] >> 6);
+	team.color1_green = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //13
-	teams.color1_green += (pDescriptorNew->data[current_byte] << 2) & 63;
+	team.color1_green += (pDescriptorNew->data[current_byte] << 2) & 63;
 	
 	current_byte++; //14
-	teams.color2_red = (pDescriptorNew->data[current_byte]) & 63;
+	team.color2_red = (pDescriptorNew->data[current_byte]) & 63;
 	
-	teams.color2_green = (pDescriptorNew->data[current_byte] >> 6);
+	team.color2_green = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //15
-	teams.color2_green += (pDescriptorNew->data[current_byte] << 2) & 63;
+	team.color2_green += (pDescriptorNew->data[current_byte] << 2) & 63;
 	
-	teams.color2_blue = (pDescriptorNew->data[current_byte] >> 4);
+	team.color2_blue = (pDescriptorNew->data[current_byte] >> 4);
 	current_byte++; //16
-	teams.color2_blue += (pDescriptorNew->data[current_byte] << 4) & 63;
+	team.color2_blue += (pDescriptorNew->data[current_byte] << 4) & 63;
 
-	teams.color1_blue = (pDescriptorNew->data[current_byte] >> 2);
+	team.color1_blue = (pDescriptorNew->data[current_byte] >> 2);
 	
 
 	//current_byte+=0x94;
 	current_byte+=0x3; //19
-	teams.b_edit_name = (pDescriptorNew->data[current_byte] >> 4) & 1;
+	team.b_edit_name = (pDescriptorNew->data[current_byte] >> 4) & 1;
 
 	current_byte+=0x7F;
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, teams.name, 0x46);
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, team.name, 0x46);
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]));
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]), 0x4 - 1);
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
-		if((int)teams.short_name[ii]<33 || (int)teams.short_name[ii]>95)
-			teams.short_name[ii]=(char)0;
+		if((int)team.short_name[ii]<33 || (int)team.short_name[ii]>95)
+			team.short_name[ii]=(char)0;
 	}
 	current_byte+=0x4;
 
@@ -935,7 +935,7 @@ void extract_team_info18(team_entry team, int &current_byte, void* ghdescriptor)
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name);
+	strncpy_s((char*)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name, 0x4 - 1);
 	current_byte+=0x4;
 	
 	current_byte+=0xFE;

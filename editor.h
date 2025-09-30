@@ -564,6 +564,7 @@ struct team_entry
 	unsigned long players[team_max];
 	uint16_t numbers[team_max];
 	bool b_edit_name;
+	bool b_edit_shortname;
 	bool b_edit_stadium;
 	bool b_edit_strip; //Edited Strip flag
 
@@ -591,6 +592,7 @@ struct team_entry
 		b_changed = false;
 		b_show = true;
 		b_edit_name = false;
+		b_edit_shortname = false;
 		b_edit_stadium = false;
 		b_edit_strip = false;
 		memset(name,0,sizeof(name));

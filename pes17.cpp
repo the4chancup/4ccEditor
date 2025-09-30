@@ -265,50 +265,50 @@ void fill_player_entry17(player_entry &players, int &current_byte, void* ghdescr
 }
 
 
-void fill_team_ids17(team_entry &teams, int &current_byte, void* ghdescriptor)
+void fill_team_ids17(team_entry &team, int &current_byte, void* ghdescriptor)
 {
 	FileDescriptorOld* pDescriptorOld = (FileDescriptorOld*)ghdescriptor;
 
-	teams.id = read_dataOld(0, 4 * 8, current_byte, pDescriptorOld);
+	team.id = read_dataOld(0, 4 * 8, current_byte, pDescriptorOld);
 
 	current_byte+=0xE; //0x12
-	teams.color1_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x12:0 - 0x12:5
+	team.color1_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x12:0 - 0x12:5
 
-	teams.color1_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x12:6 - 0x13:3
+	team.color1_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x12:6 - 0x13:3
 	
 	current_byte++; //0x14
-	teams.color2_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x14:0 - 0x14:5
+	team.color2_red = read_dataOld(0, 6, current_byte, pDescriptorOld); //0x14:0 - 0x14:5
 	
-	teams.color2_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x14:6 - 0x15:3
+	team.color2_green = read_dataOld(6, 6, current_byte, pDescriptorOld); //0x14:6 - 0x15:3
 	
-	teams.color2_blue = read_dataOld(4, 6, current_byte, pDescriptorOld); //0x15:4 - 0x16:1
+	team.color2_blue = read_dataOld(4, 6, current_byte, pDescriptorOld); //0x15:4 - 0x16:1
 
-	teams.color1_blue = read_dataOld(2, 6, current_byte, pDescriptorOld); //0x16:2 - 0x16:7
+	team.color1_blue = read_dataOld(2, 6, current_byte, pDescriptorOld); //0x16:2 - 0x16:7
 	
 	current_byte+=0x2; //0x19
-	teams.b_edit_name = read_dataOld(4, 1, current_byte, pDescriptorOld); //0x19:4
+	team.b_edit_name = read_dataOld(4, 1, current_byte, pDescriptorOld); //0x19:4
 
 	current_byte++; //0x1A
-	teams.b_edit_strip = read_dataOld(5, 1, current_byte, pDescriptorOld); //0x1A:5
+	team.b_edit_strip = read_dataOld(5, 1, current_byte, pDescriptorOld); //0x1A:5
 
 	current_byte += 2; //0x1C
 	for (int ii = 0; ii < 10; ii++)
 	{
-		teams.stripBlock[ii].stripNumber = read_dataOld(0, 1 * 8, current_byte, pDescriptorOld); //Loop from 0x1C to 0x40
-		teams.stripBlock[ii].stripTeamId = read_dataOld(0, 3 * 8, current_byte, pDescriptorOld);
+		team.stripBlock[ii].stripNumber = read_dataOld(0, 1 * 8, current_byte, pDescriptorOld); //Loop from 0x1C to 0x40
+		team.stripBlock[ii].stripTeamId = read_dataOld(0, 3 * 8, current_byte, pDescriptorOld);
 	}
 
 	current_byte += 0x54;
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, teams.name, 0x46); //0x98
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, team.name, 0x46); //0x98
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte])); //0xDE
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte]), 0x4 - 1); //0xDE
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
-		if((int)teams.short_name[ii]<33 || (int)teams.short_name[ii]>95)
-			teams.short_name[ii]=(char)0;
+		if((int)team.short_name[ii]<33 || (int)team.short_name[ii]>95)
+			team.short_name[ii]=(char)0;
 	}
 	current_byte+=0x4; //48-90
 
@@ -696,7 +696,7 @@ void extract_team_info17(team_entry team, int &current_byte, void* ghdescriptor)
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL); //0x98
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name); //0xDE
+	strncpy_s((char*)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name, 0x4 - 1); //0xDE
 	current_byte+=0x4;
 	
 	current_byte+=0xFE;

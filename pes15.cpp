@@ -306,13 +306,15 @@ void read_team_ids15(team_entry& team, int& current_byte, void* ghdescriptor)
 
 	current_byte += 0xE;
 	team.b_edit_name = read_data15(0, 1, current_byte, pDescriptor15);
+	team.b_edit_shortname = read_data15(1, 1, current_byte, pDescriptor15);
 
 	current_byte += 0x82;
 
 	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR) & (pDescriptor15->data[current_byte]), -1, team.name, 0x46);
 	current_byte += 0x46;
 
-	strcpy_s(team.short_name, 0x4, (const char*)&(pDescriptor15->data[current_byte]));
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptor15->data[current_byte]), 0x4 - 1);
+
 	//Remove non alphanumeric characters
 	for (int ii = 0; ii < 4; ii++)
 	{
@@ -678,13 +680,15 @@ void write_team_info15(team_entry team, int& current_byte, void* ghdescriptor)
 
 	current_byte += 0xE;
 	write_data15(team.b_edit_name, 0, 1, current_byte, pDescriptor15);
+	write_data15(team.b_edit_shortname, 1, 1, current_byte, pDescriptor15);
 
 	current_byte += 0x82;
 
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR) & (pDescriptor15->data[current_byte]), 0x46, NULL, NULL);
 	current_byte += 0x46;
 
-	strcpy_s((char*)&(pDescriptor15->data[current_byte]), 0x4, team.short_name);
+	strncpy_s((char*)&(pDescriptor15->data[current_byte]), 0x4, team.short_name, 0x4 - 1);
+
 	current_byte += 0x4;
 
 	current_byte += 0xEA;

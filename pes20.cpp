@@ -201,30 +201,30 @@ void fill_player_entry20(player_entry &players, int &current_byte, void* ghdescr
 }
 
 
-void fill_team_ids20(team_entry &teams, int &current_byte, void* ghdescriptor)
+void fill_team_ids20(team_entry &team, int &current_byte, void* ghdescriptor)
 {
 	FileDescriptorNew* pDescriptorNew = (FileDescriptorNew*)ghdescriptor;
 
-	teams.id = read_data(0, 4*8, current_byte, pDescriptorNew);
-	teams.manager_id = read_data(0, 4*8, current_byte, pDescriptorNew);
+	team.id = read_data(0, 4*8, current_byte, pDescriptorNew);
+	team.manager_id = read_data(0, 4*8, current_byte, pDescriptorNew);
 
 	current_byte+=2; //Team emblem
 	//0xA
-	teams.stadium_id = read_data(0, 2*8, current_byte, pDescriptorNew);
+	team.stadium_id = read_data(0, 2*8, current_byte, pDescriptorNew);
 
 	current_byte+=0xA; //Skip to 0x16
-	teams.color1_red	= read_data(2, 6, current_byte, pDescriptorNew);
-	teams.color1_green	= read_data(0, 6, current_byte, pDescriptorNew);
-	teams.b_edit_name	= read_data(6, 1, current_byte, pDescriptorNew);
+	team.color1_red	= read_data(2, 6, current_byte, pDescriptorNew);
+	team.color1_green	= read_data(0, 6, current_byte, pDescriptorNew);
+	team.b_edit_name	= read_data(6, 1, current_byte, pDescriptorNew);
 	current_byte++; //Edited emblem: 1 bit
-	teams.color2_green	= read_data(0, 6, current_byte, pDescriptorNew);
-	teams.color2_blue	= read_data(6, 6, current_byte, pDescriptorNew);
+	team.color2_green	= read_data(0, 6, current_byte, pDescriptorNew);
+	team.color2_blue	= read_data(6, 6, current_byte, pDescriptorNew);
 	current_byte+=2; //Media backdrop colors
-	teams.b_edit_stadium = read_data(6, 1, current_byte, pDescriptorNew);
+	team.b_edit_stadium = read_data(6, 1, current_byte, pDescriptorNew);
 	current_byte++; //Edited stadium name: 1 bit
 	current_byte+=2; //Stadium settings
-	teams.color1_blue	= read_data(0, 6, current_byte, pDescriptorNew);
-	teams.color2_red	= read_data(6, 6, current_byte, pDescriptorNew);
+	team.color1_blue	= read_data(0, 6, current_byte, pDescriptorNew);
+	team.color2_red	= read_data(6, 6, current_byte, pDescriptorNew);
 
 	current_byte+=0x39;
 	current_byte+=4; //Rival team ID 1
@@ -232,16 +232,16 @@ void fill_team_ids20(team_entry &teams, int &current_byte, void* ghdescriptor)
 	current_byte+=4; //Rival team ID 3
 	current_byte+=4; //Banner Edited flags
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, teams.name, 0x46);
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, team.name, 0x46);
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]));
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]), 0x4 - 1);
 	current_byte+=0x4;
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
-		if((int)teams.short_name[ii]<33 || (int)teams.short_name[ii]>95)
-			teams.short_name[ii]=(char)0;
+		if((int)team.short_name[ii]<33 || (int)team.short_name[ii]>95)
+			team.short_name[ii]=(char)0;
 	}
 
 	current_byte+=181; //Stadium name
@@ -566,7 +566,7 @@ void extract_team_info20(team_entry team, int &current_byte, void* ghdescriptor)
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name);
+	strncpy_s((char*)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name, 0x4 - 1);
 	current_byte+=0x4;
 	
 	current_byte+=181; //Stadium name

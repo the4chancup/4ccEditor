@@ -279,26 +279,26 @@ void fill_appearance_entry16(player_entry &players, int &current_byte, void* ghd
 }
 
 
-void fill_team_ids16(team_entry &teams, int &current_byte, void* ghdescriptor)
+void fill_team_ids16(team_entry &team, int &current_byte, void* ghdescriptor)
 {
 	FileDescriptorOld* pDescriptorOld = (FileDescriptorOld*)ghdescriptor;
 
-	teams.id = read_dataOld(0, 4*8, current_byte, pDescriptorOld);
+	team.id = read_dataOld(0, 4*8, current_byte, pDescriptorOld);
 
 	current_byte+=0xE;
-	teams.b_edit_name = read_dataOld(0, 1, current_byte, pDescriptorOld); //(pDescriptorOld->data[current_byte]) & 1;
+	team.b_edit_name = read_dataOld(0, 1, current_byte, pDescriptorOld); //(pDescriptorOld->data[current_byte]) & 1;
 
 	current_byte+=0x82;
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, teams.name, 0x46);
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorOld->data[current_byte]), -1, team.name, 0x46);
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte]));
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptorOld->data[current_byte]), 0x4 - 1);
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
-		if((int)teams.short_name[ii]<33 || (int)teams.short_name[ii]>95)
-			teams.short_name[ii]=(char)0;
+		if((int)team.short_name[ii]<33 || (int)team.short_name[ii]>95)
+			team.short_name[ii]=(char)0;
 	}
 	current_byte+=0x4;
 
@@ -681,7 +681,7 @@ void extract_team_info16(team_entry team, int &current_byte, void* ghdescriptor)
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorOld->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name);
+	strncpy_s((char*)&(pDescriptorOld->data[current_byte]), 0x4, team.short_name, 0x4 - 1);
 	current_byte+=0x4;
 	
 	current_byte+=0xEA;

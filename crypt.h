@@ -52,7 +52,7 @@ struct FileDescriptorOld
 struct FileDescriptor15
 {
     uint32_t dataSize;
-    char startByte;
+    unsigned char startByte;
     uint32_t chunk0Size; //384
     uint32_t chunk1Size;
     uint32_t chunk2Size;

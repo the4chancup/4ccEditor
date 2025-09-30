@@ -38,7 +38,7 @@ BOOL CALLBACK draw_children(HWND,LPARAM);
 int loadDLL();
 int DoFileOpen(HWND, int, TCHAR* = NULL);
 void DoFileSave(HWND);
-void data_handler(const TCHAR *);
+void data_handler(const TCHAR *, int);
 void save_handler(const TCHAR *);
 
 void player_names_to_positions();
@@ -177,7 +177,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Summer 25 Edition (Version B)"),
+		_T("4ccEditor Autumn 25 Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1212,10 +1212,10 @@ int DoFileOpen(HWND hwnd, int pesVersion, TCHAR* pcs_title)
 	if(GetOpenFileName(&ofn))
 	{
 		gb_firstsave = true;
-		giPesVersion = pesVersion;
+		//giPesVersion = pesVersion;
 		__try
 		{
-			data_handler(cs_file_name);
+			data_handler(cs_file_name, pesVersion);
 		}
 		__except(code = GetExceptionCode(), info = GetExceptionInformation(), EXCEPTION_EXECUTE_HANDLER) 
 			                                //If file loading fails (usually due to trying to open the wrong type of file for the chosen loader, 
@@ -1281,7 +1281,7 @@ void DoFileSave(HWND hwnd)
 }
 
 
-void data_handler(const TCHAR *pcs_file_name)
+void data_handler(const TCHAR *pcs_file_name, int pesVersion)
 {
 	int ii, current_byte, appearance_byte;
 
@@ -1295,6 +1295,8 @@ void data_handler(const TCHAR *pcs_file_name)
 			destroyFileDescriptor15((FileDescriptor15*)ghdescriptor);
 		ghdescriptor = NULL;
 	}
+	giPesVersion = pesVersion;
+
 	if(gplayers) 
 	{
 		delete[] gplayers;
@@ -3181,6 +3183,8 @@ bool get_form_team_info(int player_index, team_entry &output)
 		SendDlgItemMessage(ghw_main, IDT_TEAM_ID, WM_GETTEXT, 18, (LPARAM)buffer);
 		output.id = _wtoi(buffer);
 
+		//Manually send EN_CHANGE message to avoid edge cases
+		//SendMessage(ghw_main, WM_COMMAND, MAKEWPARAM(IDT_TEAM_SHORT, EN_CHANGE), LPARAM(GetDlgItem(ghw_main, IDT_TEAM_SHORT)));
 		SendDlgItemMessage(ghw_main, IDT_TEAM_SHORT, WM_GETTEXT, 4, (LPARAM)buffer);
 		buffer[4] = 0;
 		ii = 0;
@@ -3195,6 +3199,7 @@ bool get_form_team_info(int player_index, team_entry &output)
 		{
 			strcpy(output.short_name, cbuff);
 			output.b_edit_name = true;
+			output.b_edit_shortname = true;
 		}
 		
 		SendDlgItemMessage(ghw_main, IDT_PLAY_NUM, WM_GETTEXT, 18, (LPARAM)buffer);

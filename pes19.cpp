@@ -277,72 +277,72 @@ void fill_player_entry19(player_entry &players, int &current_byte, void* ghdescr
 }
 
 
-void fill_team_ids19(team_entry &teams, int &current_byte, void* ghdescriptor)
+void fill_team_ids19(team_entry &team, int &current_byte, void* ghdescriptor)
 {
 	FileDescriptorNew* pDescriptorNew = (FileDescriptorNew*)ghdescriptor;
 
-	teams.id = pDescriptorNew->data[current_byte];
+	team.id = pDescriptorNew->data[current_byte];
 	current_byte++; //1
-	teams.id += pDescriptorNew->data[current_byte] << 8;
+	team.id += pDescriptorNew->data[current_byte] << 8;
 	current_byte++; //2
-	teams.id += pDescriptorNew->data[current_byte] << 16;
+	team.id += pDescriptorNew->data[current_byte] << 16;
 	current_byte++; //3
-	teams.id += pDescriptorNew->data[current_byte] << 24;
+	team.id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++; //4
 
-	teams.manager_id = pDescriptorNew->data[current_byte];
+	team.manager_id = pDescriptorNew->data[current_byte];
 	current_byte++; //1
-	teams.manager_id += pDescriptorNew->data[current_byte] << 8;
+	team.manager_id += pDescriptorNew->data[current_byte] << 8;
 	current_byte++; //2
-	teams.manager_id += pDescriptorNew->data[current_byte] << 16;
+	team.manager_id += pDescriptorNew->data[current_byte] << 16;
 	current_byte++; //3
-	teams.manager_id += pDescriptorNew->data[current_byte] << 24;
+	team.manager_id += pDescriptorNew->data[current_byte] << 24;
 	current_byte++; //4
 
 	current_byte+=2; //Team emblem
 
-	teams.stadium_id = pDescriptorNew->data[current_byte];
+	team.stadium_id = pDescriptorNew->data[current_byte];
 	current_byte++; //1
-	teams.stadium_id += pDescriptorNew->data[current_byte] << 8;
+	team.stadium_id += pDescriptorNew->data[current_byte] << 8;
 	current_byte++; //2
 
 	current_byte+=0xA; //22
-	teams.color1_red = (pDescriptorNew->data[current_byte] >> 2);
+	team.color1_red = (pDescriptorNew->data[current_byte] >> 2);
 
 	current_byte++; //23
-	teams.color1_green = (pDescriptorNew->data[current_byte] & 63);
+	team.color1_green = (pDescriptorNew->data[current_byte] & 63);
 
-	teams.b_edit_name = (pDescriptorNew->data[current_byte] >> 6) & 1;
+	team.b_edit_name = (pDescriptorNew->data[current_byte] >> 6) & 1;
 	
 	current_byte++; //24
-	teams.color2_green = (pDescriptorNew->data[current_byte] & 63);
+	team.color2_green = (pDescriptorNew->data[current_byte] & 63);
 	
-	teams.color2_blue = (pDescriptorNew->data[current_byte] >> 6);
+	team.color2_blue = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //25
-	teams.color2_blue += (pDescriptorNew->data[current_byte] << 2) & 63;
+	team.color2_blue += (pDescriptorNew->data[current_byte] << 2) & 63;
 
 	current_byte+=2; //27
-	teams.b_edit_stadium = (pDescriptorNew->data[current_byte] >> 6) & 64; //7th bit of byte 27
+	team.b_edit_stadium = (pDescriptorNew->data[current_byte] >> 6) & 64; //7th bit of byte 27
 	
 	current_byte++; //28
-	teams.color1_blue = (pDescriptorNew->data[current_byte] & 63);
+	team.color1_blue = (pDescriptorNew->data[current_byte] & 63);
 
-	teams.color2_red = (pDescriptorNew->data[current_byte] >> 6);
+	team.color2_red = (pDescriptorNew->data[current_byte] >> 6);
 	current_byte++; //29
-	teams.color2_red += (pDescriptorNew->data[current_byte] << 2) & 63;
+	team.color2_red += (pDescriptorNew->data[current_byte] << 2) & 63;
 
 	current_byte+=0x3B;
 
-	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, teams.name, 0x46);
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(pDescriptorNew->data[current_byte]), -1, team.name, 0x46);
 	current_byte+=0x46;
 
-	strcpy_s(teams.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]));
+	strncpy_s(team.short_name, 0x4, (const char*)&(pDescriptorNew->data[current_byte]), 0x4 - 1); 
 	current_byte+=0x4;
 	//Remove non alphanumeric characters
 	for(int ii=0;ii<4;ii++)
 	{
-		if((int)teams.short_name[ii]<33 || (int)teams.short_name[ii]>95)
-			teams.short_name[ii]=(char)0;
+		if((int)team.short_name[ii]<33 || (int)team.short_name[ii]>95)
+			team.short_name[ii]=(char)0;
 	}
 
 	current_byte+=0xFE;
@@ -788,7 +788,7 @@ void extract_team_info19(team_entry team, int &current_byte, void* ghdescriptor)
 	WideCharToMultiByte(CP_UTF8, 0, team.name, -1, (LPSTR)&(pDescriptorNew->data[current_byte]), 0x46, NULL, NULL);
 	current_byte+=0x46;
 	
-	strcpy_s((char *)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name);
+	strncpy_s((char*)&(pDescriptorNew->data[current_byte]), 0x4, team.short_name, 0x4 - 1);
 	current_byte+=0x4;
 	
 	current_byte+=0xFE;

@@ -44,11 +44,11 @@ int regPosToPlayPosMap[13] = { 12, 9, 10, 11, 5, 6, 7, 8, 4, 2, 3, 1, 0 };
 int manletBonus = 5;
 int silverManletBonus = 0;
 int goldManletBonus = 0;
-int silverGiantPen = 4;
+int silverGiantPen = 0;
 int goldGiantPen = 0;
 
 int goldRate = 99; //Player skill ratings
-int silverRate = 92;
+int silverRate = 88;
 int regRate = 77;
 int gkRate = 77;
 
@@ -91,9 +91,9 @@ int silverCOM = 1;
 int goldCOM = 2;
 
 int greenGiga = 0; //Green height bracket
-int greenGiant = 6;
+int greenGiant = 5;
 int greenTall = 6;
-int greenMid = 5;
+int greenMid = 6;
 int greenManlet = 6;
 
 int redGiga = 0; //Red height bracket
@@ -879,7 +879,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 	SetWindowText(GetDlgItem(hAatfbox, IDT_AATFOUT), msgOut.c_str());
 	if(errorTot)
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Back to Magic Kindergarten"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Alright, get their clothes"));
 	else
-		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("Turns out you were prepared for this!"));
+		SendDlgItemMessage(hAatfbox, IDB_AATFOK, WM_SETTEXT, 0, (LPARAM) _T("GO TEAM EXPORT!"));
 }
