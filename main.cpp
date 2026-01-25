@@ -177,7 +177,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Autumn 25 Edition (Version A)"),
+		_T("4ccEditor Autumn 25 Edition (Version B)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1120+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1864,18 +1864,30 @@ void data_handler(const TCHAR *pcs_file_name, int pesVersion)
 		current_byte = 0x8ED2FC;
 		if(gteams != NULL) delete[] gteams;
 		gteams = new team_entry[gnum_teams];
-		for(ii=0;ii<gnum_teams;ii++)
+		if (giPesVersion == 20)
 		{
-			fill_team_ids20(gteams[ii], current_byte, ghdescriptor);
+			for (ii = 0; ii < gnum_teams; ii++)
+			{
+				fill_team_ids20(gteams[ii], current_byte, ghdescriptor);
+			}
+		}
+		else
+		{
+			for (ii = 0; ii < gnum_teams; ii++)
+			{
+				fill_team_ids21(gteams[ii], current_byte, ghdescriptor);
+			}
 		}
 
-		current_byte = 0x9D4648;
+		if (giPesVersion == 20) current_byte = 0x9ccc04;
+		else current_byte = 0x9D4648;
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			fill_team_rosters20(current_byte, ghdescriptor, gteams, gnum_teams);
 		}
 
-		current_byte = 0xA09880;
+		if (giPesVersion == 20) current_byte = 0xa01e3c;
+		else current_byte = 0xA09880;
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			fill_team_tactics20(current_byte, ghdescriptor, gteams, gnum_teams);
@@ -2159,16 +2171,30 @@ void save_handler(const TCHAR *pcs_file_name)
 
 		//Extract team info from array of structs
 		current_byte = 0x8ED2FC;
-		for(ii=0;ii<gnum_teams;ii++)
+		if (giPesVersion == 20)
 		{
-			extract_team_info20(gteams[ii], current_byte, ghdescriptor);
+			for (ii = 0; ii < gnum_teams; ii++)
+			{
+				extract_team_info20(gteams[ii], current_byte, ghdescriptor);
+			}
 		}
-		current_byte = 0x9D4648;
+		else
+		{
+			for (ii = 0; ii < gnum_teams; ii++)
+			{
+				extract_team_info21(gteams[ii], current_byte, ghdescriptor);
+			}
+		}
+
+		if (giPesVersion == 20) current_byte = 0x9ccc04;
+		else current_byte = 0x9D4648;
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			extract_teamplayer_info20(gteams[ii], current_byte, ghdescriptor);
 		}
-		current_byte = 0xA09880;
+
+		if (giPesVersion == 20) current_byte = 0xa01e3c;
+		else current_byte = 0xA09880;
 		for(ii=0;ii<gnum_teams;ii++)
 		{
 			extract_team_tactics20(gteams[ii], current_byte, ghdescriptor);

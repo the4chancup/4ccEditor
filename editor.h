@@ -728,10 +728,12 @@ void extract_team_tactics19(team_entry, int &, void*);
 
 void fill_player_entry20(player_entry &, int &, void*);
 void fill_team_ids20(team_entry &, int &, void*);
+void fill_team_ids21(team_entry&, int&, void*);
 void fill_team_rosters20(int &, void*, team_entry*, int);
 void fill_team_tactics20(int &, void*, team_entry*, int);
 void extract_player_entry20(player_entry, int &, void*);
 void extract_team_info20(team_entry, int &, void*);
+void extract_team_info21(team_entry, int&, void*);
 void extract_teamplayer_info20(team_entry, int &, void*);
 void extract_team_tactics20(team_entry, int &, void*);
 
