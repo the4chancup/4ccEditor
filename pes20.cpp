@@ -683,7 +683,7 @@ void extract_team_info21(team_entry team, int& current_byte, void* ghdescriptor)
 	current_byte += 16; //Banner 3 text
 	current_byte += 16; //Banner 4 text
 
-	current_byte += 24C; //Unknown D
+	current_byte += 165; //Unknown D
 }
 
 
