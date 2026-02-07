@@ -583,7 +583,7 @@ void extract_team_info20(team_entry team, int &current_byte, void* ghdescriptor)
 
 	if(!team.b_changed)
 	{
-		current_byte += 0x24C;
+		current_byte += 0x210;
 		return;
 	}
 	
@@ -628,7 +628,7 @@ void extract_team_info20(team_entry team, int &current_byte, void* ghdescriptor)
 	current_byte+=16; //Banner 3 text
 	current_byte+=16; //Banner 4 text
 
-	current_byte+=165; //Unknown D
+	current_byte+=105; //Unknown D
 }
 
 
@@ -638,7 +638,7 @@ void extract_team_info21(team_entry team, int& current_byte, void* ghdescriptor)
 
 	if (!team.b_changed)
 	{
-		current_byte += 0x210;
+		current_byte += 0x24C;
 		return;
 	}
 
@@ -683,7 +683,7 @@ void extract_team_info21(team_entry team, int& current_byte, void* ghdescriptor)
 	current_byte += 16; //Banner 3 text
 	current_byte += 16; //Banner 4 text
 
-	current_byte += 105; //Unknown D
+	current_byte += 165; //Unknown D
 }
 
 
