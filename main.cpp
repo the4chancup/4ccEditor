@@ -103,6 +103,7 @@ int gnum_players, gnum_teams, gn_listsel=-1, gn_teamsel=-1, gn_forceupdate=-1;
 bool gb_forceupdate = false;
 bool gb_firstsave = true;
 bool gb_importStats = true, gb_importAes = true; //Squad import options
+bool useSuggestions = false;
 int gn_oldysize = 642;
 int g_prevx=0;
 int giPesVersion = 0;
@@ -889,21 +890,25 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				{
 					if(HIWORD(W)==BN_CLICKED)
 					{
-						_itow_s(goldRate, buffer, 3, 10);
-						for(int ii=IDT_ABIL_ATKP;ii<gi_lastAbility;ii+=2)
-							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)buffer);
+						using namespace gold; //use gold stats only
+						int ii;
+						for (ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
+						{
+							if (stat_array[(ii - IDT_ABIL_ATKP) / 2] == 0) //stat is not changed from base stat value
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(base_stat).c_str());
+							}
+							else //stat is changed
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(stat_array[(ii - IDT_ABIL_ATKP) / 2]).c_str());
+							}
 
-						_itow_s(goldForm, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)buffer);
+						}
 
-						_itow_s(goldIR, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
-						
-						_itow_s(goldWeakFootUse, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(goldWeakFootAcc, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)std::to_wstring(form).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)std::to_wstring(injury_resistance).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_usage).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_accuracy).c_str());
 					}
 				}
 				break;
@@ -911,21 +916,25 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				{
 					if(HIWORD(W)==BN_CLICKED)
 					{
-						_itow_s(silverRate, buffer, 3, 10);
-						for (int ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
-							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)buffer);
+						using namespace silver; //use silver stats only
+						int ii;
+						for (ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
+						{
+							if (stat_array[(ii - IDT_ABIL_ATKP) / 2] == 0) //stat is not changed from base stat value
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(base_stat).c_str());
+							}
+							else //stat is changed
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(stat_array[(ii - IDT_ABIL_ATKP) / 2]).c_str());
+							}
 
-						_itow_s(silverForm, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)buffer);
+						}
 
-						_itow_s(silverIR, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(silverWeakFootUse, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(silverWeakFootAcc, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)std::to_wstring(form).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)std::to_wstring(injury_resistance).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_usage).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_accuracy).c_str());
 					}
 				}
 				break;
@@ -933,24 +942,25 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				{
 					if(HIWORD(W)==BN_CLICKED)
 					{
-							//if(ii==IDT_ABIL_DEFP || ii==IDT_ABIL_BWIN || ii==IDT_ABIL_EXPL) //Nerf Defensive Prowess, Ball winning and Explosive power to 72
-							//	SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)_T("77"));
+						using namespace regular; //use regular stats only
+						int ii;
+						for (ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
+						{
+							if (stat_array[(ii - IDT_ABIL_ATKP) / 2] == 0) //stat is not changed from base stat value
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(base_stat).c_str());
+							}
+							else //stat is changed
+							{
+								SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)std::to_wstring(stat_array[(ii - IDT_ABIL_ATKP) / 2]).c_str());
+							}
 
-						_itow_s(regRate, buffer, 3, 10);
-						for (int ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
-							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)buffer);
+						}
 
-						_itow_s(regForm, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(regIR, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(regWeakFootUse, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
-
-						_itow_s(regWeakFootAcc, buffer, 3, 10);
-						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)std::to_wstring(form).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)std::to_wstring(injury_resistance).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_usage).c_str());
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)std::to_wstring(weak_foot_accuracy).c_str());
 					}
 				}
 				break;
@@ -972,17 +982,41 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 				{
 					if(gn_teamsel > -1)
 					{
+						useSuggestions = false;
 						update_tables();
 						ShowWindow(ghAatfbox, SW_SHOW);
-						aatf_single(ghAatfbox, giPesVersion, gn_teamsel, gplayers, gteams, gnum_players);
+						aatf_single(ghAatfbox, giPesVersion, gn_teamsel, gplayers, gteams, gnum_players, useSuggestions);
 					}
 					else MessageBox(H,_T("Please select a team to check."),NULL,MB_ICONWARNING);
+				}
+				break;
+				case IDM_DATA_AATFC_SUG: //Run AATF on currently-selected team and show results in a dialog box
+				{
+					if (gn_teamsel > -1)
+					{
+						useSuggestions = true;
+						update_tables();
+						ShowWindow(ghAatfbox, SW_SHOW);
+						aatf_single(ghAatfbox, giPesVersion, gn_teamsel, gplayers, gteams, gnum_players, useSuggestions);
+					}
+					else MessageBox(H, _T("Please select a team to check."), NULL, MB_ICONWARNING);
 				}
 				break;
 				case IDM_DATA_AATFS: //Run AATF on teams selected from a list
 				{
 					if(ghdescriptor)
 					{
+						useSuggestions = false;
+						update_tables();
+						DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_AATF_SEL), H, aatf_sel_dlg_proc);
+					}
+				}
+				break;
+				case IDM_DATA_AATFS_SUG: //Run AATF on teams selected from a list
+				{
+					if (ghdescriptor)
+					{
+						useSuggestions = true;
 						update_tables();
 						DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_AATF_SEL), H, aatf_sel_dlg_proc);
 					}
@@ -5679,7 +5713,7 @@ BOOL CALLBACK aatf_mult_dlg_proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM 
     {
 		case WM_INITDIALOG:
 		{
-			aatf_single(hwnd, giPesVersion, lParam, gplayers, gteams, gnum_players);
+			aatf_single(hwnd, giPesVersion, lParam, gplayers, gteams, gnum_players, useSuggestions);
 			SetFocus(GetDlgItem(hwnd,IDB_AATFOK));
 		}
 		break;
