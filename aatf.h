@@ -55,7 +55,7 @@ namespace silver { //silver stats
 	const int skills = 4; //max number of non free skills allowed
 	const int tricks = 3; //max number of trick cards allowed
 	const int coms = 1; //free coms allowed
-	const int a_pos = 2; //free a positions allowed, note this includes the A position that a registered position gives
+	const int a_pos = 1; //free a positions allowed, note this includes the A position that a registered position gives
 
 	const int base_stat = 88; //base stat value used if no changes. if a stat below is set at 0, this value will be used.
 	const int manlet_buff = 0; //if running red bracket, buff by this amount
@@ -97,7 +97,7 @@ namespace regular { //regular player stats
 	const int weak_foot_accuracy = 4;
 	const int skills = 3; //max number of non free skills allowed
 	const int tricks = 2; //max number of trick cards allowed
-	const int coms = 1; //free coms allowed
+	const int coms = 0; //free coms allowed
 	const int a_pos = 1; //free a positions allowed, note this includes the A position that a registered position gives
 
 	const int base_stat = 77; //base stat value used if no changes. if a stat below is set at 0, this value will be used.

@@ -131,22 +131,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 
 		tstringstream errorMsg;
 
-		int cardCount = 0;
-		int cardMod = 0;
-		int cardLimit = 0;
 		int heightMod = 0;
 		int statMod = 0;
 		bool hasTrick = false;
 		// Form, Injury Resist and Weak Foot
-		int allowedForm = 0;
-		int allowedInjResist = 0;
-		int allowedAPostions = 0;
+		int reqForm = 0;
+		int reqInjResist = 0;
+		int reqAPos = 0;
 		int weakFootUse = 0;
 		int weakFootAcc = 0;
 		// Cards
-		int allowedSkills = 0;
-		int allowedTricks = 0;
-		int allowedComs = 0;
+		int reqSkill = 0;
+		int reqTrick = 0;
+		int reqCom = 0;
 		// Individual Stat Comparison
 		int targetRate = 0;
 		int targetDrib = 0;
@@ -218,9 +215,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			errorMsg << _T("\tDoesn't have A in registered position;\r\n");
 		}
 
-		//Count number of registered GKs
-		if (player.reg_pos == 0) numGK++;
-
 		//Count A positions
 		int countA = 0;
 		int countB = 0;
@@ -243,44 +237,6 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		{
 			errorTot++;
 			errorMsg << _T("\tHas GK as second A position;\r\n");
-		}
-
-		//Count cards
-		int numTrick = 0;
-		int numCom = 0;
-		int numSkill;
-		if (pesVersion == 19) numSkill = 39;
-		else if (pesVersion > 19) numSkill = 41;
-		else numSkill = 28;
-		for (int jj = 0; jj < numSkill; jj++)
-		{
-			if (player.play_skill[jj])
-			{
-				cardCount++;
-				//SPECIAL Winter/Spring 24: Malicia (21) is a free card
-				if (jj == 21) cardMod++;
-				//Captain gets free captaincy card
-				if (jj == 25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
-				{
-					captainHasCaptaincy = true;
-					cardMod++;
-				}
-				//Trick cards may be free, count number
-				if (jj < 6 || jj == 16 || jj == 28 || jj == 29 || jj == 30 || jj == 34)
-				{
-					hasTrick = true;
-					numTrick++;
-				}
-			}
-		}
-
-		for (int jj = 0; jj < 7; jj++)
-		{
-			if (player.com_style[jj])
-			{
-				cardCount++;
-				numCom++;
-			}
 		}
 
 		if (player.age < 15 || player.age>50)
@@ -329,18 +285,19 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		/* GOALKEEPER */
 		if (player.reg_pos == 0) //Goalkeeper player, counts towards regular
 		{
+			numGK++;
 			numReg++;
 			using namespace goalkeeper;
 
-			allowedInjResist = injury_resistance;
-			allowedForm = form;
-			allowedAPostions = a_pos;
+			reqAPos = a_pos;
+			reqForm = form;
+			reqInjResist = injury_resistance;
 			weakFootUse = weak_foot_usage;
 			weakFootAcc = weak_foot_accuracy;
 
-			allowedTricks = tricks;
-			allowedComs = coms;
-			allowedSkills = skills;
+			reqSkill = skills;
+			reqTrick = tricks;
+			reqCom = coms;
 
 			targetRate = base_stat;
 			targetDrib = dribbling;
@@ -386,15 +343,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			numReg++;
 			using namespace regular;
 
-			allowedInjResist = injury_resistance;
-			allowedForm = form;
-			allowedAPostions = a_pos;
+			reqAPos = a_pos;
+			reqForm = form;
+			reqInjResist = injury_resistance;
 			weakFootUse = weak_foot_usage;
 			weakFootAcc = weak_foot_accuracy;
 
-			allowedTricks = tricks;
-			allowedComs = coms;
-			allowedSkills = skills;
+			reqSkill = skills;
+			reqTrick = tricks;
+			reqCom = coms;
 
 			targetRate = base_stat;
 			targetDrib = dribbling;
@@ -440,15 +397,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			numSilver++;
 			using namespace silver;
 
-			allowedInjResist = injury_resistance;
-			allowedForm = form;
-			allowedAPostions = a_pos;
+			reqAPos = a_pos;
+			reqForm = form;
+			reqInjResist = injury_resistance;
 			weakFootUse = weak_foot_usage;
 			weakFootAcc = weak_foot_accuracy;
 
-			allowedTricks = tricks;
-			allowedComs = coms;
-			allowedSkills = skills;
+			reqSkill = skills;
+			reqTrick = tricks;
+			reqCom = coms;
 
 			targetRate = base_stat;
 			targetDrib = dribbling;
@@ -499,15 +456,15 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			numGold++;
 			using namespace gold;
 
-			allowedInjResist = injury_resistance;
-			allowedForm = form;
-			allowedAPostions = a_pos;
+			reqAPos = a_pos;
+			reqForm = form;
+			reqInjResist = injury_resistance;
 			weakFootUse = weak_foot_usage;
 			weakFootAcc = weak_foot_accuracy;
 
-			allowedTricks = tricks;
-			allowedComs = coms;
-			allowedSkills = skills;
+			reqSkill = skills;
+			reqTrick = tricks;
+			reqCom = coms;
 
 			targetRate = base_stat;
 			targetDrib = dribbling;
@@ -561,12 +518,56 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			continue;
 		}
 
+		//Count cards
+		int numSkill = 0;
+		int numTrick = 0;
+		int numCom = 0;
+		int cardCount;
+		if (pesVersion > 19) cardCount = 41;
+		else if (pesVersion == 19) cardCount = 39;
+		else cardCount = 28;
+		for (int jj = 0; jj < cardCount; jj++)
+		{
+			if (player.play_skill[jj])
+			{
+				//SPECIAL Winter/Spring 24: Malicia (21) is a free card
+				if (jj == 21)
+				{
+					numSkill++;
+					reqSkill++;
+				}
+				//Captain gets free captaincy card
+				else if (jj == 25 && player.id == gteams[teamSel].players[gteams[teamSel].captain_ind])
+				{
+					captainHasCaptaincy = true;
+					numSkill++;
+					reqSkill++;
+				}
+				//Trick cards may be free, count number
+				else if ((jj < 6 || jj == 16 || jj == 28 || jj == 29 || jj == 30 || jj == 34) && numTrick < reqTrick)
+				{
+					hasTrick = true;
+					numTrick++;
+				}
+				else numSkill++;
+			}
+		}
+
+		for (int jj = 0; jj < 7; jj++)
+		{
+			if (player.com_style[jj])
+			{
+				if (numCom < reqCom) numCom++;
+				else numSkill++;
+			}
+		}
+
 		//Check player height
 		if (((player.height - heightMod) <= heightManlet))
 		{
 			numManlet++;
-			cardMod += manletCardBonus; //Manlets get a bonus card
-			allowedAPostions++; //Manlets get a bonus double A position
+			reqSkill += manletCardBonus; //Manlets get a bonus card
+			reqAPos++; //Manlets get a bonus double A position
 			weakFootUse = manletWeakFootUse; //Manlets get weak foot acc/use 4/4
 			weakFootAcc = manletWeakFootAcc;
 		}
@@ -588,17 +589,17 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			errorMsg << _T("Illegal height (") << player.height << _T(" cm); ");
 		}
 
-		if (player.form + 1 != allowedForm)
+		if (player.form + 1 != reqForm)
 		{
 			errorTot++;
-			errorMsg << _T("\tForm is ") << player.form + 1 << _T(", should be ") << allowedForm << _T(";\r\n");
+			errorMsg << _T("\tForm is ") << player.form + 1 << _T(", should be ") << reqForm << _T(";\r\n");
 		}
 
 		//Check injury resistance
-		if (player.injury + 1 > allowedInjResist)
+		if (player.injury + 1 > reqInjResist)
 		{
 			errorTot++;
-			errorMsg << _T("\tInjury resist is ") << player.injury + 1 << _T(", should be ") << allowedInjResist << _T(";\r\n");
+			errorMsg << _T("\tInjury resist is ") << player.injury + 1 << _T(", should be ") << reqInjResist << _T(";\r\n");
 		}
 
 		//Check weak foot ratings
@@ -614,29 +615,31 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 		}
 
 		//If more than allowed A positions, 1 card less for each
-		if (countA > allowedAPostions) cardMod -= (countA - allowedAPostions);
-
-		//Count cards
-		cardMod += min(allowedTricks, numTrick);
-		cardMod += min(allowedComs, numCom);
-		cardLimit = allowedSkills + cardMod;
+		if (countA > reqAPos) reqSkill -= (countA - reqAPos);
 
 		//Check player card count
-		if (cardCount > cardLimit)
+		if (numSkill > reqSkill)
 		{
 			errorTot++;
-			errorMsg << _T("\tHas ") << cardCount - numTrick << _T(" cards, only allowed ") << cardLimit - numTrick << _T(";\r\n");
+			errorMsg << _T("\tHas ") << numSkill << _T(" skill cards, only allowed ") << reqSkill << _T(";\r\n");
+		}
+
+		//Check PES skill card limit of 10
+		if (numSkill + numTrick > 10)
+		{
+			errorTot++;
+			errorMsg << _T("\tHas ") << numSkill + numTrick << _T(" cards, PES limit is 10, please swap to COM cards or trade for additional A positions;\r\n");
 		}
 
 		if (useSuggestions)
 		{
-			if (cardCount < cardLimit) errorMsg << _T("\tWARN: Has ") << cardCount << _T(" cards, allowed ") << cardLimit << _T(";\r\n");
-			if (numTrick < allowedTricks) errorMsg << _T("\tWARN: Has ") << numTrick << _T(" trick cards, allowed ") << allowedTricks << _T(";\r\n");
-			if (numCom < allowedComs) errorMsg << _T("\tWARN: Has ") << numCom << _T(" COM cards, allowed ") << allowedComs << _T(";\r\n");
-			if (player.injury + 1 < allowedInjResist) errorMsg << _T("\tWARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << allowedInjResist << _T(";\r\n");
+			if (numSkill < reqSkill && numSkill + numTrick < 10) errorMsg << _T("\tWARN: Has ") << numSkill << _T(" skill cards, allowed ") << reqSkill << _T(";\r\n");
+			if (numTrick < reqTrick && numSkill + numTrick < 10) errorMsg << _T("\tWARN: Has ") << numTrick << _T(" trick cards, allowed ") << reqTrick << _T(";\r\n");
+			if (numCom < reqCom) errorMsg << _T("\tWARN: Has ") << numCom << _T(" COM cards, allowed ") << reqCom << _T(";\r\n");
+			if (countA < reqAPos) errorMsg << _T("\tWARN; Has ") << countA << _T(" A positions, allowed ") << reqAPos << _T(";\r\n");
+			if (player.injury + 1 < reqInjResist) errorMsg << _T("\tWARN: Has inj resist") << player.injury + 1 << _T(", allowed ") << reqInjResist << _T(";\r\n");
 			if (player.weak_use + 1 < weakFootUse) errorMsg << _T("\tWARN: Has weak usage ") << player.weak_use + 1 << _T(", allowed ") << weakFootUse << _T(";\r\n");
 			if (player.weak_acc + 1 < weakFootAcc) errorMsg << _T("\tWARN: Has weak accuracy ") << player.weak_acc + 1 << _T(", allowed ") << weakFootAcc << _T(";\r\n");
-			if (countA < allowedAPostions) errorMsg << _T("\tWARN; Has ") << countA << _T(" A positions, allowed ") << allowedAPostions << _T(";\r\n");
 		}
 
 		//Check individual skill ratings
