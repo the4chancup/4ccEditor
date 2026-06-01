@@ -4654,6 +4654,85 @@ BOOL CALLBACK bumpDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 }
 
 
+//Builds the player list dropdowns for the copy and swap popups
+VOID CALLBACK BuildPlayerListDropdowns(HWND hwnd, int playerId, int dropdown1, int dropdown2)
+{
+	int num_on_team, selectedPlayerIndex = -1, kk = 0;
+	int csel = SendDlgItemMessage(ghw_main, IDC_TEAM_LIST, CB_GETCURSEL, 0, 0) - 1;
+	if (csel == -1)
+	{
+		num_on_team = gnum_players;
+	}
+	else
+	{
+		for (num_on_team = 0; num_on_team < gteams->team_max; num_on_team++)
+		{
+			if (!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
+		}
+	}
+	for (int ii = 0; ii < gnum_players; ii++)
+	{
+		for (int jj = 0; jj < num_on_team; jj++)
+		{
+			if (csel == -1 || gplayers[ii].id == gteams[gn_teamCbIndToArray[csel]].players[jj])
+			{
+				SendDlgItemMessage(hwnd, dropdown1, CB_ADDSTRING, 0, (LPARAM)gplayers[ii].name);
+				SendDlgItemMessage(hwnd, dropdown1, CB_SETITEMDATA, kk, (unsigned long)gplayers[ii].id);
+				SendDlgItemMessage(hwnd, dropdown2, CB_ADDSTRING, 0, (LPARAM)gplayers[ii].name);
+				SendDlgItemMessage(hwnd, dropdown2, CB_SETITEMDATA, kk, (unsigned long)gplayers[ii].id);
+				if (gplayers[ii].id == playerId)
+					selectedPlayerIndex = kk;
+				kk++;
+				break;
+			}
+		}
+		if (csel != -1 && kk == num_on_team) break;
+	}
+	if (selectedPlayerIndex > -1)
+	{
+		SendDlgItemMessage(hwnd, dropdown1, CB_SETCURSEL, selectedPlayerIndex, 0);
+		SendDlgItemMessage(hwnd, dropdown2, CB_SETCURSEL, selectedPlayerIndex, 0);
+	}
+}
+
+//Updates the PID fields for the copy and swap popups
+VOID CALLBACK UpdatePIDInput(HWND hwnd, int textBox, int dropdown)
+{
+	int csel = SendDlgItemMessage(hwnd, dropdown, CB_GETCURSEL, 0, 0);
+	unsigned long playerId = SendDlgItemMessage(hwnd, dropdown, CB_GETITEMDATA, csel, 0);
+	TCHAR buffer[7];
+	_ultot(playerId, buffer, 10);
+	SetDlgItemText(hwnd, textBox, buffer);
+}
+
+//Updates the player list dropdowns for the copy and swap popups
+VOID CALLBACK UpdatePlayerListDropdown(HWND hwnd, int textBox, int dropdown)
+{
+	int csel = SendDlgItemMessage(ghw_main, IDC_TEAM_LIST, CB_GETCURSEL, 0, 0) - 1;
+	if (csel > -1)
+	{
+		wchar_t buffer[21];
+		SendDlgItemMessage(hwnd, textBox, WM_GETTEXT, 18, (LPARAM)buffer);
+		int newId = _wtoi(buffer);
+
+		int num_on_team;
+		for (num_on_team = 0; num_on_team < gteams->team_max; num_on_team++)
+		{
+			if (!gteams[gn_teamCbIndToArray[csel]].players[num_on_team]) break;
+		}
+		for (int ii = 0; ii < num_on_team; ii++)
+		{
+			unsigned long playerId = SendDlgItemMessage(hwnd, dropdown, CB_GETITEMDATA, ii, 0);
+			if (newId == playerId)
+			{
+				SendDlgItemMessage(hwnd, dropdown, CB_SETCURSEL, ii, 0);
+				break;
+			}
+		}
+	}
+}
+
+
 BOOL CALLBACK copyDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) //Copy player from one ID to another
 {
 	switch (Message) 
@@ -4666,6 +4745,8 @@ BOOL CALLBACK copyDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(hwnd, IDT_STAT_SOUR, buffer);
 			SetDlgItemText(hwnd, IDT_STAT_DEST, buffer);
 
+			BuildPlayerListDropdowns(hwnd, _wtoi(buffer), IDC_STAT_S_CBL, IDC_STAT_D_CBL);
+
 			//SetFocus(GetDlgItem(hwnd, IDT_STAT));
 
 			SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
@@ -4675,56 +4756,80 @@ BOOL CALLBACK copyDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND:	
 			switch(LOWORD(wParam))
             {
+				case IDT_STAT_SOUR: //Source player ID changed,
+				{
+					if (HIWORD(wParam) == EN_CHANGE)
+						UpdatePlayerListDropdown(hwnd, IDT_STAT_SOUR, IDC_STAT_S_CBL);
+				}
+				case IDT_STAT_DEST: //Destination player ID changed,
+				{
+					if (HIWORD(wParam) == EN_CHANGE)
+						UpdatePlayerListDropdown(hwnd, IDT_STAT_DEST, IDC_STAT_D_CBL);
+				}
+				case IDC_STAT_S_CBL: //Source player combo changed,
+				{
+					if (HIWORD(wParam) == CBN_SELCHANGE)
+						UpdatePIDInput(hwnd, IDT_STAT_SOUR, IDC_STAT_S_CBL);
+				}
+				case IDC_STAT_D_CBL: //Destination player combo changed,
+				{
+					if (HIWORD(wParam) == CBN_SELCHANGE)
+						UpdatePIDInput(hwnd, IDT_STAT_DEST, IDC_STAT_D_CBL);
+				}
+
 				case IDC_OK: //If the "OK" button is pressed,
 				{
-					int srcPID, destPID;
-					int srcIndex=-1, destIndex=-1;
-					player_export srcPlyrExport;
-					wchar_t buffer[21];
-
-					//Update current player entry
-					if(gn_listsel > -1)
+					if (HIWORD(wParam) == BN_CLICKED)
 					{
-						player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
-						if( !(gplayers[gn_playind[gn_listsel]] == pe_current) )
+						int srcPID, destPID;
+						int srcIndex=-1, destIndex=-1;
+						player_export srcPlyrExport;
+						wchar_t buffer[21];
+
+						//Update current player entry
+						if(gn_listsel > -1)
 						{
-							if( wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name) )
-								pe_current.b_edit_player = true;
-							gplayers[gn_playind[gn_listsel]] = pe_current;
+							player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+							if( !(gplayers[gn_playind[gn_listsel]] == pe_current) )
+							{
+								if( wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name) )
+									pe_current.b_edit_player = true;
+								gplayers[gn_playind[gn_listsel]] = pe_current;
+							}
 						}
+
+						//Get source and destination PIDs:
+						SendDlgItemMessage(hwnd, IDT_STAT_SOUR, WM_GETTEXT, 18, (LPARAM)buffer);
+						srcPID = _wtoi(buffer);
+						SendDlgItemMessage(hwnd, IDT_STAT_DEST, WM_GETTEXT, 18, (LPARAM)buffer);
+						destPID = _wtoi(buffer);
+
+						//Find the source and destination players by PID
+						for(int ii=0;ii<gnum_players;ii++)
+						{
+							if(srcIndex > -1 && destIndex > -1) break;
+							if(gplayers[ii].id == srcPID)
+							{
+								srcIndex = ii;
+								srcPlyrExport = gplayers[srcIndex].PlayerExport();
+							}
+							if(gplayers[ii].id == destPID)
+							{
+								destIndex = ii;
+							}
+						}
+						if(srcIndex == -1 || destIndex == -1) break;
+
+						//Overwrite stats of dest player (leave Aes alone), set b_changed flag
+						gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
+						gplayers[destIndex].b_changed = true;
+
+						//Refresh display of currently selected player
+						if(gn_listsel > -1)
+							show_player_info(gn_playind[gn_listsel]);
+
+						//SendMessage(hwnd, WM_CLOSE, 0, 0);
 					}
-
-					//Get source and destination PIDs:
-					SendDlgItemMessage(hwnd, IDT_STAT_SOUR, WM_GETTEXT, 18, (LPARAM)buffer);
-					srcPID = _wtoi(buffer);
-					SendDlgItemMessage(hwnd, IDT_STAT_DEST, WM_GETTEXT, 18, (LPARAM)buffer);
-					destPID = _wtoi(buffer);
-
-					//Find the source and destination players by PID
-					for(int ii=0;ii<gnum_players;ii++)
-					{
-						if(srcIndex > -1 && destIndex > -1) break;
-						if(gplayers[ii].id == srcPID)
-						{
-							srcIndex = ii;
-							srcPlyrExport = gplayers[srcIndex].PlayerExport();
-						}
-						if(gplayers[ii].id == destPID)
-						{
-							destIndex = ii;
-						}
-					}
-					if(srcIndex == -1 || destIndex == -1) break;
-
-					//Overwrite stats of dest player (leave Aes alone), set b_changed flag
-					gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
-					gplayers[destIndex].b_changed = true;
-
-					//Refresh display of currently selected player
-					if(gn_listsel > -1)
-						show_player_info(gn_playind[gn_listsel]);
-
-					//SendMessage(hwnd, WM_CLOSE, 0, 0);
 				}
 				break;
 
@@ -4759,6 +4864,8 @@ BOOL CALLBACK swapDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		SetDlgItemText(hwnd, IDT_STAT_FPID, buffer);
 		SetDlgItemText(hwnd, IDT_STAT_SPID, buffer);
 
+		BuildPlayerListDropdowns(hwnd, _wtoi(buffer), IDC_STAT_SWAP_F_CBL, IDC_STAT_SWAP_S_CBL);
+
 		//SetFocus(GetDlgItem(hwnd, IDT_STAT));
 
 		SetClassLongPtr(hwnd, GCLP_HICONSM, (LONG)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_4CC), IMAGE_ICON, 16, 16, 0)); //set 4cc logo as dialog box icon
@@ -4768,65 +4875,89 @@ BOOL CALLBACK swapDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-		case IDC_OK: //If the "OK" button is pressed,
-		{
-			int srcPID, destPID;
-			int srcIndex = -1, destIndex = -1;
-			player_export srcPlyrExport;
-			player_export destPlyrExport;
-			wchar_t buffer[21];
-
-			//Update current player entry
-			player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
-			if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+			case IDT_STAT_FPID: //Source player ID changed,
 			{
-				if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
-					pe_current.b_edit_player = true;
-				gplayers[gn_playind[gn_listsel]] = pe_current;
+				if (HIWORD(wParam) == EN_CHANGE)
+					UpdatePlayerListDropdown(hwnd, IDT_STAT_FPID, IDC_STAT_SWAP_F_CBL);
+			}
+			case IDT_STAT_SPID: //Destination player ID changed,
+			{
+				if (HIWORD(wParam) == EN_CHANGE)
+					UpdatePlayerListDropdown(hwnd, IDT_STAT_SPID, IDC_STAT_SWAP_S_CBL);
+			}
+			case IDC_STAT_SWAP_F_CBL: //Source player combo changed,
+			{
+				if (HIWORD(wParam) == CBN_SELCHANGE)
+					UpdatePIDInput(hwnd, IDT_STAT_FPID, IDC_STAT_SWAP_F_CBL);
+			}
+			case IDC_STAT_SWAP_S_CBL: //Destination player combo changed,
+			{
+				if (HIWORD(wParam) == CBN_SELCHANGE)
+					UpdatePIDInput(hwnd, IDT_STAT_SPID, IDC_STAT_SWAP_S_CBL);
 			}
 
-			//Get source and destination PIDs:
-			SendDlgItemMessage(hwnd, IDT_STAT_FPID, WM_GETTEXT, 18, (LPARAM)buffer);
-			srcPID = _wtoi(buffer);
-			SendDlgItemMessage(hwnd, IDT_STAT_SPID, WM_GETTEXT, 18, (LPARAM)buffer);
-			destPID = _wtoi(buffer);
-
-			//Find the source and destination players by PID
-			for (int ii = 0; ii < gnum_players; ii++)
+			case IDC_OK: //If the "OK" button is pressed,
 			{
-				if (srcIndex > -1 && destIndex > -1) break;
-				if (gplayers[ii].id == srcPID)
+				if (HIWORD(wParam) == BN_CLICKED)
 				{
-					srcIndex = ii;
-					srcPlyrExport = gplayers[srcIndex].PlayerExport();
-				}
-				if (gplayers[ii].id == destPID)
-				{
-					destIndex = ii;
-					destPlyrExport = gplayers[destIndex].PlayerExport();
+					int srcPID, destPID;
+					int srcIndex = -1, destIndex = -1;
+					player_export srcPlyrExport;
+					player_export destPlyrExport;
+					wchar_t buffer[21];
+
+					//Update current player entry
+					player_entry pe_current = get_form_player_info(gn_playind[gn_listsel]);
+					if (!(gplayers[gn_playind[gn_listsel]] == pe_current))
+					{
+						if (wcscmp(gplayers[gn_playind[gn_listsel]].name, pe_current.name))
+							pe_current.b_edit_player = true;
+						gplayers[gn_playind[gn_listsel]] = pe_current;
+					}
+
+					//Get source and destination PIDs:
+					SendDlgItemMessage(hwnd, IDT_STAT_FPID, WM_GETTEXT, 18, (LPARAM)buffer);
+					srcPID = _wtoi(buffer);
+					SendDlgItemMessage(hwnd, IDT_STAT_SPID, WM_GETTEXT, 18, (LPARAM)buffer);
+					destPID = _wtoi(buffer);
+
+					//Find the source and destination players by PID
+					for (int ii = 0; ii < gnum_players; ii++)
+					{
+						if (srcIndex > -1 && destIndex > -1) break;
+						if (gplayers[ii].id == srcPID)
+						{
+							srcIndex = ii;
+							srcPlyrExport = gplayers[srcIndex].PlayerExport();
+						}
+						if (gplayers[ii].id == destPID)
+						{
+							destIndex = ii;
+							destPlyrExport = gplayers[destIndex].PlayerExport();
+						}
+					}
+					if (srcIndex == -1 || destIndex == -1) break;
+
+					//Overwrite stats of dest player (leave Aes alone), set b_changed flag
+					gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
+					gplayers[destIndex].b_changed = true;
+
+					gplayers[srcIndex].PlayerImport(destPlyrExport, true, false);
+					gplayers[srcIndex].b_changed = true;
+
+					//Refresh display of currently selected player
+					show_player_info(gn_playind[gn_listsel]);
+
+					//SendMessage(hwnd, WM_CLOSE, 0, 0);
 				}
 			}
-			if (srcIndex == -1 || destIndex == -1) break;
+			break;
 
-			//Overwrite stats of dest player (leave Aes alone), set b_changed flag
-			gplayers[destIndex].PlayerImport(srcPlyrExport, true, false);
-			gplayers[destIndex].b_changed = true;
-
-			gplayers[srcIndex].PlayerImport(destPlyrExport, true, false);
-			gplayers[srcIndex].b_changed = true;
-
-			//Refresh display of currently selected player
-			show_player_info(gn_playind[gn_listsel]);
-
-			//SendMessage(hwnd, WM_CLOSE, 0, 0);
-		}
-		break;
-
-		case IDC_CANCEL: //If the "OK" button is pressed,
-		{
-			SendMessage(hwnd, WM_CLOSE, 0, 0);
-		}
-		break;
+			case IDC_CANCEL: //If the "OK" button is pressed,
+			{
+				SendMessage(hwnd, WM_CLOSE, 0, 0);
+			}
+			break;
 		}
 		break;
 
