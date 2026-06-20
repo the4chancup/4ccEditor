@@ -60,7 +60,9 @@ BEGIN
 		POPUP "&AATF"
 		BEGIN
 			MENUITEM "&Current Team", IDM_DATA_AATFC
-			MENUITEM "&Select Teams", IDM_DATA_AATFS //, GRAYED
+			MENUITEM "&Current Team w/ suggestions", IDM_DATA_AATFC_SUG
+			MENUITEM "&Select Teams", IDM_DATA_AATFS
+			MENUITEM "&Select Teams w/ suggestions", IDM_DATA_AATFS_SUG
 			MENUITEM "Compare &EDITs", IDM_DATA_COMPE
 		END
         MENUITEM "&Output rosters to TSV",	IDM_DATA_OUTPUT

@@ -737,7 +737,7 @@ void extract_team_info21(team_entry, int&, void*);
 void extract_teamplayer_info20(team_entry, int &, void*);
 void extract_team_tactics20(team_entry, int &, void*);
 
-void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
+void aatf_single(HWND, int, int, player_entry*, team_entry*, int, bool);
 
 void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, void*);
 
