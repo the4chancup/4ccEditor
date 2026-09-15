@@ -518,7 +518,7 @@
 #define IDC_TACT_AID2	1863
 #define IDC_TACT_AID2PL	1864
 #define IDB_TACT_BG		1865
-#define IDB_TACT_BG2	1866
+#define IDB_TACT_BG2	1866 //Background of the player roster
 #define IDB_TACT_BNMVUP	1867
 #define IDB_TACT_BNMVDN	1868
 

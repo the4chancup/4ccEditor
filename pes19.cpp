@@ -778,7 +778,7 @@ void fill_player_entry19_texport(player_entry& players, int& current_byte, byte*
 	current_byte+=7;
 
 	//Set the properties aren't in 19 to 0 or default;
-	for (int ii = 38; ii < 41; ii++)
+	for (int ii = 39; ii < 41; ii++)
 	{
 		players.play_skill[ii] = false;
 	}
