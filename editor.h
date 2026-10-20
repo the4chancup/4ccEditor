@@ -979,6 +979,7 @@ void extract_teamplayer_info20(team_entry, int &, void*);
 void extract_team_tactics20(team_entry, int &, void*);
 
 void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
+bool aatf_check_player_in_pos(team_entry&, player_entry& player, int position, bool exclusive = false);
 
 void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, void*);
 

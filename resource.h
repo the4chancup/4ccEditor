@@ -82,8 +82,9 @@
 #define	IDC_TEAM_LIST	1104
 #define	IDB_MAKE_GOLD	1105
 #define	IDB_MAKE_SILV	1106
-#define	IDB_MAKE_REGU	1107
-#define	IDC_STATIC_G1	1108
+#define	IDB_MAKE_BRNZ	1107
+#define	IDB_MAKE_REGU	1108
+#define	IDC_STATIC_G1	1109
 
 #define IDD_BASIC		1110
 #define IDC_STATIC_B1	1111
@@ -518,7 +519,7 @@
 #define IDC_TACT_AID2	1863
 #define IDC_TACT_AID2PL	1864
 #define IDB_TACT_BG		1865
-#define IDB_TACT_BG2	1866 //Background of the player roster
+#define IDB_TACT_BG2	1866
 #define IDB_TACT_BNMVUP	1867
 #define IDB_TACT_BNMVDN	1868
 

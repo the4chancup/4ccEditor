@@ -40,27 +40,32 @@ void setup_main(HWND H)
 
 	hw_new = CreateWindowEx(0, _T("Button"), _T("Make Gold Medal"), 
 		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		20, 520, 250, 26, H, (HMENU)IDB_MAKE_GOLD, GetModuleHandle(NULL), NULL);	
+		20, 508, 250, 26, H, (HMENU)IDB_MAKE_GOLD, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	hw_new = CreateWindowEx(0, _T("Button"), _T("Make Silver Medal"), 
 		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, //| WS_DISABLED 
-		20, 552, 250, 26, H, (HMENU)IDB_MAKE_SILV, GetModuleHandle(NULL), NULL);	
+		20, 539, 250, 26, H, (HMENU)IDB_MAKE_SILV, GetModuleHandle(NULL), NULL);	
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Make Bronze Medal"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, //| WS_DISABLED 
+		20, 570, 250, 26, H, (HMENU)IDB_MAKE_BRNZ, GetModuleHandle(NULL), NULL);
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	hw_new = CreateWindowEx(0, _T("Button"), _T("Make Regular"), 
 		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		20, 584, 110, 26, H, (HMENU)IDB_MAKE_REGU, GetModuleHandle(NULL), NULL);
+		20, 601, 110, 26, H, (HMENU)IDB_MAKE_REGU, GetModuleHandle(NULL), NULL);
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	hw_new = CreateWindowEx(0, _T("Button"), _T("Set Stats to:"), 
 		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		140, 584, 80, 26, H, (HMENU)IDB_SET_STATS, GetModuleHandle(NULL), NULL);
+		140, 601, 80, 26, H, (HMENU)IDB_SET_STATS, GetModuleHandle(NULL), NULL);
 	setup_control(hw_new, ghFont, scale_cntl_proc);
 
 	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), 
 		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE, 
-		230, 585, 40, 23, H, (HMENU)IDT_SET_STATS, GetModuleHandle(NULL), NULL);
+		230, 602, 40, 23, H, (HMENU)IDT_SET_STATS, GetModuleHandle(NULL), NULL);
 	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""), 
 		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE, 
 		0, 0, 0, 0, H, (HMENU)IDC_SET_STATS, GetModuleHandle(NULL), NULL);

@@ -206,7 +206,7 @@ int APIENTRY _tWinMain(HINSTANCE I, HINSTANCE PI, LPTSTR CL, int SC)
 	ghw_main = CreateWindowEx(
 		0,
 		wc.lpszClassName,
-		_T("4ccEditor Spring 26 Edition (Version A)"),
+		_T("4ccEditor Autumn 26 Edition (Version A)"),
 		WS_OVERLAPPEDWINDOW,
 		20, 20, 1320+144, 700,
 		NULL, NULL, ghinst, NULL);
@@ -1103,6 +1103,28 @@ LRESULT CALLBACK wnd_proc(HWND H, UINT M, WPARAM W, LPARAM L)
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
 
 						_itow_s(silverWeakFootAcc, buffer, 3, 10);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
+					}
+				}
+				break;
+				case IDB_MAKE_BRNZ:
+				{
+					if (HIWORD(W) == BN_CLICKED)
+					{
+						_itow_s(bronzeRate, buffer, 3, 10);
+						for (int ii = IDT_ABIL_ATKP; ii < gi_lastAbility; ii += 2)
+							SendDlgItemMessage(ghw_tab1, ii, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(bronzeForm, buffer, 3, 10);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_FORM, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(bronzeIR, buffer, 3, 10);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_INJU, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(bronzeWeakFootUse, buffer, 3, 10);
+						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKUS, WM_SETTEXT, 0, (LPARAM)buffer);
+
+						_itow_s(bronzeWeakFootAcc, buffer, 3, 10);
 						SendDlgItemMessage(ghw_tab1, IDT_ABIL_WKAC, WM_SETTEXT, 0, (LPARAM)buffer);
 					}
 				}
