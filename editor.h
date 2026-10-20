@@ -909,6 +909,9 @@ extern unsigned char n_playstyle2021to1718[];
 extern unsigned char n_playstyle19to2021[];
 extern unsigned char n_playstyle2021to19[];
 
+extern unsigned char n_regPosToPlayPos[];
+extern unsigned char n_playPosToRegPos[];
+
 //Function prototypes
 typedef std::unordered_map<int, int> appearance_map;
 
@@ -980,6 +983,7 @@ void extract_team_tactics20(team_entry, int &, void*);
 
 void aatf_single(HWND, int, int, player_entry*, team_entry*, int);
 bool aatf_check_player_in_pos(team_entry&, player_entry& player, int position, bool exclusive = false);
+bool aatf_check_player_in_A_position_in_P1(team_entry& team, player_entry& player);
 
 void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, void*);
 

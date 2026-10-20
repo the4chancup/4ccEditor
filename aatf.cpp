@@ -262,7 +262,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorMsg << _T("Has GK as second A position; ");
 			}
 
-            //cardMod -= (countA - 1);
+            cardMod -= (countA - 1);
         }
 
 		//Count cards
@@ -351,6 +351,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			if (countA > 1)
 			{
 				limitA += manletPosBonus; //Manlets get a bonus double A position
+				cardMod++; //Offset the reduction in cards above by one if they have second A
 			}
 		}
 
@@ -412,6 +413,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				cardMod += min(regTrickCards, numTrick); //free tricks
 				//cardMod += min(1, (countA - 1)); //1 free A-position
 				cardLimit += regSkillCards + cardMod; //skill cards
+				limitA += regSkillCards; //Can trade up to the number of non-free cards for double As
 			}
             
 			if(player.injury+1 > regIR)
@@ -456,8 +458,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				heightMod = 5;
 			}*/
 
-			//SPECIAL Autumn 26: Red non-medals registered as CB's and set to CB on all presets can go up to 189 cm
-			if (usingRed && player.reg_pos == 1 && aatf_check_player_in_pos(gteams[teamSel], player, 1, true))
+			//SPECIAL Autumn 26: Red heights non-medal players in the 185cm bracket that have Center Back as Registered and their only A Playable Position can go up to 189cm
+			if (usingRed && player.reg_pos == 1 && player.play_pos[n_regPosToPlayPos[1]] == 2 && countA == 1)
 			{
 				heightMod = 4;
 			}
@@ -525,6 +527,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (countA > limitA)
 				{
 					comMod -= min(freeCOM, countA - limitA); //Reduce free COMs by 1 if the double A is being used
+					cardMod += min(freeCOM, countA - limitA); //Replaces the reduction in non-free cards from double A calc, above
 					limitA += min(freeCOM, countA - limitA); //Raise A limit by 1
 				}
 			}
@@ -533,6 +536,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			cardMod += min(freeCOM + comMod, numCom); //free COM
 			//cardMod += min(1, (countA - 1)); //1 free A-position
 			cardLimit += bronzeSkillCards + cardMod; //skill cards
+			limitA += bronzeSkillCards; //Can trade up to the number of non-free cards for double As
 
 			if (player.injury+1 > bronzeIR)
 			{
@@ -602,6 +606,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (countA > limitA)
 				{
 					comMod -= min(freeCOM, countA - limitA); //Reduce free COMs by 1 if the double A is being used
+					cardMod += min(freeCOM, countA - limitA); //Replaces the reduction in non-free cards from double A calc, above
 					limitA += min(freeCOM, countA - limitA); //Raise A limit by 1
 				}
 			}
@@ -610,6 +615,8 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			cardMod += min(freeCOM + comMod, numCom); //free COM
 			//cardMod += min(1, (countA - 1)); //free A-position
 			cardLimit += silverSkillCards + cardMod; //skill cards
+			limitA += silverSkillCards; //Can trade up to the number of non-free cards for double As
+
 
 			if(player.injury+1 > silverIR)
 			{
@@ -690,6 +697,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				if (countA > limitA)
 				{
 					comMod -= min(freeCOM, countA - limitA); //Reduce free COMs by 1 if the double A is being used
+					cardMod += min(freeCOM, countA - limitA); //Replaces the reduction in non-free cards from double A calc, above
 					limitA += min(freeCOM, countA - limitA); //Raise A limit by 1
 				}
 			}
@@ -697,6 +705,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
             cardMod += min(goldTrickCards, numTrick); //free tricks
 			cardMod += min(freeCOM + comMod, numCom); //free COMs
 			cardLimit += goldSkillCards + cardMod; //skill cards
+			limitA += goldSkillCards; //Can trade up to the number of non-free cards for double As
            
 			if(player.injury+1 > goldIR)
 			{
@@ -853,6 +862,13 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 				errorTot++;
 				errorMsg << skillChecks[ii].s_skillName << _T(" is ") << skillChecks[ii].c_skillRate << _T(", should be ") << skillChecks[ii].n_targetRate << _T("; ");
 			}
+		}
+
+		//The position of each player on a team's first preset in their deadline export are required to match one of the player's 'A' positions
+		if (!aatf_check_player_in_A_position_in_P1(gteams[teamSel], player))
+		{
+			errorTot++;
+			errorMsg << _T("Playing in non-A position on P1 [ignore if this isn't the deadline export]; ");
 		}
 
 		if(errorMsg.rdbuf()->in_avail())
@@ -1044,7 +1060,7 @@ bool aatf_check_player_in_pos(team_entry& team, player_entry& player, int positi
 
 	for (int ii = 0; ii < 11; ii++)
 	{
-		if (player.id == (team.id * 1000) + 1 + team.starting11[ii])
+		if (player.id == (team.id * 100) + 1 + team.starting11[ii])
 		{
 			isInStarting11 = true;
 			playerIndex = ii;
@@ -1056,7 +1072,7 @@ bool aatf_check_player_in_pos(team_entry& team, player_entry& player, int positi
 	{
 		for (int indexP = 0; indexP < 3; indexP++)
 		{
-			int formationCount = team.presets[indexP].fluid ? 1 : 3;
+			int formationCount = team.presets[indexP].fluid ? 3 : 1;
 			for (int indexF = 0; indexF < formationCount; indexF++)
 			{
 				int playerPos = team.presets[indexP].formations[indexF].players[playerIndex].pos;
@@ -1072,6 +1088,54 @@ bool aatf_check_player_in_pos(team_entry& team, player_entry& player, int positi
 	else
 	{
 		return player.reg_pos == position;
+	}
+
+	return isInPos;
+}
+
+//The position of each player on a team's first preset in their deadline export are required to match one of the player's 'A' positions
+bool aatf_check_player_in_A_position_in_P1(team_entry& team, player_entry& player)
+{
+	bool isInPos = true;
+	bool isInStarting11 = false;
+	int playerIndex = 0;
+
+	for (int ii = 0; ii < 11; ii++)
+	{
+		if (player.id == (team.id * 100) + 1 + team.starting11[ii])
+		{
+			isInStarting11 = true;
+			playerIndex = ii;
+			break;
+		}
+	}
+
+	if (isInStarting11)
+	{
+		int indexP = 0;
+		int formationCount = team.presets[indexP].fluid ? 3 : 1;
+		for (int indexF = 0; indexF < formationCount; indexF++)
+		{
+			//Get the position the player is in in this formation (uses Registered Position values)
+			int playerPos = team.presets[indexP].formations[indexF].players[playerIndex].pos;
+
+			//Loop over A positions for this player and see if matches position in formation
+			bool inAPos = false;
+			for (int jj = 0; jj < 13; jj++)
+			{
+				//Check if any A position matches the formation position, converted to Playable Position values
+				if (player.play_pos[jj] == 2 && jj == n_regPosToPlayPos[playerPos])
+				{
+					inAPos = true;
+				}
+			}
+
+			isInPos = isInPos && inAPos;
+		}
+	}
+	else
+	{
+		return true;
 	}
 
 	return isInPos;
