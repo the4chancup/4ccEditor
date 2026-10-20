@@ -552,6 +552,192 @@ struct stripSet
 	unsigned long stripTeamId; //3 bytes, Team ID * 0x40
 };
 
+
+struct player_formation_data
+{
+	//Range:
+	//16: 0x00-0x68
+	//17: 0x00-0x68
+	byte x;
+
+	//Range:
+	//16: 0x00-0x30
+	//17: 0x00-0x30
+	byte y;
+
+	//Position byte map:
+	//0x00 - GK
+	//0x01 - CB
+	//0x02 - LB
+	//0x03 - RB
+	//0x04 - DMF
+	//0x05 - CMF
+	//0x06 - LMF
+	//0x07 - RMF
+	//0x08 - AMF
+	//0x09 - LWF
+	//0x0A - RWF
+	//0xOB - SS
+	//0xOC - CF
+	byte pos;
+};
+
+struct formation_entry
+{
+	player_formation_data players[11];
+
+	//Constructor
+	formation_entry()
+	{
+		for (int ii = 0; ii < 11; ii++)
+		{
+			players[ii].x = 0x00;
+			players[ii].y = 0x00;
+			players[ii].pos = 0x00;
+		}
+	}
+
+	bool operator==(const formation_entry& rhs)
+	{
+		bool b_out = true;
+
+		for (int ii = 0; ii < 11; ii++)
+		{
+			b_out = b_out && this->players[ii].x == rhs.players[ii].x;
+			b_out = b_out && this->players[ii].y == rhs.players[ii].y;
+			b_out = b_out && this->players[ii].pos == rhs.players[ii].pos;
+		}
+
+		return b_out;
+	}
+};
+
+struct advanced_instruction {
+	//17
+	//0x00 - OFF
+	//0x01 - Hug the Touchline
+	//0x02 - False No. 9
+	//0x03 - False Full Backs
+	//0x04 - Attacking Full Backs
+	//0x05 - Wing Rotation
+	//0x06 - Tiki-Taka
+	//0x07 - Centering Targets
+	//0x08 - Swarm the Box
+	//0x09 - Deep Defensive Line
+	//0x0A - Gegenpress
+	//0x0B - Tight Marking (Invalid in edit mode, should not be allowed to be selected by the editor)
+	//0x0C - Counter Target (Has targetted player)
+
+	//18
+	//0x00 - OFF
+	//0x01 - Hug the Touchline
+	//0x02 - False No. 9
+	//0x03 - False Full Backs
+	//0x04 - Attacking Full Backs
+	//0x05 - Wing Rotation
+	//0x06 - Tiki-Taka
+	//0x07 - Centering Targets
+	//0x08 - Defensive (Has targetted player)
+	//0x09 - False Winger
+	//0x0A - Swarm the Box
+	//0x0B - Deep Defensive Line
+	//0x0C - Gegenpress
+	//0x0D - Tight Marking (Invalid in edit mode, should not be allowed to be selected by the editor)
+	//0x0E - Counter Target (Has targetted player)
+	//0x0F - Wingback
+	char instruction;
+	char player_id;
+	//Constructor
+
+	advanced_instruction()
+	{
+		instruction = 0x00;
+		player_id = 0x00;
+	}
+};
+
+struct preset_entry
+{
+	bool attacking_style; //0 = Counter Attack, 1 = Possession
+	bool attacking_zone; //0 = Center, 1 = Wide
+	bool buildup; //0 = Long Pass, 1 = Short Pass
+	bool positioning; //0 = Maintain, 1 = Flex
+	bool defensive_style; //0 = Frontline Pressure, 1 = All-out Defense
+	bool containment_area; //0 = Middle, 1 = Wide
+	bool pressure; //0 = Aggressive, 1 = Conservative 
+	bool fluid;
+
+	byte support_range; //Valid values: 0x01 - 0x0A
+	byte defensive_line; //Valid values: 0x01 - 0x0A
+	byte compactness; //Valid values: 0x01 - 0x0A
+	byte numbers_in_attack; //1 = Few, 2 = Medium, 3 = Many
+	byte numbers_in_defense; //1 = Few, 2 = Medium, 3 = Many
+
+	formation_entry formations[3];
+	advanced_instruction atk_instructions[2];
+	advanced_instruction def_instructions[2];
+
+	//Constructor
+	preset_entry()
+	{
+		attacking_style = 0;
+		attacking_zone = 0;
+		buildup = 0;
+		positioning = 0;
+		defensive_style = 0;
+		containment_area = 0;
+		pressure = 0;
+		fluid = 0;
+		support_range = 0;
+		defensive_line = 0;
+		compactness = 0;
+		numbers_in_attack = 0;
+		numbers_in_defense = 0;
+
+		for (int ii = 0; ii < 3; ii++)
+		{
+			formations[ii] = formation_entry();
+		}
+
+		for (int ii = 0; ii < 2; ii++)
+		{
+			atk_instructions[ii] = advanced_instruction();
+			def_instructions[ii] = advanced_instruction();
+		}
+	}
+
+	bool operator==(const preset_entry& rhs)
+	{
+		bool b_out = this->attacking_style == rhs.attacking_style;
+
+		b_out = b_out && this->attacking_zone == rhs.attacking_zone;
+		b_out = b_out && this->buildup == rhs.buildup;
+		b_out = b_out && this->positioning == rhs.positioning;
+		b_out = b_out && this->defensive_style == rhs.defensive_style;
+		b_out = b_out && this->containment_area == rhs.containment_area;
+		b_out = b_out && this->pressure == rhs.pressure;
+		b_out = b_out && this->fluid == rhs.fluid;
+		b_out = b_out && this->support_range == rhs.support_range;
+		b_out = b_out && this->defensive_line == rhs.defensive_line;
+		b_out = b_out && this->compactness == rhs.compactness;
+		b_out = b_out && this->numbers_in_attack == rhs.numbers_in_attack;
+		b_out = b_out && this->numbers_in_defense == rhs.numbers_in_defense;
+
+		for (int ii = 0; ii < 3; ii++)
+			b_out = b_out && this->formations[ii] == rhs.formations[ii];
+
+		for (int ii = 0; ii < 2; ii++)
+		{
+			b_out = b_out && this->atk_instructions[ii].instruction == rhs.atk_instructions[ii].instruction;
+			b_out = b_out && this->atk_instructions[ii].player_id == rhs.atk_instructions[ii].player_id;
+			b_out = b_out && this->def_instructions[ii].instruction == rhs.def_instructions[ii].instruction;
+			b_out = b_out && this->def_instructions[ii].player_id == rhs.def_instructions[ii].player_id;
+		}
+
+		return b_out;
+	}
+};
+
 struct team_entry
 {
 	static const int team_max = 40; //Number of player entries per team
@@ -571,7 +757,21 @@ struct team_entry
 	int num_on_team;
 
 	int starting11[11];
+	int bench_order[21];
+
+	//Tactical stuff
+	byte fk_taker_long;
+	byte fk_taker_short;
+	byte fk_taker_2;
+	byte ck_taker_left;
+	byte ck_taker_right;
+	byte pk_taker;
+	byte players_to_join_attack[3];
 	char captain_ind;
+	byte auto_substitution;
+	bool auto_offside_trap;
+	bool auto_change_atk_def_levels;
+	bool auto_preset_change;
 
 	char color1_red;
 	char color1_blue;
@@ -579,6 +779,8 @@ struct team_entry
 	char color2_red;
 	char color2_blue;
 	char color2_green;
+
+	preset_entry presets[3];
 
 	//Team strip block
 	stripSet stripBlock[10];
@@ -619,6 +821,25 @@ struct team_entry
 
 		manager_id = 0;
 		stadium_id = 0;
+
+		fk_taker_long = 0xFF;
+		fk_taker_short = 0xFF;
+		fk_taker_2 = 0xFF;
+		ck_taker_left = 0xFF;
+		ck_taker_right = 0xFF;
+		pk_taker = 0xFF;
+		auto_substitution = 0;
+		auto_offside_trap = 0;
+		auto_preset_change = 0;
+		auto_change_atk_def_levels = 0;
+		for (int ii = 0; ii < 3; ii++)
+		{
+			presets[ii] = preset_entry();
+		}
+		for (int ii = 0; ii < 3; ii++)
+		{
+			players_to_join_attack[ii] = 0xFF;
+		}
 	}
 
 	bool operator==(const team_entry& rhs)
@@ -641,6 +862,19 @@ struct team_entry
 		b_out = b_out && this->color2_red==rhs.color2_red;
 		b_out = b_out && this->color2_blue==rhs.color2_blue;
 		b_out = b_out && this->color2_green==rhs.color2_green;
+
+		b_out = b_out && this->fk_taker_long == rhs.fk_taker_long;
+		b_out = b_out && this->fk_taker_short == rhs.fk_taker_short;
+		b_out = b_out && this->fk_taker_2 == rhs.fk_taker_2;
+		b_out = b_out && this->ck_taker_left == rhs.ck_taker_left;
+		b_out = b_out && this->ck_taker_right == rhs.ck_taker_right;
+		b_out = b_out && this->pk_taker == rhs.pk_taker;
+		b_out = b_out && this->auto_substitution == rhs.auto_substitution;
+		b_out = b_out && this->auto_offside_trap == rhs.auto_offside_trap;
+		b_out = b_out && this->auto_preset_change == rhs.auto_preset_change;
+		b_out = b_out && this->auto_change_atk_def_levels == rhs.auto_change_atk_def_levels;
+
+		for (ii = 0; ii < 3; ii++) b_out = b_out && (this->presets[ii] == rhs.presets[ii]);
 
 		return b_out;
 	}
@@ -679,30 +913,31 @@ extern unsigned char n_playstyle2021to19[];
 typedef std::unordered_map<int, int> appearance_map;
 
 void build_appearance_map15(appearance_map&, int&, void*);
-void read_player_entry15(player_entry&, int&, void*);
+void read_player_entry15(player_entry&, int&, void*, bool preserveId = false);
 void read_appearance_entry15(player_entry&, appearance_map&, void*);
+void read_appearance_entry15_raw(player_entry&, int&, void*);
 void read_team_ids15(team_entry&, int&, void*);
 void read_team_rosters15(int&, void*, team_entry*, int);
-void read_team_tactics15(int&, void*, team_entry*, int);
+void read_team_tactics15(int&, void*, team_entry*, int, int t_ind = -1);
 void write_player_entry15(player_entry, int&, appearance_map&, void*);
 void write_team_info15(team_entry, int&, void*);
 void write_teamplayer_info15(team_entry, int&, void*);
 void write_team_tactics15(team_entry, int&, void*);
 
-void fill_player_entry16(player_entry &, int &, void*);
-void fill_appearance_entry16(player_entry &, int &, void*);
+void fill_player_entry16(player_entry &, int &, void*, bool preserveId = false);
+void fill_appearance_entry16(player_entry &, int &, void*, bool preserveId = false);
 void fill_team_ids16(team_entry &, int &, void*);
 void fill_team_rosters16(int &, void*, team_entry*, int);
-void fill_team_tactics16(int &, void*, team_entry*, int);
+void fill_team_tactics16(int &, void*, team_entry*, int, int t_ind = -1);
 void extract_player_entry16(player_entry, int &, int &, void*);
 void extract_team_info16(team_entry, int &, void*);
 void extract_teamplayer_info16(team_entry, int &, void*);
 void extract_team_tactics16(team_entry, int &, void*);
 
-void fill_player_entry17(player_entry &, int &, void*);
+void fill_player_entry17(player_entry &, int &, void*, bool preserveId = false);
 void fill_team_ids17(team_entry &, int &, void*);
 void fill_team_rosters17(int &, void*, team_entry*, int);
-void fill_team_tactics17(int &, void*, team_entry*, int);
+void fill_team_tactics17(int &, void*, team_entry*, int, int t_ind = -1);
 void extract_player_entry17(player_entry, int &, void*);
 void extract_team_info17(team_entry, int &, void*);
 void extract_teamplayer_info17(team_entry, int &, void*);
@@ -712,6 +947,8 @@ void fill_player_entry18(player_entry &, int &, void*);
 void fill_team_ids18(team_entry &, int &, void*);
 void fill_team_rosters18(int &, void*, team_entry*, int);
 void fill_team_tactics18(int &, void*, team_entry*, int);
+void fill_player_entry18_texport(player_entry &, int &, byte*);
+void fill_team_tactics18_texport(int &, byte*, team_entry*, int);
 void extract_player_entry18(player_entry, int &, void*);
 void extract_team_info18(team_entry, int &, void*);
 void extract_teamplayer_info18(team_entry, int &, void*);
@@ -721,6 +958,8 @@ void fill_player_entry19(player_entry &, int &, void*);
 void fill_team_ids19(team_entry &, int &, void*);
 void fill_team_rosters19(int &, void*, team_entry*, int);
 void fill_team_tactics19(int &, void*, team_entry*, int);
+void fill_player_entry19_texport(player_entry &, int &, byte*);
+void fill_team_tactics19_texport(int &, byte*, team_entry*, int);
 void extract_player_entry19(player_entry, int &, void*);
 void extract_team_info19(team_entry, int &, void*);
 void extract_teamplayer_info19(team_entry, int &, void*);
@@ -731,6 +970,8 @@ void fill_team_ids20(team_entry &, int &, void*);
 void fill_team_ids21(team_entry&, int&, void*);
 void fill_team_rosters20(int &, void*, team_entry*, int);
 void fill_team_tactics20(int &, void*, team_entry*, int);
+void fill_player_entry20_texport(player_entry &, int &, byte*);
+void fill_team_tactics20_texport(int &, byte*, team_entry*, int);
 void extract_player_entry20(player_entry, int &, void*);
 void extract_team_info20(team_entry, int &, void*);
 void extract_team_info21(team_entry, int&, void*);
@@ -743,6 +984,7 @@ void save_comparator(HWND, int, player_entry*, int, team_entry*, int, TCHAR*, vo
 
 //data_util.cpp functions
 int read_data(int, int, int&, FileDescriptorNew*);
+int read_data_raw(int start_bit, int bits_to_read, int& current_byte, byte* data);
 void write_data(int, int, int, int&, FileDescriptorNew*);
 int read_dataOld(int, int, int&, FileDescriptorOld*);
 void write_dataOld(int, int, int, int&, FileDescriptorOld*);

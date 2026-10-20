@@ -34,6 +34,16 @@ BEGIN
 		MENUITEM "&Load 21 Edit file (encrypted)\tCtrl+1",	ID_FILE_OPEN_21_EN
         MENUITEM "&Save Edit file (encrypted)\tCtrl+S",	ID_FILE_SAVE_EN
         MENUITEM SEPARATOR
+		POPUP "&Import Texport file (select version)"
+		BEGIN
+			MENUITEM "&Import 15 Texport file", ID_TEXP_OPEN_15_EN
+			MENUITEM "&Import 16 Texport file", ID_TEXP_OPEN_16_EN
+			MENUITEM "&Import 17 Texport file", ID_TEXP_OPEN_17_EN
+			MENUITEM "&Import 18 Texport file", ID_TEXP_OPEN_18_EN
+			MENUITEM "&Import 19 Texport file", ID_TEXP_OPEN_19_EN
+			MENUITEM "&Import 21 Texport file", ID_TEXP_OPEN_21_EN
+		END
+        MENUITEM SEPARATOR
         MENUITEM "E&xit",						ID_FILE_EXIT
     END
 	POPUP "&Player"
@@ -55,6 +65,59 @@ BEGIN
 		MENUITEM "&Save squad",								IDM_TEAM_SAVES
 		MENUITEM "&Load squad",								IDM_TEAM_LOADS
     END
+	POPUP "&Tactics"
+	BEGIN
+		MENUITEM "&Export Tactics", IDM_TACT_NIGHTS
+		MENUITEM "&Import Tactics", IDM_TACT_NIGHTL
+		POPUP "&Copy Preset"
+		BEGIN
+			POPUP "&Copy Preset 1 To"
+			BEGIN
+				MENUITEM "&Preset 2", IDM_TACT_CPY1_2_P
+				MENUITEM "&Preset 3", IDM_TACT_CPY1_3_P
+			END
+			POPUP "&Copy Preset 2 To"
+			BEGIN
+				MENUITEM "&Preset 1", IDM_TACT_CPY2_1_P
+				MENUITEM "&Preset 3", IDM_TACT_CPY2_3_P
+			END
+			POPUP "&Copy Preset 3 To"
+			BEGIN
+				MENUITEM "&Preset 1", IDM_TACT_CPY3_1_P
+				MENUITEM "&Preset 2", IDM_TACT_CPY3_2_P
+			END
+		END
+		POPUP "&Swap Preset"
+		BEGIN
+			MENUITEM "&Swap Preset 1 and Preset 2", IDM_TACT_SWP1_2_P
+			MENUITEM "&Swap Preset 1 and Preset 3", IDM_TACT_SWP1_3_P
+			MENUITEM "&Swap Preset 2 and Preset 3", IDM_TACT_SWP2_3_P
+		END
+		POPUP "&Copy Formation"
+		BEGIN
+			POPUP "&Copy Kick-off To"
+			BEGIN
+				MENUITEM "&In-possession", IDM_TACT_CPY1_2_F
+				MENUITEM "&Out-of-possession", IDM_TACT_CPY1_3_F
+			END
+			POPUP "&Copy In-possession To"
+			BEGIN
+				MENUITEM "&Kick-off", IDM_TACT_CPY2_1_F
+				MENUITEM "&Out-of-possession", IDM_TACT_CPY2_3_F
+			END
+			POPUP "&Copy Out-of-possession To"
+			BEGIN
+				MENUITEM "&Kick-off", IDM_TACT_CPY3_1_F
+				MENUITEM "&In-possession", IDM_TACT_CPY3_2_F
+			END
+		END
+		POPUP "&Swap Formation"
+		BEGIN
+			MENUITEM "&Swap Kick-off and In-possession", IDM_TACT_SWP1_2_F
+			MENUITEM "&Swap Kick-off and Out-of-possession", IDM_TACT_SWP1_3_F
+			MENUITEM "&Swap In-possession and Out-of-possession", IDM_TACT_SWP2_3_F
+		END
+	END
 	POPUP "&Database"
     BEGIN
 		POPUP "&AATF"
@@ -162,16 +225,17 @@ BEGIN
 	EDITTEXT			IDT_GLOVE_ID, 110, 114, 60, 12, WS_TABSTOP
 END
 
-IDD_DATA_IMPORT DIALOG DISCARDABLE 0, 0, 160, 50
+IDD_DATA_IMPORT DIALOG DISCARDABLE 0, 0, 160, 60
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select squad data to import"
 FONT 9, "Segoe UI"
 BEGIN
-	DEFPUSHBUTTON   "&OK",IDC_OK,20,30,50,12,WS_TABSTOP //Default-selected pushbutton
-	PUSHBUTTON		"&Cancel",IDC_CANCEL,90,30,50,12,WS_TABSTOP //pushbutton
+	DEFPUSHBUTTON   "&OK",IDC_OK,20,40,50,12,WS_TABSTOP //Default-selected pushbutton
+	PUSHBUTTON		"&Cancel",IDC_CANCEL,90,40,50,12,WS_TABSTOP //pushbutton
 
 	AUTOCHECKBOX	"Player gameplay settings", IDB_IMPO_STAT, 20, 7, 100, 10
 	AUTOCHECKBOX	"Player aesthetic settings", IDB_IMPO_AEST, 20, 17, 100, 10
+	AUTOCHECKBOX	"Tactical settings", IDB_IMPO_TACT, 20, 27, 100, 10
 END
 
 
@@ -201,6 +265,14 @@ END
 
 IDD_TAB_THREE DIALOGEX 9,17,310,310
 STYLE WS_VISIBLE|WS_CHILDWINDOW|DS_CONTROL
+FONT 9, "Segoe UI"
+BEGIN
+	//GROUPBOX        "Visual Settings",IDC_STATIC_T48,0,0,74,55
+
+END
+
+IDD_TAB_FOUR DIALOGEX 9, 17, 310, 310
+STYLE WS_VISIBLE | WS_CHILDWINDOW | DS_CONTROL
 FONT 9, "Segoe UI"
 BEGIN
 	//GROUPBOX        "Visual Settings",IDC_STATIC_T48,0,0,74,55

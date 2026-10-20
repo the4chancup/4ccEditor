@@ -501,19 +501,560 @@ void fill_team_tactics18(int &current_byte, void* ghdescriptor, team_entry* gtea
 	{
 		if(team_id == gteams[t_ind].id) break;
 	}
-	//current_byte+=0x209;
-	current_byte+=0x1E0;
 
-	//Starting lineup
-	for(int ii=0; ii<11; ii++)
+	for (int ii = 0; ii < 3; ii++)
 	{
-		gteams[t_ind].starting11[ii] = pDescriptorNew->data[current_byte];
-		current_byte++;
-	}
-	current_byte+=0x1E;
+		for (int jj = 0; jj < 3; jj++)
+		{
+			for (int kk = 0; kk < 11; kk++)
+			{
+				gteams[t_ind].presets[ii].formations[jj].players[kk].pos = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			}
 
-	gteams[t_ind].captain_ind = (char)pDescriptorNew->data[current_byte];
-	current_byte+=0x67;
+			for (int kk = 0; kk < 11; kk++)
+			{
+				//Y/X rather than X/Y strangely
+				gteams[t_ind].presets[ii].formations[jj].players[kk].y = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+				gteams[t_ind].presets[ii].formations[jj].players[kk].x = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			}
+		}
+
+		gteams[t_ind].presets[ii].attacking_style = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].buildup = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].attacking_zone = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].positioning = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].defensive_style = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].containment_area = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].pressure = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+
+		//Begin differences from 16
+		current_byte+=0x2;
+		for (int jj = 0; jj < 2; jj++)
+		{
+			gteams[t_ind].presets[ii].atk_instructions[jj].instruction = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+			gteams[t_ind].presets[ii].atk_instructions[jj].player_id = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+		}
+		for (int jj = 0; jj < 2; jj++)
+		{
+			gteams[t_ind].presets[ii].def_instructions[jj].instruction = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+			gteams[t_ind].presets[ii].def_instructions[jj].player_id = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+		}
+
+		gteams[t_ind].presets[ii].support_range = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].numbers_in_attack = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].defensive_line = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].compactness = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		gteams[t_ind].presets[ii].numbers_in_defense = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		current_byte+=0xB; //Man Marking data, useless for the save file
+		gteams[t_ind].presets[ii].fluid = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+		current_byte+=0x3;
+	}
+
+	for (int ii = 0; ii < 11; ii++)
+	{
+		gteams[t_ind].starting11[ii] = read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	for (int ii = 0; ii < 21; ii++)
+	{
+		gteams[t_ind].bench_order[ii] = read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	gteams[t_ind].fk_taker_long = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].fk_taker_short = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].fk_taker_2 = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].ck_taker_left = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].ck_taker_right = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].pk_taker = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	for (int ii = 0; ii < 3; ii++)
+	{
+		gteams[t_ind].players_to_join_attack[ii] = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	gteams[t_ind].captain_ind = (char)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].auto_substitution = (byte)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].auto_offside_trap = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].auto_preset_change = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	gteams[t_ind].auto_change_atk_def_levels = (bool)read_data(0, 1 * 8, current_byte, pDescriptorNew);
+	current_byte+=0x1; //Auto Lineup Select, no reason for us to use that
+	current_byte+=0x61; //Skip unknown byte plus padding
+}
+
+void fill_player_entry18_texport(player_entry& players, int& current_byte, byte* data)
+{
+
+	//players.id = data[current_byte];
+	current_byte++;
+	//players.id += data[current_byte] << 8;
+	current_byte++;
+	//players.id += data[current_byte] << 16;
+	current_byte++;
+	//players.id += data[current_byte] << 24;
+	current_byte++;
+
+	current_byte += 0x6;
+
+	players.nation = data[current_byte];
+	current_byte++;
+	players.nation += data[current_byte] << 8;
+	current_byte++;
+
+	players.height = data[current_byte];
+	current_byte++;
+
+	players.weight = data[current_byte];
+	current_byte++;
+
+	players.gc1 = data[current_byte];
+	current_byte++;
+
+	players.gc2 = data[current_byte];
+	current_byte++;
+
+	players.atk = data[current_byte] & 127;
+
+	players.def = data[current_byte] >> 7;
+	current_byte++;
+	players.def += (data[current_byte] << 1) & 127;
+
+	players.gk = data[current_byte] >> 6;
+	current_byte++;
+	players.gk += (data[current_byte] << 2) & 127;
+
+	players.drib = data[current_byte] >> 5;
+	current_byte++;
+	players.drib += (data[current_byte] << 3) & 127;
+
+	players.mo_fk = data[current_byte] >> 4;
+	current_byte++;
+
+	players.finish = data[current_byte] & 127;
+
+	players.lowpass = data[current_byte] >> 7;
+	current_byte++;
+	players.lowpass += (data[current_byte] << 1) & 127;
+
+	players.loftpass = data[current_byte] >> 6;
+	current_byte++;
+	players.loftpass += (data[current_byte] << 2) & 127;
+
+	players.header = data[current_byte] >> 5;
+	current_byte++;
+	players.header += (data[current_byte] << 3) & 127;
+
+	players.form = (data[current_byte] >> 4) & 7;
+
+	players.b_edit_player = data[current_byte] >> 7;
+	current_byte++;
+
+	players.swerve = data[current_byte] & 127;
+
+	players.catching = data[current_byte] >> 7;
+	current_byte++;
+	players.catching += (data[current_byte] << 1) & 127;
+
+	players.clearing = data[current_byte] >> 6;
+	current_byte++;
+	players.clearing += (data[current_byte] << 2) & 127;
+
+	players.reflex = data[current_byte] >> 5;
+	current_byte++;
+	players.reflex += (data[current_byte] << 3) & 127;
+
+	players.injury = (data[current_byte] >> 4) & 3;
+
+	//Unknown B - 1 bit
+
+	players.b_edit_basicset = data[current_byte] >> 7;
+	current_byte++;
+
+	players.body_ctrl = data[current_byte] & 127;
+
+	players.phys_cont = data[current_byte] >> 7;
+	current_byte++;
+	players.phys_cont += (data[current_byte] << 1) & 127;
+
+	players.kick_pwr = data[current_byte] >> 6;
+	current_byte++;
+	players.kick_pwr += (data[current_byte] << 2) & 127;
+
+	players.exp_pwr = data[current_byte] >> 5;
+	current_byte++;
+	players.exp_pwr += (data[current_byte] << 3) & 127;
+
+	//-------------------Changes start here
+
+	//Unknown motion - 3 bits (data[current_byte] >> 4) & 7;
+
+	players.b_edit_regpos = data[current_byte] >> 7;
+	current_byte++;
+
+	players.age = data[current_byte] & 63;
+
+	players.reg_pos = data[current_byte] >> 6;
+	current_byte++;
+	players.reg_pos += (data[current_byte] << 2) & 12;
+
+	//Unknown C - 1 bit
+
+//	if(players.id == 73301)
+//	{
+//		int test1 = data[current_byte] >> 3;
+//		test1 = 0;
+//	}
+
+	players.play_style = data[current_byte] >> 3;
+	current_byte++;
+
+	players.ball_ctrl = data[current_byte] & 127;
+
+	players.ball_win = data[current_byte] >> 7;
+	current_byte++;
+	players.ball_win += (data[current_byte] << 1) & 127;
+
+	players.weak_acc = data[current_byte] >> 6;
+	current_byte++;
+
+	players.jump = data[current_byte] & 127;
+
+	players.mo_armd = data[current_byte] >> 7;
+	current_byte++;
+	players.mo_armd += (data[current_byte] << 1) & 3;
+
+	players.mo_armr = (data[current_byte] >> 2) & 7;
+
+	//	if(current_byte==138525 || current_byte==138526)
+	//	{
+	//		int test3=0;
+	//	}
+
+	players.mo_ck = data[current_byte] >> 5;
+	current_byte++;
+
+	players.cover = data[current_byte] & 127;
+
+	players.weak_use = (data[current_byte] >> 7);
+	current_byte++;
+	players.weak_use += (data[current_byte] << 1) & 3;
+
+	players.play_pos[0] = (data[current_byte] >> 1) & 3;
+	players.play_pos[1] = (data[current_byte] >> 3) & 3;
+	players.play_pos[2] = (data[current_byte] >> 5) & 3;
+	players.b_edit_playpos = (data[current_byte] >> 7);
+	current_byte++;
+
+	players.play_pos[4] = (data[current_byte]) & 3;
+	players.play_pos[5] = (data[current_byte] >> 2) & 3;
+	players.play_pos[6] = (data[current_byte] >> 4) & 3;
+	players.play_pos[7] = (data[current_byte] >> 6) & 3;
+	current_byte++;
+
+	players.play_pos[8] = (data[current_byte]) & 3;
+	players.play_pos[9] = (data[current_byte] >> 2) & 3;
+	players.play_pos[10] = (data[current_byte] >> 4) & 3;
+	players.play_pos[11] = (data[current_byte] >> 6) & 3;
+	current_byte++;
+
+	players.play_pos[12] = (data[current_byte]) & 3;
+
+	players.mo_hunchd = (data[current_byte] >> 2) & 3;
+
+	players.mo_hunchr = (data[current_byte] >> 4) & 3;
+
+	players.mo_pk = (data[current_byte] >> 6) & 3;
+	current_byte++;
+
+	players.place_kick = data[current_byte] & 127;
+
+	players.b_edit_ability = (data[current_byte] >> 7);
+	current_byte++;
+
+	players.stamina = data[current_byte] & 127;
+
+	players.play_pos[3] = (data[current_byte] >> 7);
+	current_byte++;
+	players.play_pos[3] += (data[current_byte] << 1) & 3;
+
+	players.speed = data[current_byte] >> 1;
+	current_byte++;
+
+	players.b_edit_skill = (data[current_byte]) & 1;
+
+	players.b_edit_style = (data[current_byte] >> 1) & 1;
+
+	players.b_edit_com = (data[current_byte] >> 2) & 1;
+
+	players.b_edit_motion = (data[current_byte] >> 3) & 1;
+
+	players.b_base_copy = (data[current_byte] >> 4) & 1;
+	//Unknown D - 1/1
+
+	players.strong_foot = (data[current_byte] >> 6) & 1;
+	//Unknown E - 1/1
+	current_byte++;
+
+	players.com_style[0] = (data[current_byte]) & 1;
+	players.com_style[1] = (data[current_byte] >> 1) & 1;
+	players.com_style[2] = (data[current_byte] >> 2) & 1;
+	players.com_style[3] = (data[current_byte] >> 3) & 1;
+	players.com_style[4] = (data[current_byte] >> 4) & 1;
+	players.com_style[5] = (data[current_byte] >> 5) & 1;
+	players.com_style[6] = (data[current_byte] >> 6) & 1;
+
+	players.play_skill[0] = (data[current_byte] >> 7) & 1;
+	current_byte++;
+	players.play_skill[1] = (data[current_byte]) & 1;
+	players.play_skill[2] = (data[current_byte] >> 1) & 1;
+	players.play_skill[3] = (data[current_byte] >> 2) & 1;
+	players.play_skill[4] = (data[current_byte] >> 3) & 1;
+	players.play_skill[5] = (data[current_byte] >> 4) & 1;
+	players.play_skill[6] = (data[current_byte] >> 5) & 1;
+	players.play_skill[7] = (data[current_byte] >> 6) & 1;
+	players.play_skill[8] = (data[current_byte] >> 7) & 1;
+	current_byte++;
+	players.play_skill[9] = (data[current_byte]) & 1;
+	players.play_skill[10] = (data[current_byte] >> 1) & 1;
+	players.play_skill[11] = (data[current_byte] >> 2) & 1;
+	players.play_skill[12] = (data[current_byte] >> 3) & 1;
+	players.play_skill[13] = (data[current_byte] >> 4) & 1;
+	players.play_skill[14] = (data[current_byte] >> 5) & 1;
+	players.play_skill[15] = (data[current_byte] >> 6) & 1;
+	players.play_skill[16] = (data[current_byte] >> 7) & 1;
+	current_byte++;
+	players.play_skill[17] = (data[current_byte]) & 1;
+	players.play_skill[18] = (data[current_byte] >> 1) & 1;
+	players.play_skill[19] = (data[current_byte] >> 2) & 1;
+	players.play_skill[20] = (data[current_byte] >> 3) & 1;
+	players.play_skill[21] = (data[current_byte] >> 4) & 1;
+	players.play_skill[22] = (data[current_byte] >> 5) & 1;
+	players.play_skill[23] = (data[current_byte] >> 6) & 1;
+	players.play_skill[24] = (data[current_byte] >> 7) & 1;
+	current_byte++;
+	players.play_skill[25] = (data[current_byte]) & 1;
+	players.play_skill[26] = (data[current_byte] >> 1) & 1;
+	players.play_skill[27] = (data[current_byte] >> 2) & 1;
+
+	//Unknown F - 5/8
+	current_byte++;
+
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)&(data[current_byte]), -1, players.name, 46);
+	current_byte+=46;
+
+	strncpy_s(players.shirt_name, 18, (const char*)&(data[current_byte]), 18 - 1);
+	current_byte+=18;
+
+	//Appearance entries
+	//playerID
+	current_byte+=4;
+
+	players.b_edit_face = data[current_byte] & 1;
+	players.b_edit_hair = (data[current_byte] >> 1) & 1;
+	players.b_edit_phys = (data[current_byte] >> 2) & 1;
+	players.b_edit_strip = (data[current_byte] >> 3) & 1;
+
+	players.boot_id = data[current_byte] >> 4;
+	current_byte++;
+	players.boot_id += data[current_byte] << 4;
+	current_byte++;
+	players.boot_id += (data[current_byte] & 3) << 12;
+
+	players.glove_id = data[current_byte] >> 2;
+	current_byte++;
+	//players.glove_id += (data[current_byte] & 15) << 6;
+	players.glove_id += (data[current_byte]) << 6; //Extend to be 14 bits, using Unk B space
+
+	//Unknown B - 4/4
+	current_byte++;
+
+	players.copy_id = data[current_byte];
+	current_byte++;
+	players.copy_id += data[current_byte] << 8;
+	current_byte++;
+	players.copy_id += data[current_byte] << 16;
+	current_byte++;
+	players.copy_id += data[current_byte] << 24;
+	current_byte++;
+
+	players.neck_len = data[current_byte] & 15;
+
+	players.neck_size = data[current_byte] >> 4;
+	current_byte++;
+
+	players.shldr_hi = data[current_byte] & 15;
+
+	players.shldr_wid = data[current_byte] >> 4;
+	current_byte++;
+
+	players.chest = data[current_byte] & 15;
+
+	players.waist = data[current_byte] >> 4;
+	current_byte++;
+
+	players.arm_size = data[current_byte] & 15;
+
+	players.arm_len = data[current_byte] >> 4;
+	current_byte++;
+
+	players.thigh = data[current_byte] & 15;
+
+	players.calf = data[current_byte] >> 4;
+	current_byte++;
+
+	players.leg_len = data[current_byte] & 15;
+
+	players.head_len = data[current_byte] >> 4;
+	current_byte++;
+
+	players.head_wid = data[current_byte] & 15;
+
+	players.head_dep = data[current_byte] >> 4;
+	current_byte++;
+
+	players.wrist_col_l = data[current_byte] & 7;
+	players.wrist_col_r = (data[current_byte] >> 3) & 7;
+	players.wrist_tape = data[current_byte] >> 6;
+	current_byte++;
+
+	players.spec_col = data[current_byte] & 7;
+	players.spec_style = (data[current_byte] >> 3) & 7;
+	players.sleeve = data[current_byte] >> 6;
+	current_byte++;
+
+	players.inners = data[current_byte] & 3;
+	players.socks = (data[current_byte] >> 2) & 3;
+	players.undershorts = (data[current_byte] >> 4) & 3;
+	players.untucked = (data[current_byte] >> 6) & 1;
+	players.ankle_tape = (data[current_byte] >> 7) & 1;
+	current_byte++;
+
+	players.gloves = data[current_byte] & 1;
+	players.gloves_col = (data[current_byte] >> 1) & 7;
+	//Unknown D
+	current_byte++;
+
+	//Unknown E
+	current_byte+=22;
+
+	players.skin_col = data[current_byte] & 7;
+	//No custom skin in 18
+	if (players.skin_col==7)
+	{
+		players.skin_col=0;
+		players.b_changed=true;
+	}
+	//Unknown F
+	current_byte++;
+
+	//Unknown G
+	current_byte+=18;
+
+	players.iris_col = data[current_byte] & 15;
+	//Unknown H
+	current_byte++;
+
+	//Unknown I
+	current_byte+=7;
+
+	//Set the properties aren't in 18 to 0 or default;
+	for (int ii = 28; ii < 41; ii++)
+	{
+		players.play_skill[ii] = false;
+	}
+	players.tight_pos = 77;
+	players.aggres = 77;
+}
+
+void fill_team_tactics18_texport(int& current_byte, byte* data, team_entry* gteams, int t_ind)
+{
+	//unsigned long team_id;
+
+	//team_id = data[current_byte];
+	current_byte++;
+	//team_id += data[current_byte] << 8;
+	current_byte++;
+	//team_id += data[current_byte] << 16;
+	current_byte++;
+	//team_id += data[current_byte] << 24;
+	current_byte++;
+
+	for (int ii = 0; ii < 3; ii++)
+	{
+		for (int jj = 0; jj < 3; jj++)
+		{
+			for (int kk = 0; kk < 11; kk++)
+			{
+				gteams[t_ind].presets[ii].formations[jj].players[kk].pos = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			}
+
+			for (int kk = 0; kk < 11; kk++)
+			{
+				//Y/X rather than X/Y strangely
+				gteams[t_ind].presets[ii].formations[jj].players[kk].y = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+				gteams[t_ind].presets[ii].formations[jj].players[kk].x = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			}
+		}
+
+		gteams[t_ind].presets[ii].attacking_style = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].buildup = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].attacking_zone = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].positioning = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].defensive_style = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].containment_area = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].pressure = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+
+		//Begin differences from 16
+		current_byte+=0x2;
+		for (int jj = 0; jj < 2; jj++)
+		{
+			gteams[t_ind].presets[ii].atk_instructions[jj].instruction = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			current_byte+=0x3;
+			gteams[t_ind].presets[ii].atk_instructions[jj].player_id = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			current_byte+=0x3;
+		}
+		for (int jj = 0; jj < 2; jj++)
+		{
+			gteams[t_ind].presets[ii].def_instructions[jj].instruction = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			current_byte+=0x3;
+			gteams[t_ind].presets[ii].def_instructions[jj].player_id = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+			current_byte+=0x3;
+		}
+
+		gteams[t_ind].presets[ii].support_range = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].numbers_in_attack = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].defensive_line = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].compactness = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+		gteams[t_ind].presets[ii].numbers_in_defense = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+		current_byte+=0xB; //Man Marking data, useless for the save file
+		gteams[t_ind].presets[ii].fluid = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+		current_byte+=0x3;
+	}
+
+	for (int ii = 0; ii < 11; ii++)
+	{
+		gteams[t_ind].starting11[ii] = read_data_raw(0, 1 * 8, current_byte, data);
+	}
+	for (int ii = 0; ii < 21; ii++)
+	{
+		gteams[t_ind].bench_order[ii] = read_data_raw(0, 1 * 8, current_byte, data);
+	}
+	gteams[t_ind].fk_taker_long = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].fk_taker_short = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].fk_taker_2 = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].ck_taker_left = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].ck_taker_right = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].pk_taker = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	for (int ii = 0; ii < 3; ii++)
+	{
+		gteams[t_ind].players_to_join_attack[ii] = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	}
+	gteams[t_ind].captain_ind = (char)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].auto_substitution = (byte)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].auto_offside_trap = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].auto_preset_change = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+	gteams[t_ind].auto_change_atk_def_levels = (bool)read_data_raw(0, 1 * 8, current_byte, data);
+	current_byte+=0x1; //Auto Lineup Select, no reason for us to use that
+	current_byte+=0x61; //Skip unknown byte plus padding
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -990,7 +1531,7 @@ void extract_team_tactics18(team_entry team, int &current_byte, void* ghdescript
 		current_byte += 0x274;
 		return;
 	}
-	
+
 	pDescriptorNew->data[current_byte] = team.id & 255; //8/32
 	current_byte++;
 	pDescriptorNew->data[current_byte] = (team.id >> 8) & 255; //8/32
@@ -1000,8 +1541,81 @@ void extract_team_tactics18(team_entry team, int &current_byte, void* ghdescript
 	pDescriptorNew->data[current_byte] = (team.id >> 24) & 255; //8/32
 	current_byte++;
 	
-	current_byte+=0x209;
-	pDescriptorNew->data[current_byte] = team.captain_ind;
+	for (int ii = 0; ii < 3; ii++)
+	{
+		for (int jj = 0; jj < 3; jj++)
+		{
+			for (int kk = 0; kk < 11; kk++)
+			{
+				write_data(team.presets[ii].formations[jj].players[kk].pos, 0, 1 * 8, current_byte, pDescriptorNew);
+			}
 
-	current_byte+=0x67;
+			for (int kk = 0; kk < 11; kk++)
+			{
+				//Y/X rather than X/Y strangely
+				write_data(team.presets[ii].formations[jj].players[kk].y, 0, 1 * 8, current_byte, pDescriptorNew);
+				write_data(team.presets[ii].formations[jj].players[kk].x, 0, 1 * 8, current_byte, pDescriptorNew);
+			}
+		}
+
+		write_data(team.presets[ii].attacking_style, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].buildup, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].attacking_zone, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].positioning, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].defensive_style, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].containment_area, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].pressure, 0, 1 * 8, current_byte, pDescriptorNew);
+
+		//Begin differences from 16
+		current_byte+=0x2;
+		for (int jj = 0; jj < 2; jj++)
+		{
+			write_data(team.presets[ii].atk_instructions[jj].instruction, 0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+			write_data(team.presets[ii].atk_instructions[jj].player_id, 0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+		}
+		for (int jj = 0; jj < 2; jj++)
+		{
+			write_data(team.presets[ii].def_instructions[jj].instruction, 0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+			write_data(team.presets[ii].def_instructions[jj].player_id, 0, 1 * 8, current_byte, pDescriptorNew);
+			current_byte+=0x3;
+		}
+
+		write_data(team.presets[ii].support_range, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].numbers_in_attack, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].defensive_line, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].compactness, 0, 1 * 8, current_byte, pDescriptorNew);
+		write_data(team.presets[ii].numbers_in_defense, 0, 1 * 8, current_byte, pDescriptorNew);
+		current_byte+=0xB; //Man Marking data, useless for the save file
+		write_data(team.presets[ii].fluid, 0, 1 * 8, current_byte, pDescriptorNew);
+		current_byte+=0x3;
+	}
+
+	for (int ii = 0; ii < 11; ii++)
+	{
+		write_data(team.starting11[ii], 0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	for (int ii = 0; ii < 21; ii++)
+	{
+		write_data(team.bench_order[ii], 0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	write_data(team.fk_taker_long, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.fk_taker_short, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.fk_taker_2, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.ck_taker_left, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.ck_taker_right, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.pk_taker, 0, 1 * 8, current_byte, pDescriptorNew);
+	for (int ii = 0; ii < 3; ii++)
+	{
+		write_data(team.players_to_join_attack[ii], 0, 1 * 8, current_byte, pDescriptorNew);
+	}
+	write_data(team.captain_ind, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.auto_substitution, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.auto_offside_trap, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.auto_preset_change, 0, 1 * 8, current_byte, pDescriptorNew);
+	write_data(team.auto_change_atk_def_levels, 0, 1 * 8, current_byte, pDescriptorNew);
+	current_byte+=0x1; //Auto Lineup Select, no reason for us to use that
+	current_byte+=0x61; //Skip unknown byte plus padding
 }

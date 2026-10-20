@@ -13,11 +13,13 @@ void build_appearance_map15(appearance_map& umap_pid_to_startByte, int& current_
 	current_byte = startByte + 0x44; //Advance by length of 1 Appearance Entry
 }
 
-void read_player_entry15(player_entry& player, int& current_byte, void* ghdescriptor)
+void read_player_entry15(player_entry& player, int& current_byte, void* ghdescriptor, bool preserveId)
 {
 	FileDescriptor15* pDescriptor15 = (FileDescriptor15*)ghdescriptor;
 
-	player.id = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+	int id = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+	if (!preserveId)
+		player.id = id;
 
 	//Commentary Name
 	//Unknown A
@@ -296,6 +298,88 @@ void read_appearance_entry15(player_entry& player, appearance_map& umap_pid_to_s
 
 	//Block length: 0x44
 }
+void read_appearance_entry15_raw(player_entry& player, int& current_byte, void* ghdescriptor)
+{
+	FileDescriptor15* pDescriptor15 = (FileDescriptor15*)ghdescriptor;
+	current_byte += 4; //Advance by 4 to get past 4 byte PID entry
+
+	player.b_edit_face = read_data15(0, 1, current_byte, pDescriptor15);
+	player.b_edit_hair = read_data15(1, 1, current_byte, pDescriptor15);
+	player.b_edit_phys = read_data15(2, 1, current_byte, pDescriptor15);
+	player.b_edit_strip = read_data15(3, 1, current_byte, pDescriptor15);
+
+	player.boot_id = read_data15(4, 14, current_byte, pDescriptor15);
+
+	player.glove_id = read_data15(2, 14, current_byte, pDescriptor15); //Extend to be 14 bits, using Unk B space
+
+	player.copy_id = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+
+	player.neck_len = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.neck_size = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.shldr_hi = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.shldr_wid = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.chest = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.waist = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.arm_size = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.arm_len = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.thigh = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.calf = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.leg_len = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.head_len = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.head_wid = read_data15(0, 4, current_byte, pDescriptor15);
+
+	player.head_dep = read_data15(4, 4, current_byte, pDescriptor15);
+
+	player.wrist_col_l = read_data15(0, 3, current_byte, pDescriptor15);
+	player.wrist_col_r = read_data15(3, 3, current_byte, pDescriptor15);
+	player.wrist_tape = read_data15(6, 2, current_byte, pDescriptor15);
+
+	player.spec_col = read_data15(0, 3, current_byte, pDescriptor15);
+	player.spec_style = read_data15(3, 3, current_byte, pDescriptor15);
+	player.sleeve = read_data15(6, 2, current_byte, pDescriptor15);
+
+	player.inners = read_data15(0, 2, current_byte, pDescriptor15);
+	player.socks = read_data15(2, 2, current_byte, pDescriptor15);
+	player.undershorts = read_data15(4, 2, current_byte, pDescriptor15);
+	player.untucked = read_data15(6, 1, current_byte, pDescriptor15);
+	player.ankle_tape = read_data15(7, 1, current_byte, pDescriptor15);
+
+	player.gloves = read_data15(0, 1, current_byte, pDescriptor15);
+	player.gloves_col = read_data15(1, 3, current_byte, pDescriptor15);
+	//Unknown D
+	current_byte++;
+
+	//Unknown E
+	current_byte += 22;
+
+	player.skin_col = read_data15(0, 3, current_byte, pDescriptor15);
+	//Unknown F
+	current_byte++;
+
+	//Unknown G
+	current_byte += 18;
+
+	player.iris_col = read_data15(0, 4, current_byte, pDescriptor15);
+	//Unknown H
+	current_byte++;
+
+	//Unknown I
+	current_byte += 3; //Shortened by 3 compared to 16: 0x44 vs 0x48 block length
+
+	//Block length: 0x44
+}
 
 
 void read_team_ids15(team_entry& team, int& current_byte, void* ghdescriptor)
@@ -362,27 +446,101 @@ void read_team_rosters15(int& current_byte, void* ghdescriptor, team_entry* gtea
 
 	//Block length: 0xA4
 }
+//
+//
+//void read_team_tactics15(int& current_byte, void* ghdescriptor, team_entry* gteams, int gnum_teams, int t_ind)
+//{
+//	FileDescriptor15* pDescriptor15 = (FileDescriptor15*)ghdescriptor;
+//
+//	int t_ind;
+//	unsigned long team_id;
+//
+//	team_id = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+//
+//	for (t_ind = 0; t_ind < gnum_teams; t_ind++)
+//	{
+//		if (team_id == gteams[t_ind].id) break;
+//	}
+//	current_byte += 0x1F6;
+//
+//	gteams[t_ind].captain_ind = (char)pDescriptor15->data[current_byte]; //0x1FA
+//	current_byte += 0xA; 
+//	
+//	//Block length: 0x204
+//}
+//
 
-
-void read_team_tactics15(int& current_byte, void* ghdescriptor, team_entry* gteams, int gnum_teams)
+void read_team_tactics15(int& current_byte, void* ghdescriptor, team_entry* gteams, int gnum_teams, int t_ind)
 {
 	FileDescriptor15* pDescriptor15 = (FileDescriptor15*)ghdescriptor;
 
-	int t_ind;
 	unsigned long team_id;
 
-	team_id = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+	team_id = read_data15(0, 4*8, current_byte, pDescriptor15);
 
-	for (t_ind = 0; t_ind < gnum_teams; t_ind++)
+	if (t_ind == -1)
 	{
-		if (team_id == gteams[t_ind].id) break;
+		for (t_ind=0; t_ind<gnum_teams; t_ind++)
+		{
+			if (team_id == gteams[t_ind].id) break;
+		}
 	}
-	current_byte += 0x1F6;
+	//current_byte+=0x1FA;
 
-	gteams[t_ind].captain_ind = (char)pDescriptor15->data[current_byte]; //0x1FA
-	current_byte += 0xA; 
-	
-	//Block length: 0x204
+	for (int ii = 0; ii < 3; ii++)
+	{
+		for (int jj = 0; jj < 3; jj++)
+		{
+			for (int kk = 0; kk < 11; kk++)
+			{
+				gteams[t_ind].presets[ii].formations[jj].players[kk].pos = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+			}
+
+			for (int kk = 0; kk < 11; kk++)
+			{
+				//Y/X rather than X/Y strangely
+				gteams[t_ind].presets[ii].formations[jj].players[kk].y = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+				gteams[t_ind].presets[ii].formations[jj].players[kk].x = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+			}
+		}
+
+		gteams[t_ind].presets[ii].attacking_style = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].buildup = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].attacking_zone = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].positioning = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].defensive_style = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].containment_area = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].pressure = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].support_range = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].numbers_in_attack = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].defensive_line = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].compactness = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		gteams[t_ind].presets[ii].numbers_in_defense = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+		current_byte += 0xB;
+		//gteams[t_ind].presets[ii].fluid = (bool)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	}
+
+	current_byte+=0x2;
+	for (int ii = 0; ii < 11; ii++)
+	{
+		gteams[t_ind].starting11[ii] = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+	}
+	for (int ii = 0; ii < 21; ii++)
+	{
+		gteams[t_ind].bench_order[ii] = read_data15(0, 4 * 8, current_byte, pDescriptor15);
+	}
+	gteams[t_ind].fk_taker_long = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].fk_taker_short = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].fk_taker_2 = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].ck_taker_left = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].ck_taker_right = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].pk_taker = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	gteams[t_ind].captain_ind = (char)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	for (int ii = 0; ii < 3; ii++)
+	{
+		gteams[t_ind].players_to_join_attack[ii] = (byte)read_data15(0, 1 * 8, current_byte, pDescriptor15);
+	}
+	current_byte+=0x6;
 }
 
 

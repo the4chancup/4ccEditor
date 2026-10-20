@@ -261,7 +261,7 @@ void setup_main(HWND H)
 
 	ghw_tabcon = CreateWindowEx(WS_EX_CONTROLPARENT, _T("SysTabControl32"), _T(""), 
 		TCS_OWNERDRAWFIXED | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 
-		530, 4, 555+144, 620, H, (HMENU)IDC_TAB_MAIN, GetModuleHandle(NULL), NULL);
+		530, 4, 755+144, 620, H, (HMENU)IDC_TAB_MAIN, GetModuleHandle(NULL), NULL);
 	setup_control(ghw_tabcon, ghFont, from_tab_proc);
 
 	TCITEM ti;
@@ -272,6 +272,8 @@ void setup_main(HWND H)
 	TabCtrl_InsertItem(ghw_tabcon,1,&ti);
 	ti.pszText = _T("Team"); //Tab three title
 	TabCtrl_InsertItem(ghw_tabcon,2,&ti);
+	ti.pszText = _T("Tactics"); //Tab three title
+	TabCtrl_InsertItem(ghw_tabcon,3,&ti);
 
 	TabCtrl_SetCurSel(ghw_tabcon,0); //tab 1 visible by default
 }
@@ -2110,4 +2112,837 @@ void setup_tab3(HWND H)
 		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
 		x1, y2+2+ydiff, 80, 17, ghw_tab3, (HMENU)IDC_STATIC_T96, GetModuleHandle(NULL), NULL);	
 	setup_control(hw_new, ghFont, scale_static_proc);
+}
+
+void setup_tab4(HWND H)
+{
+	RECT* chd_rect;
+	HWND hw_new, hw_bud;
+	int x, y;
+
+	//##############################
+	// Tactics tab
+	ghw_tab4 = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TAB_FOUR), ghw_tabcon, 0);
+	ShowWindow(ghw_tab4, SW_HIDE);
+	chd_rect = new RECT;
+	GetWindowRect(ghw_tabcon, chd_rect);
+	MapWindowPoints(HWND_DESKTOP, ghw_tabcon, (LPPOINT)chd_rect, 2);
+	TabCtrl_AdjustRect(ghw_tabcon, false, chd_rect);
+	SetWindowPos(ghw_tab4, HWND_TOP, chd_rect->left, chd_rect->top,
+		chd_rect->right - chd_rect->left, chd_rect->bottom - chd_rect->top,
+		SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
+	SetWindowSubclass(ghw_tab4, tab_four_dlg_proc, 0, (DWORD_PTR)chd_rect);
+
+
+	//Preset
+	x = 10;
+	y = 5;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Preset"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 197, 115, ghw_tab4, (HMENU)IDC_STATIC_F1, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Change Preset:"), 
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE, 
+		x+10, y+21, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F7, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+17, 86, 100, ghw_tab4, (HMENU)IDC_TACT_PRESET, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Preset 1"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Preset 2"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Preset 3"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Change Formation:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+45, 120, 17, ghw_tab4, (HMENU)IDC_STATIC_F8, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+10, y+63, 176, 100, ghw_tab4, (HMENU)IDC_TACT_FORM, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Kick-off"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("In-possession"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Out-of-possession"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Fluid"),
+		BS_AUTOCHECKBOX | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+143, y+92, 50, 17, ghw_tab4, (HMENU)IDB_TACT_FLUID, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+
+	//Player Controls
+	x = 10;
+	y = 120;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Player Controls"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 197, 167, ghw_tab4, (HMENU)IDC_STATIC_F2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Position:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+21, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_F9, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+62, y+17, 55, 100, ghw_tab4, (HMENU)IDC_TACT_PLPOS, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("CB"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x01);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("LB"));
+	SendMessage(hw_new, CB_SETITEMDATA, 1, (byte)0x02);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("RB"));
+	SendMessage(hw_new, CB_SETITEMDATA, 2, (byte)0x03);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("DMF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 3, (byte)0x04);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("CMF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 4, (byte)0x05);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("LMF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 5, (byte)0x06);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("RMF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 6, (byte)0x07);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("AMF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 7, (byte)0x08);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("LWF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 8, (byte)0x09);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("RWF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 9, (byte)0x0A);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("SS"));
+	SendMessage(hw_new, CB_SETITEMDATA, 10, (byte)0x0B);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("CF"));
+	SendMessage(hw_new, CB_SETITEMDATA, 11, (byte)0x0C);
+	//Do not allow selection of GK here. Since the game only allows 1 GK make it seperate button instead
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Make GK"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+124, y+16, 64, 25, ghw_tab4, (HMENU)IDB_TACT_BTNGK, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("X:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+54, 15, 17, ghw_tab4, (HMENU)IDC_STATIC_F10, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_NUMBER | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+26, y+50, 68, 23, ghw_tab4, (HMENU)IDT_TACT_PLX, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 3, 0);
+	SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("0"));
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Y:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+103, y+54, 15, 17, ghw_tab4, (HMENU)IDC_STATIC_F11, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_NUMBER | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+119, y+50, 68, 23, ghw_tab4, (HMENU)IDT_TACT_PLY, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
+	SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("0"));
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Selected Player:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+82, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F12, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_READONLY | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+99, y+78, 88, 23, ghw_tab4, (HMENU)IDT_TACT_CURPL, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Prev. Player"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+10, y+105, 86, 25, ghw_tab4, (HMENU)IDB_TACT_PLPRV, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Next Player"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+102, y+105, 86, 25, ghw_tab4, (HMENU)IDB_TACT_PLNXT, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Swap selected players"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+10, y+133, 178, 25, ghw_tab4, (HMENU)IDB_TACT_SWPPL, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+
+	//Player Assignments
+	x = 10;
+	y = 288;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Player Assignments"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 197, 297, ghw_tab4, (HMENU)IDC_STATIC_F5, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Long FK:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+21, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F13, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+76, y+17, 110, 100, ghw_tab4, (HMENU)IDC_TACT_FKLG, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Short FK:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+49, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F14, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+ 76, y+45, 110, 100, ghw_tab4, (HMENU)IDC_TACT_FKSH, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("FK Taker 2:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+77, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F15, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+76, y+73, 110, 100, ghw_tab4, (HMENU)IDC_TACT_FK2, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Left CK:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+105, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F16, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+76, y+101, 110, 100, ghw_tab4, (HMENU)IDC_TACT_CKL, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Right CK:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+133, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F17, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+76, y+129, 110, 100, ghw_tab4, (HMENU)IDC_TACT_CKR, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("PK Taker:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+161, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F18, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+76, y+157, 110, 100, ghw_tab4, (HMENU)IDC_TACT_PK, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Players to join the attack:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+186, 170, 17, ghw_tab4, (HMENU)IDC_STATIC_F19, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("#1:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+210, 30, 17, ghw_tab4, (HMENU)IDC_STATIC_F20, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+30, y+206, 156, 100, ghw_tab4, (HMENU)IDC_TACT_PTJ1, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("#2"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+238, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F21, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+30, y+234, 156, 100, ghw_tab4, (HMENU)IDC_TACT_PTJ2, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("#3"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+266, 85, 17, ghw_tab4, (HMENU)IDC_STATIC_F22, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+30, y+262, 156, 100, ghw_tab4, (HMENU)IDC_TACT_PTJ3, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0xFF);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+
+	//Formation
+	x = 217;
+	y = 5;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Formation"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 270, 370, ghw_tab4, (HMENU)IDC_STATIC_F3, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T(""),
+		SS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+5, y+15, 260, 350, ghw_tab4, (HMENU)IDB_TACT_BG, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 1"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+20, y+20, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL1, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("CF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+20, y+36, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL1, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 2"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+80, y+20, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("SS"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+80, y+36, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 3"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+140, y+20, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL3, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("RMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+140, y+36, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL3, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 4"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+200, y+20, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL4, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("LMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+200, y+36, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL4, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 5"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+20, y+90, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL5, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("AMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+20, y+106, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL5, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 6"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+80, y+90, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL6, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("CMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+80, y+106, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL6, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 7"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+140, y+90, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL7, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("DMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+140, y+106, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL7, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 8"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+200, y+90, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL8, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("RB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+200, y+106, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL8, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 9"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+20, y+160, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL9, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("LB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+20, y+176, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL9, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 10"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+80, y+160, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL10, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("CB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+80, y+176, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL10, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player 11"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+140, y+160, 60, 17, ghw_tab4, (HMENU)IDC_STATIC_PL11, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("GK"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+140, y+176, 52, 17, ghw_tab4, (HMENU)IDB_TACT_PL11, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+
+	//Lineup
+	x = 497;
+	y = 5;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Lineup"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 383, 370, ghw_tab4, (HMENU)IDC_STATIC_F4, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T(""),
+		SS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+5, y+15, 173, 350, ghw_tab4, (HMENU)IDB_TACT_BG2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("GK"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+20, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN1, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 1"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+21, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN1, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("CB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+40, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 2"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+41, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN2, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("LB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+60, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN3, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 3"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+61, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN3, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("RB"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+80, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN4, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 4"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+81, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN4, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("DMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+101, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN5, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 5"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+101, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN5, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("CMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+120, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN6, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 6"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+121, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN6, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("LMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+140, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN7, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 7"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+141, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN7, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("RMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+160, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN8, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 8"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+161, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN8, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("AMF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+180, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN9, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 9"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+181, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN9, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("LWF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+200, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN10, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 10"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+201, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN10, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("RWF"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+220, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN11, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 11"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+221, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN11, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("SS"),
+		BS_PUSHBUTTON | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE,
+		x+10, y+240, 51, 17, ghw_tab4, (HMENU)IDB_TACT_BN12, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Backup 12"),
+		SS_NOTIFY | SS_OWNERDRAW | SS_NOPREFIX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x+67, y+241, 280, 17, ghw_tab4, (HMENU)IDC_STATIC_BN12, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Move Up"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+8, y+337, 80, 25, ghw_tab4, (HMENU)IDB_TACT_BNMVUP, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Move Down"),
+		BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+		x+94, y+337, 80, 25, ghw_tab4, (HMENU)IDB_TACT_BNMVDN, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+
+	//Formation Settings
+	x = 217;
+	y = 378;
+	hw_new = CreateWindowEx(0, _T("Button"), _T("Formation Settings"),
+		BS_GROUPBOX | WS_CHILD | WS_VISIBLE | WS_GROUP,
+		x, y, 663, 207, ghw_tab4, (HMENU)IDC_STATIC_F6, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Attacking Style:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+21, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F23, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+17, 100, 100, ghw_tab4, (HMENU)IDC_TACT_ASTY, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Counter Attack"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Possession"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Build Up:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+49, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F24, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+45, 100, 100, ghw_tab4, (HMENU)IDC_TACT_BLD, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Long Pass"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Short Pass"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Attacking Zone:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+77, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F25, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+73, 100, 100, ghw_tab4, (HMENU)IDC_TACT_AZON, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Wide"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Center"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Positioning:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+105, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F26, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+101, 100, 100, ghw_tab4, (HMENU)IDC_TACT_SLDPOS, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Maintain"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Flexible"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Support Range:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+133, 90, 17, ghw_tab4, (HMENU)IDC_STATIC_F27, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+100, y+129, 100, 25, ghw_tab4, (HMENU)IDT_TACT_SRNG, GetModuleHandle(NULL), NULL);
+	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""),
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE,
+		0, 0, 0, 0, ghw_tab4, (HMENU)IDC_SET_STATS, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	setup_control(hw_bud, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
+	SendMessage(hw_bud, UDM_SETRANGE, 0, MAKELPARAM(0x0A, 0x01));
+	SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("1"));
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Numbers in atk:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+10, y+161, 84, 17, ghw_tab4, (HMENU)IDC_STATIC_F28, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+100, y+157, 100, 100, ghw_tab4, (HMENU)IDC_TACT_ANUM, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Few"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Medium"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Many"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Defensive Style:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+21, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F29, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+299, y+17, 100, 100, ghw_tab4, (HMENU)IDC_TACT_DSTY, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Frontline Pressure"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("All-Out Defense"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Cont. Area:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+49, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F30, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+299, y+45, 100, 100, ghw_tab4, (HMENU)IDC_TACT_CAREA, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Middle"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Wide"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Pressure:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+77, 100, 17, ghw_tab4, (HMENU)IDC_STATIC_F31, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+299, y+73, 100, 100, ghw_tab4, (HMENU)IDC_TACT_PRES, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Aggressive"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Conservative"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Defensive Line:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+105, 90, 17, ghw_tab4, (HMENU)IDC_STATIC_F32, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+299, y+101, 100, 25, ghw_tab4, (HMENU)IDT_TACT_DLNE, GetModuleHandle(NULL), NULL);
+	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""),
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE,
+		0, 0, 0, 0, ghw_tab4, (HMENU)IDC_TACT_STATS, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	setup_control(hw_bud, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
+	SendMessage(hw_bud, UDM_SETRANGE, 0, MAKELPARAM(0x0A, 0x01));
+	SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("1"));
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Compactness:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+133, 90, 17, ghw_tab4, (HMENU)IDC_STATIC_F33, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""),
+		ES_NUMBER | ES_AUTOHSCROLL | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+		x+299, y+129, 100, 25, ghw_tab4, (HMENU)IDT_TACT_CMPT, GetModuleHandle(NULL), NULL);
+	hw_bud = CreateWindowEx(WS_EX_CLIENTEDGE, _T("msctls_updown32"), _T(""),
+		UDS_AUTOBUDDY|UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_ARROWKEYS | WS_CHILD | WS_VISIBLE,
+		0, 0, 0, 0, ghw_tab4, (HMENU)IDC_SET_STATS, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+	setup_control(hw_bud, ghFont, scale_cntl_proc);
+	SendMessage(hw_new, EM_SETLIMITTEXT, 2, 0);
+	SendMessage(hw_bud, UDM_SETRANGE, 0, MAKELPARAM(0x0A, 0x01));
+	SendMessage(hw_new, WM_SETTEXT, 0, (LPARAM)_T("1"));
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Numbers in def:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+208, y+161, 84, 17, ghw_tab4, (HMENU)IDC_STATIC_F34, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+299, y+157, 100, 100, ghw_tab4, (HMENU)IDC_TACT_DNUM, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Few"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Medium"));
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Many"));
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Advanced Instructions"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+452, y+15, 120, 17, ghw_tab4, (HMENU)IDC_STATIC_F35, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Player"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+585, y+15, 50, 17, ghw_tab4, (HMENU)IDC_STATIC_F36, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Attack 1:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+408, y+39, 80, 17, ghw_tab4, (HMENU)IDC_STATIC_F37, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+468, y+35, 90, 100, ghw_tab4, (HMENU)IDC_TACT_AIA1, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+560, y+35, 92, 100, ghw_tab4, (HMENU)IDC_TACT_AIA1PL, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Attack 2:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+408, y+67, 80, 17, ghw_tab4, (HMENU)IDC_STATIC_F38, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+468, y+63, 90, 100, ghw_tab4, (HMENU)IDC_TACT_AIA2, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+560, y+63, 92, 100, ghw_tab4, (HMENU)IDC_TACT_AIA2PL, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Defense 1:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+408, y+95, 80, 17, ghw_tab4, (HMENU)IDC_STATIC_F39, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+468, y+91, 90, 100, ghw_tab4, (HMENU)IDC_TACT_AID1, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+560, y+91, 92, 100, ghw_tab4, (HMENU)IDC_TACT_AID1PL, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(0, _T("Static"), _T("Defense 2:"),
+		SS_SIMPLE | SS_NOPREFIX | WS_CHILD | WS_VISIBLE,
+		x+408, y+123, 80, 17, ghw_tab4, (HMENU)IDC_STATIC_F40, GetModuleHandle(NULL), NULL);
+	setup_control(hw_new, ghFont, scale_static_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+468, y+119, 90, 100, ghw_tab4, (HMENU)IDC_TACT_AID2, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
+
+	hw_new = CreateWindowEx(NULL, _T("ComboBox"), _T(""),
+		CBS_DROPDOWNLIST | WS_CHILD | WS_VSCROLL | WS_VISIBLE | WS_TABSTOP,
+		x+560, y+119, 92, 100, ghw_tab4, (HMENU)IDC_TACT_AID2PL, GetModuleHandle(NULL), NULL);
+	SendMessage(hw_new, CB_ADDSTRING, 0, (LPARAM)_T("Unassigned"));
+	SendMessage(hw_new, CB_SETITEMDATA, 0, (byte)0x00);
+	SendMessage(hw_new, CB_SETCURSEL, (WPARAM)0, 0);
+	setup_combo(hw_new, ghFont, cb2_cntl_proc);
 }

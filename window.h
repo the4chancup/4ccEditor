@@ -36,6 +36,7 @@ LRESULT CALLBACK onto_tab_proc(HWND,UINT,WPARAM,LPARAM,UINT_PTR,DWORD_PTR);
 LRESULT CALLBACK from_tab_proc(HWND,UINT,WPARAM,LPARAM,UINT_PTR,DWORD_PTR);
 LRESULT CALLBACK tab_two_dlg_proc(HWND,UINT,WPARAM,LPARAM,UINT_PTR,DWORD_PTR);
 LRESULT CALLBACK tab_three_dlg_proc(HWND,UINT,WPARAM,LPARAM,UINT_PTR,DWORD_PTR);
+LRESULT CALLBACK tab_four_dlg_proc(HWND,UINT,WPARAM,LPARAM,UINT_PTR,DWORD_PTR);
 BOOL CALLBACK statDlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK bumpDlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK copyDlgProc(HWND, UINT, WPARAM, LPARAM);
@@ -50,7 +51,7 @@ void setup_combo(HWND,HFONT,SUBCLASSPROC);
 
 //Global variables
 extern HINSTANCE ghinst;	//Main window instance
-extern HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3;
+extern HWND ghw_tabcon, ghw_tab1, ghw_tab2, ghw_tab3, ghw_tab4;
 extern HFONT ghFont;
 
 //Main window
@@ -58,3 +59,4 @@ void setup_main(HWND);
 void setup_tab1(HWND);
 void setup_tab2(HWND);
 void setup_tab3(HWND);
+void setup_tab4(HWND);

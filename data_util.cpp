@@ -31,6 +31,35 @@ int read_data(int start_bit, int bits_to_read, int& current_byte, FileDescriptor
 	return output;
 }
 
+int read_data_raw(int start_bit, int bits_to_read, int& current_byte, byte* data)
+{
+	int shift;
+	int pow_of_two[] = {1,2,4,8,16,32,64,128};
+
+	int bytes_advanced = 0;
+	int output = 0;
+	int bit = start_bit;
+	for (int ii=0; ii<bits_to_read; ii++)
+	{
+		if (bit == 8)
+		{
+			bit = 0;
+			current_byte++;
+		}
+		if (ii%8 == 0 && ii>0) bytes_advanced++;
+		shift = bit-(ii%8);
+		if (shift>=0)
+			output += ((data[current_byte] >> shift) & pow_of_two[ii % 8]) << bytes_advanced*8;
+		else
+			output += ((data[current_byte] << -shift) & pow_of_two[ii % 8]) << bytes_advanced*8;
+		bit++;
+	}
+	if (bit == 8) current_byte++;
+
+	return output;
+}
+
+
 // Write the data stored in 'input' to 'FileDescriptorNew* pDescriptorNew', starting at 'start_bit' of 'current_byte' 
 // and continuing for 'bits_to_write'. If end of current byte is reached, advance 'current_byte' to next byte.
 void write_data(int input, int start_bit, int bits_to_write, int& current_byte, FileDescriptorNew* pDescriptorNew)
