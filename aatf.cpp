@@ -46,7 +46,7 @@ int bronzeManletBonus = 3;
 int silverManletBonus = 2;
 int goldManletBonus = 0;
 int bronzeGiantPen = 0;
-int silverGiantPen = 0;
+int silverGiantPen = 3;
 int goldGiantPen = 0;
 
 int goldRate = 99; //Player skill ratings
@@ -585,7 +585,7 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
                 errorTot++;
 				errorMsg << _T("Medals cannot play as GK; ");
 			}
-			if(player.height >= heightGiant) //HA get penalty
+			if(player.height >= heightGiant && !usingRed) //SPECIAL Autumn 26: green heights Silver players get a -3 in all stats nerf
 			{
 				targetRate -= silverGiantPen;
 				targetRate2 -= silverGiantPen;
@@ -639,10 +639,10 @@ void aatf_single(HWND hAatfbox, int pesVersion, int teamSel, player_entry* gplay
 			}*/
 
 			//SPECIAL Autumn 26: Greens can have silver 194cms, but with a -3 stat penalty
-			if (!usingRed && player.height == heightGiant && rating > silverRate - 3)
+			if (!usingRed && player.height == heightGiant && rating > targetRate)
 			{
 				errorTot++;
-				errorMsg << _T("Illegal Ability scores: 194cm Silvers can only have ") << silverRate - 3 << _T(" ratings; ");
+				errorMsg << _T("Illegal Ability scores: 194cm Silvers can only have ") << targetRate << _T(" ratings; ");
 			}
         }
 		/* GOLD */
